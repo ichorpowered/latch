@@ -1,0 +1,24 @@
+plugins {
+    id 'org.spongepowered.plugin' version '0.6'
+}
+
+group 'com.ichorcommunity.latch'
+version '0.0.1'
+
+apply plugin: 'java'
+description = 'A locking plugin which optionally allows you to lockpick those locks.'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'spongepowered-repo'
+        url = 'https://repo.spongepowered.org/maven/'
+    }
+}
+
+dependencies {
+    compile 'org.spongepowered:spongeapi:5.0.0-SNAPSHOT'
+}
