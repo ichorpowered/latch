@@ -90,7 +90,7 @@ public class Latch {
         }
 
         try {
-            configBlockNames = getConfig().getNode("prevent_adjacent_to_locks").getList(TypeToken.of(String.class));
+            restrictedBlockNames = getConfig().getNode("prevent_adjacent_to_locks").getList(TypeToken.of(String.class));
         } catch (ObjectMappingException e) {
             getLogger().error("Error loading list of prevent_adjacent_to_locks.");
             e.printStackTrace();
