@@ -7,6 +7,11 @@ public enum LockType {
     PUBLIC,
 
     /*
+     * Accessible by the group
+     */
+    GUILD,
+
+    /*
      * Requires a password every time to use
      */
     PASSWORD_ALWAYS,
