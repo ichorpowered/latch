@@ -12,6 +12,8 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
@@ -20,6 +22,7 @@ public class ChangeBlockListener {
     @Listener
     public void onBlockPost(ChangeBlockEvent.Post event) {
         //If the post event has instances of the place event... call and validateBlockPlacement separately
+        //This handles things like pistons
         if(event.getCause().contains(ChangeBlockEvent.Place.class)) {
             for(ChangeBlockEvent.Place subEvent : event.getCause().allOf(ChangeBlockEvent.Place.class)) {
                 validateBlockPlacement(subEvent);
@@ -49,6 +52,27 @@ public class ChangeBlockListener {
                         }
                     }
                 }
+
+                //If the block is a lockable block, make sure it's not connecting with someone else's lock
+                if( Latch.lockManager.isLockableBlock(bs.getFinal().getState().getType())) {
+                    Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(bs.getFinal());
+                    Optional<Lock> otherBlockLock = Optional.ofNullable(null);
+
+                    //If the block has another block that needs to be unlocked
+                    if(optionalOtherBlock.isPresent()) {
+                        otherBlockLock = Latch.lockManager.getLock(optionalOtherBlock.get());
+                    }
+                    if(otherBlockLock.isPresent()) {
+                        if( (!player.isPresent() || (player.isPresent() && !otherBlockLock.get().isOwner(player.get().getUniqueId()))) ) {
+                            bs.setValid(false);
+                            if(player.isPresent()) {
+                                player.get().sendMessage(Text.of("You can't place that type of block near a lock you don't own."));
+                            }
+                            break;
+                        }
+                    }
+                }
+
             }
         }
 
