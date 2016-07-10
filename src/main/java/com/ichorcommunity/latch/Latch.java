@@ -6,6 +6,7 @@ import com.ichorcommunity.latch.commands.BaseCommand;
 import com.ichorcommunity.latch.entities.LockManager;
 import com.ichorcommunity.latch.listeners.ChangeBlockListener;
 import com.ichorcommunity.latch.listeners.CreateLockListener;
+import com.ichorcommunity.latch.listeners.SpawnEntityListener;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -60,12 +61,6 @@ public class Latch {
 
         TypeToken<List<String>> stringList = new TypeToken<List<String>>() {};
 
-        try {
-            getLogger().info("Size: " + getConfig().getNode("lockable_blocks").getList(stringList).size());
-        } catch (ObjectMappingException e) {
-            e.printStackTrace();
-        }
-
     }
 
     public static Logger getLogger() {
@@ -76,6 +71,7 @@ public class Latch {
         Sponge.getEventManager().registerListeners(this, new ChangeBlockListener());
         Sponge.getEventManager().registerListeners(this, new CreateLockListener());
         Sponge.getEventManager().registerListeners(this, new ChangeBlockListener());
+        Sponge.getEventManager().registerListeners(this, new SpawnEntityListener());
     }
 
     private void loadConfigurationData() {

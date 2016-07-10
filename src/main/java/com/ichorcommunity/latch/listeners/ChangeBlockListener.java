@@ -20,17 +20,6 @@ import java.util.Optional;
 public class ChangeBlockListener {
 
     @Listener
-    public void onBlockPost(ChangeBlockEvent.Post event) {
-        //If the post event has instances of the place event... call and validateBlockPlacement separately
-        //This handles things like pistons
-        if(event.getCause().contains(ChangeBlockEvent.Place.class)) {
-            for(ChangeBlockEvent.Place subEvent : event.getCause().allOf(ChangeBlockEvent.Place.class)) {
-                validateBlockPlacement(subEvent);
-            }
-        }
-    }
-
-    @Listener
     public void validateBlockPlacement(ChangeBlockEvent.Place event) {
         //Did a player cause this... if so use them for owner checks
         Optional<Player> player = event.getCause().last(Player.class);
@@ -113,12 +102,29 @@ public class ChangeBlockListener {
                 }
             }
         }
-
     }
 
     @Listener
-    public void onBlockBrokenByNonPlayer(ChangeBlockEvent.Break event) {
-        //If there's a lock broken by a non-player event, need to evaluate it
+    public void onBlockBrokenTileEntity(ChangeBlockEvent.Post event) {
+        //Player and explosion listeners handled elsewhere - this is for other events (like pistons)
+        //Can't explicitly look for pistons in the cause because if blocks are chained the piston is not in the cause
+        if(event.getCause().root() instanceof Player || event.getCause().first(Explosive.class).isPresent()) {
+            return;
+        }
+
+        //If the post event is affecting a lock... invalidate the new blocksnapshot
+        for( Transaction<BlockSnapshot> bs : event.getTransactions()) {
+            if(bs.getOriginal().getLocation().isPresent() && Latch.lockManager.isLockableBlock(bs.getOriginal().getState().getType())) {
+                if(Latch.lockManager.getLock(bs.getOriginal().getLocation().get()).isPresent()) {
+                    bs.setValid(false);
+                }
+            }
+        }
+    }
+
+    @Listener
+    public void onBlockBrokenByExplosion(ChangeBlockEvent.Break event) {
+        //If there's a lock broken by an explosion, need to evaluate it
         boolean protectFromExplosives = event.getCause().first(Explosive.class).isPresent() && Latch.getConfig().getNode("protect_from_explosives").getBoolean(true);
 
         if(!protectFromExplosives) {
