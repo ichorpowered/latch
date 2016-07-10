@@ -9,8 +9,6 @@ import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 
-import static com.ichorcommunity.latch.Latch.getLogger;
-
 public class SpawnEntityListener {
 
     @Listener
@@ -22,8 +20,6 @@ public class SpawnEntityListener {
         if( sc.getType() == SpawnTypes.CUSTOM ) {
             //For each of the entities
             for(Entity e : event.getEntities()) {
-                getLogger().info("Here");
-                getLogger().info("Lock present: "+ Latch.lockManager.getLock(e.getLocation().getExtent().getLocation(e.getLocation().getBlockX(), e.getLocation().getBlockY(), e.getLocation().getBlockZ())).isPresent());
                 //If it's an item and there's a lock there (have to convert item location to block location)
                 if(e.getType() == EntityTypes.ITEM && Latch.lockManager.getLock(e.getLocation().getExtent().getLocation(e.getLocation().getBlockX(), e.getLocation().getBlockY(), e.getLocation().getBlockZ())).isPresent() ) {
                     event.setCancelled(true);
