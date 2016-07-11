@@ -5,7 +5,7 @@ import com.google.inject.Inject;
 import com.ichorcommunity.latch.commands.BaseCommand;
 import com.ichorcommunity.latch.entities.LockManager;
 import com.ichorcommunity.latch.listeners.ChangeBlockListener;
-import com.ichorcommunity.latch.listeners.CreateLockListener;
+import com.ichorcommunity.latch.listeners.InteractBlockListener;
 import com.ichorcommunity.latch.listeners.SpawnEntityListener;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -69,8 +69,7 @@ public class Latch {
 
     private void registerListeners() {
         Sponge.getEventManager().registerListeners(this, new ChangeBlockListener());
-        Sponge.getEventManager().registerListeners(this, new CreateLockListener());
-        Sponge.getEventManager().registerListeners(this, new ChangeBlockListener());
+        Sponge.getEventManager().registerListeners(this, new InteractBlockListener());
         Sponge.getEventManager().registerListeners(this, new SpawnEntityListener());
     }
 

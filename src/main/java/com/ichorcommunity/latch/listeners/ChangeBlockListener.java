@@ -34,6 +34,7 @@ public class ChangeBlockListener {
                         //If there is a player and they aren't the owner, OR there's no player, invalidate
                         if( (!player.isPresent() || (player.isPresent() && !lock.isOwner(player.get().getUniqueId()))) ) {
                             bs.setValid(false);
+                            event.setCancelled(true);
                             if(player.isPresent()) {
                                 player.get().sendMessage(Text.of("You can't place that type of block near a lock you don't own."));
                             }
@@ -54,6 +55,7 @@ public class ChangeBlockListener {
                     if(otherBlockLock.isPresent()) {
                         if( (!player.isPresent() || (player.isPresent() && !otherBlockLock.get().isOwner(player.get().getUniqueId()))) ) {
                             bs.setValid(false);
+                            event.setCancelled(true);
                             if(player.isPresent()) {
                                 player.get().sendMessage(Text.of("You can't place that type of block near a lock you don't own."));
                             }
@@ -117,6 +119,7 @@ public class ChangeBlockListener {
             if(bs.getOriginal().getLocation().isPresent() && Latch.lockManager.isLockableBlock(bs.getOriginal().getState().getType())) {
                 if(Latch.lockManager.getLock(bs.getOriginal().getLocation().get()).isPresent()) {
                     bs.setValid(false);
+                    event.setCancelled(true);
                 }
             }
         }
