@@ -21,13 +21,14 @@ public class BaseCommand implements CommandExecutor {
 
     Map<List<String>, CommandSpec> children = new HashMap<>();
 
-    public CommandSpec baseCommand = CommandSpec.builder()
+    public final CommandSpec baseCommand = CommandSpec.builder()
             .description(Text.of("The base Latch command."))
             .permission("latch.normal")
-            .child(new CreatePrivateLockCommand().privateLockCommand, "private")
+            .child(new CreatePrivateLockCommand().getCommand(), "private")
+            .child(new CreatePasswordLockCommand().getCommand(), "password")
+            .child(new PersistCommand().getCommand(), "persist", "clear", "unpersist")
             .executor(this)
             .build();
-
 
     @Override
     public CommandResult execute(@Nonnull CommandSource source, CommandContext args) throws CommandException {
