@@ -33,14 +33,14 @@ public class CreateLockInteraction implements AbstractLockInteraction {
     @Override
     public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockstate) {
         //Check to see if another lock is present
-        if( Latch.lockManager.getLock(location).isPresent()) {
+        if(Latch.lockManager.getLock(location).isPresent()) {
             player.sendMessage(Text.of("There is already a lock here."));
             return false;
         }
 
         //Make sure it's a lockable block
-        if( !Latch.lockManager.isLockableBlock(blockstate.getState().getType())) {
-            player.sendMessage(Text.of("That is not a lockable block."));
+        if(!Latch.lockManager.isLockableBlock(blockstate.getState().getType())) {
+            player.sendMessage(Text.of("That is not a lockable block: " + blockstate.getState().getType()));
             return false;
         }
 
@@ -50,14 +50,15 @@ public class CreateLockInteraction implements AbstractLockInteraction {
         //If the block has another block that needs to be locked
         if(optionalOtherBlock.isPresent()) {
             //Check to see if another lock is present
-            if( Latch.lockManager.getLock(optionalOtherBlock.get()).isPresent() ) {
+            Optional<Lock> otherLock = Latch.lockManager.getLock(optionalOtherBlock.get());
+            if( otherLock.isPresent() && !otherLock.get().isOwner(player.getUniqueId()) ) {
                 //Shouldn't happen if we've configured this correctly - but just in case...
                 player.sendMessage(Text.of("Another lock already present on the double block - delete locks and try again."));
                 return false;
             }
             //Create the lock event for the other block
             otherBlockLockEvent = Optional.of(new LockCreateEvent(player,
-                    new Lock(player.getUniqueId(), type, optionalOtherBlock.get(), LatchUtils.hashPassword(password, location)),
+                    new Lock(player.getUniqueId(), type, optionalOtherBlock.get(), optionalOtherBlock.get().getBlockType().getName(), LatchUtils.hashPassword(password, optionalOtherBlock.get())),
                     Cause.source(player).build()));
         }
 
@@ -65,11 +66,11 @@ public class CreateLockInteraction implements AbstractLockInteraction {
 
         //Fire the lock create event and create the lock if it's not cancelled (by other plugins)
         LockCreateEvent lockCreateEvent = new LockCreateEvent(player,
-                new Lock(player.getUniqueId(), type, location, LatchUtils.hashPassword(password, location)),
+                new Lock(player.getUniqueId(), type, location, blockstate.getState().getName(), LatchUtils.hashPassword(password, location)),
                 Cause.source(player).build());
 
         Sponge.getEventManager().post(lockCreateEvent);
-        if( otherBlockLockEvent.isPresent() ) {
+        if(otherBlockLockEvent.isPresent() ) {
             Sponge.getEventManager().post(otherBlockLockEvent.get());
         }
 
