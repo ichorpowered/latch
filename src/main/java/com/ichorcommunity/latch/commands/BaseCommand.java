@@ -27,6 +27,7 @@ public class BaseCommand implements CommandExecutor {
             .child(new CreatePrivateLockCommand().getCommand(), "private")
             .child(new CreatePasswordLockCommand().getCommand(), "password")
             .child(new PersistCommand().getCommand(), "persist", "clear", "unpersist")
+            .child(new RemoveLockCommand().getCommand(), "remove", "rem")
             .executor(this)
             .build();
 
