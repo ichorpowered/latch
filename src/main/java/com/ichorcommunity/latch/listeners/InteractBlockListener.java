@@ -28,7 +28,6 @@ public class InteractBlockListener {
                     //If they're sneaking and have an item(block) in their hand, and are clicking to replace air... let the blockplace handle it
                     return;
                 }
-
             }
         }
 
@@ -44,6 +43,10 @@ public class InteractBlockListener {
             boolean result = lockInteraction.handleInteraction(player, event.getTargetBlock().getLocation().get(), event.getTargetBlock());
 
             event.setCancelled(!result);
+
+            if(!lockInteraction.shouldPersist()) {
+                Latch.lockManager.removeInteractionData(player.getUniqueId());
+            }
         } else {
             //Otherwise we only care if it's a lock
             if(Latch.lockManager.isLockableBlock(event.getTargetBlock().getState().getType())) {

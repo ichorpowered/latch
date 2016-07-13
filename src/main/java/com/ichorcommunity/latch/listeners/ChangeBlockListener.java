@@ -5,7 +5,9 @@ import com.ichorcommunity.latch.entities.Lock;
 import com.ichorcommunity.latch.interactions.AbstractLockInteraction;
 import com.ichorcommunity.latch.utils.LatchUtils;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.Transaction;
+import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.entity.explosive.Explosive;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -79,9 +81,10 @@ public class ChangeBlockListener {
             //Check all of the blocks and apply the interaction
             //Could cancel the block placement here if it fails -- but Meronat decided no
             for( Transaction<BlockSnapshot> bs : event.getTransactions()) {
-                if (bs.isValid() && bs.getFinal().getLocation().isPresent()) {
+                if (bs.isValid() && bs.getFinal().getLocation().isPresent() && isSolidBlock(bs.getFinal().getState())) {
 
-                    lockInteraction.handleInteraction(player.get(), bs.getFinal().getLocation().get(), bs.getFinal());
+                    boolean result = lockInteraction.handleInteraction(player.get(), bs.getFinal().getLocation().get(), bs.getFinal());
+                    bs.setValid(result);
 
                 }
             }
@@ -142,7 +145,16 @@ public class ChangeBlockListener {
                 }
             }
         }
+    }
 
+    //Sponge issue? - Interacting with chests near water triggers the block place event for the surrounding water
+    //So let's limit our block placing to just solid blocks
+    private boolean isSolidBlock(BlockState bs) {
+        Optional<MatterProperty> mp = bs.getProperty(MatterProperty.class);
+        if(mp.isPresent() && mp.get().equals(MatterProperty.Matter.SOLID)) {
+            return true;
+        }
+        return false;
     }
 
 
