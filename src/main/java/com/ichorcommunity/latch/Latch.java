@@ -76,6 +76,7 @@ public class Latch {
     private void loadConfigurationData() {
         List<String> configBlockNames = new ArrayList<String>();
         List<String> restrictedBlockNames = new ArrayList<String>();
+        List<String> protectBelowBlocks = new ArrayList<String>();
 
         try {
             configBlockNames = getConfig().getNode("lockable_blocks").getList(TypeToken.of(String.class));
@@ -91,8 +92,16 @@ public class Latch {
             e.printStackTrace();
         }
 
+        try {
+            protectBelowBlocks = getConfig().getNode("protect_below_block").getList(TypeToken.of(String.class));
+        } catch (ObjectMappingException e) {
+            getLogger().error("Error loading list of protect_below_block.");
+            e.printStackTrace();
+        }
+
         lockManager.setLockableBlocks(configBlockNames);
         lockManager.setRestrictedBlocks(restrictedBlockNames);
+        lockManager.setProtectBelowBlocks(protectBelowBlocks);
     }
 
     public static CommentedConfigurationNode getConfig() {
