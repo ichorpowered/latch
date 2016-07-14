@@ -36,6 +36,7 @@ public class DisplayLockInteraction implements AbstractLockInteraction {
 
         player.sendMessage(Text.of("Lock name: " + lock.get().getName() + ", Type: " + lock.get().getLockType()));
         player.sendMessage(Text.of("Owner: " + lock.get().getOwnerName()));
+        player.sendMessage(Text.of("Locked object: " + lock.get().getLockedObject()));
         player.sendMessage(Text.of("Players: " + String.join(", ", lock.get().getAbleToAccessNames())));
 
         //Return false to cancel interactions when using this command

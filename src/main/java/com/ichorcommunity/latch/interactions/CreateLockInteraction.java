@@ -58,7 +58,7 @@ public class CreateLockInteraction implements AbstractLockInteraction {
             }
             //Create the lock event for the other block
             otherBlockLockEvent = Optional.of(new LockCreateEvent(player,
-                    new Lock(player.getUniqueId(), type, optionalOtherBlock.get(), optionalOtherBlock.get().getBlockType().getName(), LatchUtils.hashPassword(password, optionalOtherBlock.get())),
+                    new Lock(player.getUniqueId(), type, optionalOtherBlock.get(), LatchUtils.getBlockNameFromType(optionalOtherBlock.get().getBlockType()), LatchUtils.hashPassword(password, optionalOtherBlock.get())),
                     Cause.source(player).build()));
         }
 
@@ -66,7 +66,7 @@ public class CreateLockInteraction implements AbstractLockInteraction {
 
         //Fire the lock create event and create the lock if it's not cancelled (by other plugins)
         LockCreateEvent lockCreateEvent = new LockCreateEvent(player,
-                new Lock(player.getUniqueId(), type, location, blockstate.getState().getName(), LatchUtils.hashPassword(password, location)),
+                new Lock(player.getUniqueId(), type, location, LatchUtils.getBlockNameFromType(blockstate.getState().getType()), LatchUtils.hashPassword(password, location)),
                 Cause.source(player).build());
 
         Sponge.getEventManager().post(lockCreateEvent);

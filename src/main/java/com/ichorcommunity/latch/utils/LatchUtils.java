@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.ichorcommunity.latch.Latch;
 import com.ichorcommunity.latch.entities.Lock;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
@@ -26,6 +27,13 @@ public class LatchUtils {
 
     private static final ImmutableList<Direction> adjacentDirections =
             ImmutableList.of(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
+
+    public static String getBlockNameFromType(BlockType type) {
+        if(type.getName().lastIndexOf(':')+1 <= type.getName().length()) {
+            return type.getName().substring(type.getName().lastIndexOf(':') + 1);
+        }
+        return type.getName();
+    }
 
     public static List<Lock> getAdjacentLocks(Location location) {
         List<Lock> lockList = new ArrayList<Lock>();
