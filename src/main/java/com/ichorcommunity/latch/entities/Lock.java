@@ -2,10 +2,16 @@ package com.ichorcommunity.latch.entities;
 
 
 import com.ichorcommunity.latch.enums.LockType;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class Lock {
@@ -102,11 +108,39 @@ public class Lock {
         ableToAccess.remove(uuid);
     }
 
+    public List<String> getAbleToAccessNames() {
+        List<String> names = new ArrayList<String>();
+
+        Optional<UserStorageService> userStorageService = Sponge.getGame().getServiceManager().provide(UserStorageService.class);
+
+        if(userStorageService.isPresent()) {
+            for(UUID uuid : ableToAccess) {
+                Optional<User> user = userStorageService.get().get(uuid);
+                if(user.isPresent()) {
+                    names.add(user.get().getName());
+                }
+            }
+
+        }
+
+        return names;
+    }
+
     public boolean canAccess(UUID uniqueId) {
         return ableToAccess.contains(uniqueId) || owner.equals(uniqueId);
     }
 
     public String getPassword() {
         return password;
+    }
+
+    public String getOwnerName() {
+        Optional<UserStorageService> userStorageService = Sponge.getGame().getServiceManager().provide(UserStorageService.class);
+
+        if(userStorageService.isPresent()) {
+            Optional<User> user = userStorageService.get().get(owner);
+            return user.get().getName();
+        }
+        return "(owner name not found)";
     }
 }

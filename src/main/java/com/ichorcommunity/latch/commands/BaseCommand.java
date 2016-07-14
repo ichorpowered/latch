@@ -29,6 +29,7 @@ public class BaseCommand implements CommandExecutor {
             .child(new PersistCommand().getCommand(), "persist", "clear", "unpersist")
             .child(new RemoveLockCommand().getCommand(), "remove", "rem")
             .child(new ChangeLockCommand().getCommand(), "change")
+            .child(new DisplayLockCommand().getCommand(), "info", "display")
             .executor(this)
             .build();
 
