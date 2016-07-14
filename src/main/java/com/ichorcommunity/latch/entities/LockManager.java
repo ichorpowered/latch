@@ -17,6 +17,7 @@ public class LockManager {
 
     private List<String> lockableBlocks = new ArrayList<String>();
     private List<String> restrictedBlocks = new ArrayList<String>();
+    private List<String> protectBelowBlocks = new ArrayList<String>();
 
     private HashMap<Location, Lock> locksByLocation = new HashMap<Location, Lock>();
 
@@ -64,6 +65,10 @@ public class LockManager {
         this.restrictedBlocks = preventAdjacentToLocks;
     }
 
+    public void setProtectBelowBlocks(List<String> protectBelowBlocks) {
+        this.protectBelowBlocks = protectBelowBlocks;
+    }
+
     public boolean isRestrictedBlock(BlockType type) {
         return restrictedBlocks.contains(type.getId());
     }
@@ -71,6 +76,8 @@ public class LockManager {
     public boolean isLockableBlock(BlockType block) {
         return lockableBlocks.contains(block.getId());
     }
+
+    public boolean isProtectBelowBlocks(BlockType block) { return protectBelowBlocks.contains(block.getId()); }
 
     public void removeInteractionData(UUID uniqueId) {
         interactionData.remove(uniqueId);

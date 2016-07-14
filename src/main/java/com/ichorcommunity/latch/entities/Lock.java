@@ -25,11 +25,11 @@ public class Lock {
     private HashSet<UUID> ableToAccess;
 
     public Lock(UUID owner, LockType type, Location<World> location, String lockedObjectName) {
-        this(owner, type, location, lockedObjectName, "", new HashSet<UUID>());
+        this(owner, type, location, lockedObjectName, "", new HashSet<>());
     }
 
     public Lock(UUID owner, LockType type, Location<World> location, String lockedObjectName, String password) {
-        this(owner, type, location, lockedObjectName, password, new HashSet<UUID>());
+        this(owner, type, location, lockedObjectName, password, new HashSet<>());
     }
 
     public Lock(UUID owner, LockType type, Location<World> location, String lockedObjectName, String password, HashSet<UUID> players) {

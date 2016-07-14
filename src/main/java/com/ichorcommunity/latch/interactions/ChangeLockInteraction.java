@@ -6,12 +6,13 @@ import com.ichorcommunity.latch.enums.LockType;
 import com.ichorcommunity.latch.utils.LatchUtils;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,8 +24,8 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
     private String password;
     private String lockName;
     private UUID newOwner;
-    private HashSet<UUID> membersToAdd;
-    private HashSet<UUID> membersToRemove;
+    private Collection<User> membersToAdd;
+    private Collection<User> membersToRemove;
 
     private boolean persisting = false;
 
@@ -49,11 +50,11 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
         this.newOwner = newOwner;
     }
 
-    public void setMembersToAdd(HashSet<UUID> members) {
+    public void setMembersToAdd(Collection<User> members) {
         this.membersToAdd = members;
     }
 
-    public void setMembersToRemove(HashSet<UUID> members) {
+    public void setMembersToRemove(Collection<User> members) {
         this.membersToRemove = members;
     }
 
@@ -106,13 +107,13 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
                 thisLock.setOwner(newOwner);
             }
             if(membersToAdd != null) {
-                for(UUID uuid : membersToAdd) {
-                    thisLock.addAccess(uuid);
+                for(User user : membersToAdd) {
+                    thisLock.addAccess(user.getUniqueId());
                 }
             }
             if(membersToRemove != null) {
-                for(UUID uuid : membersToRemove) {
-                    thisLock.removeAccess(uuid);
+                for(User user : membersToRemove) {
+                    thisLock.removeAccess(user.getUniqueId());
                 }
             }
         }

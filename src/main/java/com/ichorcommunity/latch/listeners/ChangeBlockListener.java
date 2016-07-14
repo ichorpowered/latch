@@ -14,12 +14,15 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
 public class ChangeBlockListener {
+
+    //TODO protect the block under locks (doors can still break)
 
     @Listener
     public void validateBlockPlacement(ChangeBlockEvent.Place event) {
@@ -101,6 +104,14 @@ public class ChangeBlockListener {
         for( Transaction<BlockSnapshot> bs : event.getTransactions()) {
             if (bs.isValid() && bs.getOriginal().getLocation().isPresent()) {
                 Optional<Lock> lock = Latch.lockManager.getLock(bs.getOriginal().getLocation().get());
+
+                //If the block is below a block we need to protect the below blocks of...
+                //Potentially Sponge issue - should be able to detect these blocks
+                if(Latch.lockManager.isProtectBelowBlocks(bs.getOriginal().getLocation().get().getBlockRelative(Direction.UP).getBlockType()) &&
+                        Latch.lockManager.getLock(bs.getOriginal().getLocation().get().getBlockRelative(Direction.UP)).isPresent()) {
+                    bs.setValid(false);
+                }
+
                 //If lock is present and the player is NOT the owner
                 if(lock.isPresent() && !lock.get().isOwner(player.getUniqueId())) {
                     bs.setValid(false);
@@ -119,10 +130,19 @@ public class ChangeBlockListener {
 
         //If the post event is affecting a lock... invalidate the new blocksnapshot
         for( Transaction<BlockSnapshot> bs : event.getTransactions()) {
-            if(bs.getOriginal().getLocation().isPresent() && Latch.lockManager.isLockableBlock(bs.getOriginal().getState().getType())) {
-                if(Latch.lockManager.getLock(bs.getOriginal().getLocation().get()).isPresent()) {
+            if(bs.isValid() && bs.getOriginal().getLocation().isPresent()) {
+                //If the block is below a block we need to protect the below blocks of...
+                //Potentially Sponge issue - should be able to detect these blocks
+                if(Latch.lockManager.isProtectBelowBlocks(bs.getOriginal().getLocation().get().getBlockRelative(Direction.UP).getBlockType()) &&
+                        Latch.lockManager.getLock(bs.getOriginal().getLocation().get().getBlockRelative(Direction.UP)).isPresent()) {
                     bs.setValid(false);
                     event.setCancelled(true);
+                    break;
+                }
+
+                if(Latch.lockManager.isLockableBlock(bs.getOriginal().getState().getType()) && Latch.lockManager.getLock(bs.getOriginal().getLocation().get()).isPresent()) {
+                        bs.setValid(false);
+                        event.setCancelled(true);
                 }
             }
         }
@@ -151,7 +171,7 @@ public class ChangeBlockListener {
     //So let's limit our block placing to just solid blocks
     private boolean isSolidBlock(BlockState bs) {
         Optional<MatterProperty> mp = bs.getProperty(MatterProperty.class);
-        if(mp.isPresent() && mp.get().equals(MatterProperty.Matter.SOLID)) {
+        if(mp.isPresent() && mp.get().getValue() == MatterProperty.Matter.SOLID) {
             return true;
         }
         return false;

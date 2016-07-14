@@ -69,6 +69,18 @@ public class Configuration {
         if(configNode.getNode("prevent_adjacent_to_locks").isVirtual()) {
             configNode.getNode("prevent_adjacent_to_locks").setValue(preventAdjacent);
         }
+
+        List<String> protectBelowBlock = new ArrayList<String>();
+        protectBelowBlock.add(BlockTypes.ACACIA_DOOR.getId());
+        protectBelowBlock.add(BlockTypes.BIRCH_DOOR.getId());
+        protectBelowBlock.add(BlockTypes.DARK_OAK_DOOR.getId());
+        protectBelowBlock.add(BlockTypes.WOODEN_DOOR.getId());
+        protectBelowBlock.add(BlockTypes.JUNGLE_DOOR.getId());
+        protectBelowBlock.add(BlockTypes.SPRUCE_DOOR.getId());
+
+        if(configNode.getNode("protect_below_block").isVirtual()) {
+            configNode.getNode("protect_below_block").setValue(protectBelowBlock);
+        }
     }
 
     public void saveConfig() {
