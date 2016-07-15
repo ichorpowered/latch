@@ -24,11 +24,12 @@ public enum LockType {
     /*
      * Owned/controlled by one person, access able to be shared
      */
-    PRIVATE,
+    PRIVATE;
 
     /*
      * Allows all players to deposit items, only the owner to withdraw
      */
-    DONATION;
+    //Donation locks not possible to make without Sponge Inventory implementation
+    //DONATION;
 
 }
