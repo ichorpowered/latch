@@ -19,7 +19,7 @@ public class UnlockLockInteraction implements AbstractLockInteraction {
     private final UUID player;
 
     private boolean persisting = false;
-    private String password;
+    private final String password;
 
     public UnlockLockInteraction(UUID player, String password) {
         this.player = player;
@@ -28,7 +28,7 @@ public class UnlockLockInteraction implements AbstractLockInteraction {
 
     @Override
     public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockstate) {
-        Optional<Lock> lock = Latch.lockManager.getLock(location);
+        Optional<Lock> lock = Latch.getLockManager().getLock(location);
         //Check to see if another lock is present
         if(!lock.isPresent()) {
             player.sendMessage(Text.of("There is no lock there."));
@@ -41,7 +41,7 @@ public class UnlockLockInteraction implements AbstractLockInteraction {
         }
 
         //Check the password
-        if(Latch.lockManager.isPasswordCompatibleLock(lock.get())) {
+        if(Latch.getLockManager().isPasswordCompatibleLock(lock.get())) {
             if( !LatchUtils.hashPassword(password, location).equals(lock.get().getPassword())) {
                 player.sendMessage(Text.of("The password you tried is incorrect."));
                 return false;
@@ -58,7 +58,7 @@ public class UnlockLockInteraction implements AbstractLockInteraction {
 
                 //If the block has another block that needs to be unlocked
                 if(optionalOtherBlock.isPresent()) {
-                    otherBlockLock = Optional.ofNullable(Latch.lockManager.getLock(optionalOtherBlock.get()).get());
+                    otherBlockLock = Optional.ofNullable(Latch.getLockManager().getLock(optionalOtherBlock.get()).get());
                 }
                 if(otherBlockLock.isPresent()) {
                     if(!otherBlockLock.get().getPassword().equalsIgnoreCase(password)) {
@@ -70,7 +70,7 @@ public class UnlockLockInteraction implements AbstractLockInteraction {
 
                 //Modify the attributes of the lock
                 for(Lock thisLock : locks) {
-                    thisLock.addAccess(player.getUniqueId());
+                    Latch.getLockManager().addLockAccess(thisLock, player.getUniqueId());
                 }
                 player.sendMessage(Text.of("Unlocking the password lock for future access."));
             }

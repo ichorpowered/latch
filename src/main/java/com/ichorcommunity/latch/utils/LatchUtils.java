@@ -39,8 +39,8 @@ public class LatchUtils {
         List<Lock> lockList = new ArrayList<Lock>();
 
         for( Direction d : adjacentDirections) {
-            if(Latch.lockManager.isLockableBlock(location.getBlockRelative(d).getBlock().getType())) {
-                Optional<Lock> lock = Latch.lockManager.getLock(location.getBlockRelative(d));
+            if(Latch.getLockManager().isLockableBlock(location.getBlockRelative(d).getBlock().getType())) {
+                Optional<Lock> lock = Latch.getLockManager().getLock(location.getBlockRelative(d));
                 if(lock.isPresent()) {
                     lockList.add(lock.get());
                 }

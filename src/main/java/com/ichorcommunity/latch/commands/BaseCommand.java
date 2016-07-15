@@ -30,6 +30,7 @@ public class BaseCommand implements CommandExecutor {
             .child(new RemoveLockCommand().getCommand(), "remove", "rem")
             .child(new ChangeLockCommand().getCommand(), "change")
             .child(new DisplayLockCommand().getCommand(), "info", "display")
+            .child(new UnlockCommand().getCommand(), "open", "unlock")
             .executor(this)
             .build();
 

@@ -3,10 +3,12 @@ package com.ichorcommunity.latch;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.ichorcommunity.latch.commands.BaseCommand;
+import com.ichorcommunity.latch.commands.UnlockCommand;
 import com.ichorcommunity.latch.entities.LockManager;
 import com.ichorcommunity.latch.listeners.ChangeBlockListener;
 import com.ichorcommunity.latch.listeners.InteractBlockListener;
 import com.ichorcommunity.latch.listeners.SpawnEntityListener;
+import com.ichorcommunity.latch.storage.SqlHandler;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -38,6 +40,8 @@ public class Latch {
 
     public static LockManager lockManager = new LockManager();
 
+    private static SqlHandler storageHandler = new SqlHandler();
+
     @Inject
     public Latch(Logger logger) {
         this.logger = logger;
@@ -58,6 +62,7 @@ public class Latch {
         registerListeners();
 
         Sponge.getCommandManager().register(this, new BaseCommand().baseCommand, "latch","lock");
+        Sponge.getCommandManager().register(this, new UnlockCommand().getCommand(), "unlock", "unlatch");
 
         TypeToken<List<String>> stringList = new TypeToken<List<String>>() {};
 
@@ -103,6 +108,10 @@ public class Latch {
         lockManager.setRestrictedBlocks(restrictedBlockNames);
         lockManager.setProtectBelowBlocks(protectBelowBlocks);
     }
+
+    public static SqlHandler getStorageHandler() { return storageHandler;}
+
+    public static LockManager getLockManager() { return lockManager;}
 
     public static CommentedConfigurationNode getConfig() {
         return config.getConfigurationNode();
