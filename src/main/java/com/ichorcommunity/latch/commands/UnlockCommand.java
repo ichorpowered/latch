@@ -49,7 +49,7 @@ public class UnlockCommand implements CommandExecutor {
 
             unlockLock.setPersistance(args.hasAny("p"));
 
-            Latch.lockManager.setInteractionData(((Player) src).getUniqueId(), unlockLock);
+            Latch.getLockManager().setInteractionData(((Player) src).getUniqueId(), unlockLock);
 
             ((Player) src).sendMessage(Text.of("You will unlock the next lock you click."));
 

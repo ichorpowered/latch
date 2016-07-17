@@ -85,7 +85,7 @@ public class ChangeLockCommand implements CommandExecutor {
 
             changeLock.setPersistance(args.hasAny("p"));
 
-            Latch.lockManager.setInteractionData(((Player) src).getUniqueId(), changeLock);
+            Latch.getLockManager().setInteractionData(((Player) src).getUniqueId(), changeLock);
 
             ((Player) src).sendMessage(Text.of("You will change the next lock you click."));
 

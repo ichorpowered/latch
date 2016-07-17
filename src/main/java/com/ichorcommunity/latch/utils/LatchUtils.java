@@ -13,6 +13,7 @@ import org.spongepowered.api.world.World;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ import static com.ichorcommunity.latch.Latch.getLogger;
 
 public class LatchUtils {
 
-    private static final int ITERATIONS = 2;
+    private static final int ITERATIONS = 1000;
     private static final int KEY_LENGTH = 256;
 
     private static final ImmutableList<Direction> adjacentDirections =
@@ -60,14 +61,21 @@ public class LatchUtils {
         return Optional.ofNullable(null);
     }
 
-    public static String hashPassword(String password, Location salt) {
+    public static byte[] generateSalt() {
+        SecureRandom random = new SecureRandom();
+
+        byte[] salt = new byte[8];
+        random.nextBytes(salt);
+
+        return salt;
+    }
+
+    public static String hashPassword(String password, byte[] salt) {
         char[] passwordChars = password.toCharArray();
-        String locationKey = salt.getExtent().getUniqueId() + "," + salt.getBlockX() + "," + salt.getBlockY() + "," + salt.getBlockZ();
-        byte[] saltBytes = locationKey.getBytes();
 
         PBEKeySpec spec = new PBEKeySpec(
                 passwordChars,
-                saltBytes,
+                salt,
                 ITERATIONS,
                 KEY_LENGTH
         );

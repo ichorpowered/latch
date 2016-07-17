@@ -42,7 +42,7 @@ public class UnlockLockInteraction implements AbstractLockInteraction {
 
         //Check the password
         if(Latch.getLockManager().isPasswordCompatibleLock(lock.get())) {
-            if( !LatchUtils.hashPassword(password, location).equals(lock.get().getPassword())) {
+            if( !LatchUtils.hashPassword(password, lock.get().getSalt()).equals(lock.get().getPassword())) {
                 player.sendMessage(Text.of("The password you tried is incorrect."));
                 return false;
             }
@@ -75,9 +75,11 @@ public class UnlockLockInteraction implements AbstractLockInteraction {
                 player.sendMessage(Text.of("Unlocking the password lock for future access."));
             }
             return true;
+        } else {
+            player.sendMessage(Text.of("That is not a password lock."));
         }
         //Default state
-        return true;
+        return false;
     }
 
     @Override

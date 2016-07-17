@@ -61,7 +61,7 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
 
     @Override
     public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockstate) {
-        Optional<Lock> lock = Latch.lockManager.getLock(location);
+        Optional<Lock> lock = Latch.getLockManager().getLock(location);
         //Check to see if another lock is present
         if(!lock.isPresent()) {
             player.sendMessage(Text.of("There is no lock there."));
@@ -74,49 +74,33 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
             return false;
         }
 
-        ArrayList<Lock> locks = new ArrayList<Lock>();
-        locks.add(lock.get());
-
-        Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(blockstate);
-        Optional<Lock> otherBlockLock = Optional.ofNullable(null);
-
-        //If the block has another block that needs to be unlocked
-        if(optionalOtherBlock.isPresent()) {
-            otherBlockLock = Latch.lockManager.getLock(optionalOtherBlock.get());
+        if(type != null) {
+            lock.get().setType(type);
         }
-        if(otherBlockLock.isPresent()) {
-            if(!otherBlockLock.get().isOwner(player.getUniqueId())) {
-                player.sendMessage(Text.of("You're not the owner of the adjacent lock, not modifying it."));
-            } else {
-                locks.add(otherBlockLock.get());
-            }
+        if(password != null) {
+            lock.get().setSalt(LatchUtils.generateSalt());
+            lock.get().changePassword(LatchUtils.hashPassword(password, lock.get().getSalt()));
         }
-
-        //Modify the attributes of the lock
-        for(Lock thisLock : locks) {
-            if(type != null) {
-                thisLock.setType(type);
-            }
-            if(password != null) {
-                thisLock.changePassword(LatchUtils.hashPassword(password, thisLock.getLocation()));
-            }
-            if(lockName != null) {
-                thisLock.setName(lockName);
-            }
-            if(newOwner != null) {
-                thisLock.setOwner(newOwner);
-            }
-            if(membersToAdd != null) {
-                for(User user : membersToAdd) {
-                    thisLock.addAccess(user.getUniqueId());
-                }
-            }
-            if(membersToRemove != null) {
-                for(User user : membersToRemove) {
-                    thisLock.removeAccess(user.getUniqueId());
-                }
+        if(lockName != null) {
+            lock.get().setName(lockName);
+        }
+        if(newOwner != null) {
+            lock.get().setOwner(newOwner);
+        }
+        if(membersToAdd != null) {
+            for(User user : membersToAdd) {
+                lock.get().addAccess(user.getUniqueId());
             }
         }
+        if(membersToRemove != null) {
+            for(User user : membersToRemove) {
+                lock.get().removeAccess(user.getUniqueId());
+            }
+        }
+
+        //Delete and recreate the lock
+        Latch.getLockManager().deleteLock(location, true);
+        Latch.getLockManager().createLock(lock.get());
 
         player.sendMessage(Text.of("Lock data has been updated."));
         return true;

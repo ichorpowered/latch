@@ -19,6 +19,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,16 +36,19 @@ import java.util.List;
 )
 public class Latch {
 
-    @Inject
     private static Logger logger;
+    private static Path configPath;
 
-    public static LockManager lockManager = new LockManager();
+    private static LockManager lockManager = new LockManager();
 
-    private static SqlHandler storageHandler = new SqlHandler();
+    private static SqlHandler storageHandler;
 
     @Inject
-    public Latch(Logger logger) {
+    public Latch(Logger logger, @DefaultConfig(sharedRoot = false) Path configPath) {
         this.logger = logger;
+        this.configPath = configPath;
+
+        storageHandler = new SqlHandler();
     }
 
     @Inject
@@ -116,4 +120,6 @@ public class Latch {
     public static CommentedConfigurationNode getConfig() {
         return config.getConfigurationNode();
     }
+
+    public static Path getConfigPatch() { return configPath; }
 }

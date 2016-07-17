@@ -21,7 +21,7 @@ public class SpawnEntityListener {
             //For each of the entities
             for(Entity e : event.getEntities()) {
                 //If it's an item and there's a lock there (have to convert item location to block location)
-                if(e.getType() == EntityTypes.ITEM && Latch.lockManager.getLock(e.getLocation().getExtent().getLocation(e.getLocation().getBlockX(), e.getLocation().getBlockY(), e.getLocation().getBlockZ())).isPresent() ) {
+                if(e.getType() == EntityTypes.ITEM && Latch.getLockManager().getLock(e.getLocation().getExtent().getLocation(e.getLocation().getBlockX(), e.getLocation().getBlockY(), e.getLocation().getBlockZ())).isPresent() ) {
                     event.setCancelled(true);
                 }
             }

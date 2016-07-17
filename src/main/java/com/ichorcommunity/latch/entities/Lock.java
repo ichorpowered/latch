@@ -22,41 +22,39 @@ public class Lock {
 
     private LockType type;
 
-    private UUID world;
-    private Location<World> location;
+    private HashSet<Location<World>> location = new HashSet<Location<World>>();
 
     private String lockedObjectName;
 
+    private byte[] salt = new byte[8];
     private String password = "";
     private HashSet<UUID> ableToAccess;
 
-    public Lock(UUID owner, LockType type, Location<World> location, String lockedObjectName) {
-        this(owner, type, location, lockedObjectName, "", new HashSet<>());
+    protected Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName) {
+        this(owner, type, location, lockedObjectName, new byte[0], "", new HashSet<>());
     }
 
-    public Lock(UUID owner, LockType type, Location<World> location, String lockedObjectName, String password) {
-        this(owner, type, location, lockedObjectName, password, new HashSet<>());
+    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password) {
+        this(owner, type, location, lockedObjectName, salt, password, new HashSet<>());
     }
 
-    public Lock(UUID owner, LockType type, Location<World> location, String lockedObjectName, String password, HashSet<UUID> players) {
+    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password, HashSet<UUID> players) {
 
         this.owner = owner;
         this.type = type;
         this.lockedObjectName = lockedObjectName;
 
+        this.salt = salt;
         this.password = password;
 
         this.location = location;
-        this.world = location.getExtent().getUniqueId();
 
-        this.name = location.getBlockType().getName().substring( location.getBlockType().getName().lastIndexOf(":")+1) +
-                "-" + location.getExtent().getName() +
-                "," + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ();
+        this.name = "test";
 
         ableToAccess = players;
     }
 
-    public Location<World> getLocation() {
+    protected HashSet<Location<World>> getLocations() {
         return location;
     }
 
@@ -108,6 +106,10 @@ public class Lock {
         ableToAccess.remove(uuid);
     }
 
+    protected HashSet<UUID> getAbleToAccess() {
+        return ableToAccess;
+    }
+
     public List<String> getAbleToAccessNames() {
         List<String> names = new ArrayList<String>();
 
@@ -142,5 +144,13 @@ public class Lock {
             return user.get().getName();
         }
         return "(owner name not found)";
+    }
+
+    public void setSalt(byte[] salt) {
+        this.salt = salt;
+    }
+
+    public byte[] getSalt() {
+        return this.salt;
     }
 }

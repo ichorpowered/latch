@@ -25,7 +25,7 @@ public class DisplayLockInteraction implements AbstractLockInteraction {
 
     @Override
     public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockstate) {
-        Optional<Lock> lock = Latch.lockManager.getLock(location);
+        Optional<Lock> lock = Latch.getLockManager().getLock(location);
         //Check to see if another lock is present
         if(!lock.isPresent()) {
             player.sendMessage(Text.of("There is no lock there."));

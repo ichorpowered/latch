@@ -31,18 +31,18 @@ public class PersistCommand implements CommandExecutor {
 
         if(src instanceof Player) {
 
-            if(!Latch.lockManager.hasInteractionData(((Player) src).getUniqueId())) {
+            if(!Latch.getLockManager().hasInteractionData(((Player) src).getUniqueId())) {
                 ((Player) src).sendMessage(Text.of("You must have run a latch command to persist/clear it."));
                 return CommandResult.empty();
             }
 
-            AbstractLockInteraction interaction = Latch.lockManager.getInteractionData(((Player) src).getUniqueId());
+            AbstractLockInteraction interaction = Latch.getLockManager().getInteractionData(((Player) src).getUniqueId());
             interaction.setPersistance(!interaction.shouldPersist());
 
             if(interaction.shouldPersist()) {
                 ((Player) src).sendMessage(Text.of("Your latch command will now persist."));
             } else {
-                Latch.lockManager.removeInteractionData(((Player) src).getUniqueId());
+                Latch.getLockManager().removeInteractionData(((Player) src).getUniqueId());
                 ((Player) src).sendMessage(Text.of("Your latch command has been cleared."));
             }
             return CommandResult.success();

@@ -13,6 +13,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,60 +34,53 @@ public class CreateLockInteraction implements AbstractLockInteraction {
     @Override
     public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockstate) {
         //Check to see if another lock is present
-        if(Latch.lockManager.getLock(location).isPresent()) {
+        if(Latch.getLockManager().getLock(location).isPresent()) {
             player.sendMessage(Text.of("There is already a lock here."));
             return false;
         }
 
         //Make sure it's a lockable block
-        if(!Latch.lockManager.isLockableBlock(blockstate.getState().getType())) {
+        if(!Latch.getLockManager().isLockableBlock(blockstate.getState().getType())) {
             player.sendMessage(Text.of("That is not a lockable block: " + blockstate.getState().getType()));
             return false;
         }
 
         Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(blockstate);
-        Optional<LockCreateEvent> otherBlockLockEvent = Optional.ofNullable(null);
+
+        HashSet<Location<World>> lockLocations = new HashSet<Location<World>>();
+        lockLocations.add(location);
 
         //If the block has another block that needs to be locked
         if(optionalOtherBlock.isPresent()) {
             //Check to see if another lock is present
-            Optional<Lock> otherLock = Latch.lockManager.getLock(optionalOtherBlock.get());
+            Optional<Lock> otherLock = Latch.getLockManager().getLock(optionalOtherBlock.get());
             if( otherLock.isPresent() && !otherLock.get().isOwner(player.getUniqueId()) ) {
                 //Shouldn't happen if we've configured this correctly - but just in case...
                 player.sendMessage(Text.of("Another lock already present on the double block - delete locks and try again."));
                 return false;
             }
-            //Create the lock event for the other block
-            otherBlockLockEvent = Optional.of(new LockCreateEvent(player,
-                    new Lock(player.getUniqueId(), type, optionalOtherBlock.get(), LatchUtils.getBlockNameFromType(optionalOtherBlock.get().getBlockType()), LatchUtils.hashPassword(password, optionalOtherBlock.get())),
-                    Cause.source(player).build()));
+            lockLocations.add(optionalOtherBlock.get());
         }
 
         //TODO Check to see if the player is at their maximum # of locks
 
         //Fire the lock create event and create the lock if it's not cancelled (by other plugins)
+        byte[] salt = LatchUtils.generateSalt();
+
         LockCreateEvent lockCreateEvent = new LockCreateEvent(player,
-                new Lock(player.getUniqueId(), type, location, LatchUtils.getBlockNameFromType(blockstate.getState().getType()), LatchUtils.hashPassword(password, location)),
+                new Lock(player.getUniqueId(), type, lockLocations, LatchUtils.getBlockNameFromType(blockstate.getState().getType()), salt, LatchUtils.hashPassword(password, salt)),
                 Cause.source(player).build());
 
         Sponge.getEventManager().post(lockCreateEvent);
-        if(otherBlockLockEvent.isPresent() ) {
-            Sponge.getEventManager().post(otherBlockLockEvent.get());
-        }
 
         //Stop if original locking event or other block locking event is cancelled
-        if (lockCreateEvent.isCancelled() || (otherBlockLockEvent.isPresent() && otherBlockLockEvent.get().isCancelled()) ) {
+        if (lockCreateEvent.isCancelled() ) {
             return false;
         }
 
         //Notify the player
         player.sendMessage(Text.of("You have created a " + lockCreateEvent.getLock().getLockType() + " lock, " + lockCreateEvent.getLock().getName()));
-        Latch.lockManager.createLock(lockCreateEvent.getLock());
-
-        if(otherBlockLockEvent.isPresent()) {
-            player.sendMessage(Text.of("You have created a " + otherBlockLockEvent.get().getLock().getLockType() + " lock, " + otherBlockLockEvent.get().getLock().getName()));
-            Latch.lockManager.createLock(otherBlockLockEvent.get().getLock());
-        }
+        Latch.getLockManager().createLock(lockCreateEvent.getLock());
 
         return true;
     }

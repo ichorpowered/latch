@@ -60,7 +60,7 @@ public class CreatePasswordLockCommand implements CommandExecutor {
             CreateLockInteraction passwordLock = new CreateLockInteraction(((Player) src).getUniqueId(), typeToUse, password.get());
             passwordLock.setPersistance(args.hasAny("p"));
 
-            Latch.lockManager.setInteractionData(((Player) src).getUniqueId(), passwordLock);
+            Latch.getLockManager().setInteractionData(((Player) src).getUniqueId(), passwordLock);
 
             ((Player) src).sendMessage(Text.of("You will lock the next latchable block you click or place."));
 

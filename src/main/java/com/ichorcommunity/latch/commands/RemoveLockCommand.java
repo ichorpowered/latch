@@ -38,7 +38,7 @@ public class RemoveLockCommand implements CommandExecutor {
             DeleteLockInteraction deleteLock = new DeleteLockInteraction(((Player) src).getUniqueId());
             deleteLock.setPersistance(args.hasAny("p"));
 
-            Latch.lockManager.setInteractionData(((Player) src).getUniqueId(), deleteLock);
+            Latch.getLockManager().setInteractionData(((Player) src).getUniqueId(), deleteLock);
 
             ((Player) src).sendMessage(Text.of("You will remove the next lock you click."));
 

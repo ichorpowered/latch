@@ -38,7 +38,7 @@ public class DisplayLockCommand implements CommandExecutor {
             DisplayLockInteraction displayLock = new DisplayLockInteraction(((Player) src).getUniqueId());
             displayLock.setPersistance(args.hasAny("p"));
 
-            Latch.lockManager.setInteractionData(((Player) src).getUniqueId(), displayLock);
+            Latch.getLockManager().setInteractionData(((Player) src).getUniqueId(), displayLock);
 
             ((Player) src).sendMessage(Text.of("You will display information of the next lock you click."));
 

@@ -40,7 +40,7 @@ public class CreatePrivateLockCommand implements CommandExecutor {
             CreateLockInteraction privateLock = new CreateLockInteraction(((Player) src).getUniqueId(), LockType.PRIVATE, "");
             privateLock.setPersistance(args.hasAny("p"));
 
-            Latch.lockManager.setInteractionData(((Player) src).getUniqueId(), privateLock);
+            Latch.getLockManager().setInteractionData(((Player) src).getUniqueId(), privateLock);
 
             ((Player) src).sendMessage(Text.of("You will lock the next latchable block you click or place."));
 

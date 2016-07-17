@@ -34,7 +34,7 @@ public class ChangeBlockListener {
             if (bs.isValid() && bs.getFinal().getLocation().isPresent()) {
 
                 //If the block is a restricted block, make sure it's not being placed near a lock
-                if( Latch.lockManager.isRestrictedBlock(bs.getFinal().getState().getType())) {
+                if( Latch.getLockManager().isRestrictedBlock(bs.getFinal().getState().getType())) {
                     for(Lock lock : LatchUtils.getAdjacentLocks(bs.getFinal().getLocation().get())) {
                         //If there is a player and they aren't the owner, OR there's no player, invalidate
                         if( (!player.isPresent() || (player.isPresent() && !lock.isOwner(player.get().getUniqueId()))) ) {
@@ -49,13 +49,13 @@ public class ChangeBlockListener {
                 }
 
                 //If the block is a lockable block, make sure it's not connecting with someone else's lock
-                if( Latch.lockManager.isLockableBlock(bs.getFinal().getState().getType())) {
+                if( Latch.getLockManager().isLockableBlock(bs.getFinal().getState().getType())) {
                     Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(bs.getFinal());
                     Optional<Lock> otherBlockLock = Optional.ofNullable(null);
 
                     //If the block has another block that needs to be unlocked
                     if(optionalOtherBlock.isPresent()) {
-                        otherBlockLock = Latch.lockManager.getLock(optionalOtherBlock.get());
+                        otherBlockLock = Latch.getLockManager().getLock(optionalOtherBlock.get());
                     }
                     if(otherBlockLock.isPresent()) {
                         if( (!player.isPresent() || (player.isPresent() && !otherBlockLock.get().isOwner(player.get().getUniqueId()))) ) {
@@ -77,9 +77,9 @@ public class ChangeBlockListener {
         }
 
         //If the player has interaction data
-        if(Latch.lockManager.hasInteractionData(player.get().getUniqueId())) {
+        if(Latch.getLockManager().hasInteractionData(player.get().getUniqueId())) {
 
-            AbstractLockInteraction lockInteraction = Latch.lockManager.getInteractionData(player.get().getUniqueId());
+            AbstractLockInteraction lockInteraction = Latch.getLockManager().getInteractionData(player.get().getUniqueId());
 
             //Check all of the blocks and apply the interaction
             //Could cancel the block placement here if it fails -- but Meronat decided no
@@ -93,7 +93,7 @@ public class ChangeBlockListener {
             }
 
             if(!lockInteraction.shouldPersist()) {
-                Latch.lockManager.removeInteractionData(player.get().getUniqueId());
+                Latch.getLockManager().removeInteractionData(player.get().getUniqueId());
             }
         }
     }
@@ -103,18 +103,23 @@ public class ChangeBlockListener {
         //Only allow the owner to break a lock
         for( Transaction<BlockSnapshot> bs : event.getTransactions()) {
             if (bs.isValid() && bs.getOriginal().getLocation().isPresent()) {
-                Optional<Lock> lock = Latch.lockManager.getLock(bs.getOriginal().getLocation().get());
+                Optional<Lock> lock = Latch.getLockManager().getLock(bs.getOriginal().getLocation().get());
 
                 //If the block is below a block we need to protect the below blocks of...
                 //Potentially Sponge issue - should be able to detect these blocks
-                if(Latch.lockManager.isProtectBelowBlocks(bs.getOriginal().getLocation().get().getBlockRelative(Direction.UP).getBlockType()) &&
-                        Latch.lockManager.getLock(bs.getOriginal().getLocation().get().getBlockRelative(Direction.UP)).isPresent()) {
+                if(Latch.getLockManager().isProtectBelowBlocks(bs.getOriginal().getLocation().get().getBlockRelative(Direction.UP).getBlockType()) &&
+                        Latch.getLockManager().getLock(bs.getOriginal().getLocation().get().getBlockRelative(Direction.UP)).isPresent()) {
                     bs.setValid(false);
                 }
 
                 //If lock is present and the player is NOT the owner
                 if(lock.isPresent() && !lock.get().isOwner(player.getUniqueId())) {
                     bs.setValid(false);
+                }
+
+                //Delete the lock
+                if(lock.isPresent()) {
+                    Latch.getLockManager().deleteLock(bs.getOriginal().getLocation().get(), false);
                 }
             }
         }
@@ -133,14 +138,14 @@ public class ChangeBlockListener {
             if(bs.isValid() && bs.getOriginal().getLocation().isPresent()) {
                 //If the block is below a block we need to protect the below blocks of...
                 //Potentially Sponge issue - should be able to detect these blocks
-                if(Latch.lockManager.isProtectBelowBlocks(bs.getOriginal().getLocation().get().getBlockRelative(Direction.UP).getBlockType()) &&
-                        Latch.lockManager.getLock(bs.getOriginal().getLocation().get().getBlockRelative(Direction.UP)).isPresent()) {
+                if(Latch.getLockManager().isProtectBelowBlocks(bs.getOriginal().getLocation().get().getBlockRelative(Direction.UP).getBlockType()) &&
+                        Latch.getLockManager().getLock(bs.getOriginal().getLocation().get().getBlockRelative(Direction.UP)).isPresent()) {
                     bs.setValid(false);
                     event.setCancelled(true);
                     break;
                 }
 
-                if(Latch.lockManager.isLockableBlock(bs.getOriginal().getState().getType()) && Latch.lockManager.getLock(bs.getOriginal().getLocation().get()).isPresent()) {
+                if(Latch.getLockManager().isLockableBlock(bs.getOriginal().getState().getType()) && Latch.getLockManager().getLock(bs.getOriginal().getLocation().get()).isPresent()) {
                         bs.setValid(false);
                         event.setCancelled(true);
                 }
@@ -160,7 +165,7 @@ public class ChangeBlockListener {
         for( Transaction<BlockSnapshot> bs : event.getTransactions()) {
             if (bs.isValid() && bs.getOriginal().getLocation().isPresent()) {
 
-                if(Latch.lockManager.getLock(bs.getOriginal().getLocation().get()).isPresent()) {
+                if(Latch.getLockManager().getLock(bs.getOriginal().getLocation().get()).isPresent()) {
                     bs.setValid(false);
                 }
             }

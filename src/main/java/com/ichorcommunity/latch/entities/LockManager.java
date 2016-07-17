@@ -1,6 +1,7 @@
 package com.ichorcommunity.latch.entities;
 
 
+import com.ichorcommunity.latch.Latch;
 import com.ichorcommunity.latch.enums.LockType;
 import com.ichorcommunity.latch.interactions.AbstractLockInteraction;
 import org.spongepowered.api.block.BlockType;
@@ -19,20 +20,18 @@ public class LockManager {
     private List<String> restrictedBlocks = new ArrayList<String>();
     private List<String> protectBelowBlocks = new ArrayList<String>();
 
-    private HashMap<Location, Lock> locksByLocation = new HashMap<Location, Lock>();
-
     private HashMap<UUID, AbstractLockInteraction> interactionData = new HashMap<UUID, AbstractLockInteraction>();
 
     public Optional<Lock> getLock(Location location) {
-        return Optional.ofNullable(locksByLocation.get(location));
+        return Latch.getStorageHandler().getLockByLocation(location);
     }
 
     public void createLock(Lock lock) {
-        locksByLocation.put(lock.getLocation(), lock);
+        Latch.getStorageHandler().createLock(lock, lock.getLocations(), lock.getAbleToAccess());
     }
 
-    public void deleteLock(Location<World> location) {
-        locksByLocation.remove(location);
+    public void deleteLock(Location<World> location, boolean deleteEntireLock) {
+        Latch.getStorageHandler().deleteLock(location, deleteEntireLock);
     }
 
     /*
@@ -41,8 +40,8 @@ public class LockManager {
     public boolean isPasswordCompatibleLock(Lock lock) {
         //If the lock is one of the two password locks, or a donation lock with a password
         return lock.getLockType() == LockType.PASSWORD_ALWAYS ||
-                lock.getLockType() == LockType.PASSWORD_ONCE ||
-                (lock.getLockType() == LockType.DONATION && lock.getPassword().length() > 0);
+                lock.getLockType() == LockType.PASSWORD_ONCE /*||
+                (lock.getLockType() == LockType.DONATION && lock.getPassword().length() > 0)*/;
     }
 
     public boolean hasInteractionData(UUID uniqueId) {
@@ -82,4 +81,13 @@ public class LockManager {
     public void removeInteractionData(UUID uniqueId) {
         interactionData.remove(uniqueId);
     }
+
+    public void addLockAccess(Lock thisLock, UUID uniqueId) {
+        if(!thisLock.canAccess(uniqueId)) {
+            thisLock.addAccess(uniqueId);
+            Latch.getStorageHandler().addLockAccess(thisLock, uniqueId);
+
+        }
+    }
+
 }

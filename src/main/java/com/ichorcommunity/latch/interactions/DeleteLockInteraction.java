@@ -2,7 +2,6 @@ package com.ichorcommunity.latch.interactions;
 
 import com.ichorcommunity.latch.Latch;
 import com.ichorcommunity.latch.entities.Lock;
-import com.ichorcommunity.latch.utils.LatchUtils;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
@@ -24,7 +23,7 @@ public class DeleteLockInteraction implements AbstractLockInteraction {
 
     @Override
     public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockstate) {
-        Optional<Lock> lock = Latch.lockManager.getLock(location);
+        Optional<Lock> lock = Latch.getLockManager().getLock(location);
         //Check to see if another lock is present
         if(!lock.isPresent()) {
             player.sendMessage(Text.of("There is no lock there."));
@@ -37,21 +36,9 @@ public class DeleteLockInteraction implements AbstractLockInteraction {
             return false;
         }
 
-        Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(blockstate);
-        Optional<Lock> otherBlockLock = Optional.ofNullable(null);
-
-        //If the block has another block that needs to be unlocked
-        if(optionalOtherBlock.isPresent()) {
-            otherBlockLock = Optional.ofNullable(Latch.lockManager.getLock(optionalOtherBlock.get()).get());
-        }
-
         player.sendMessage(Text.of("You have deleted this " + lock.get().getLockedObject() + " lock."));
-        Latch.lockManager.deleteLock(location);
+        Latch.getLockManager().deleteLock(location, true);
 
-        if(otherBlockLock.isPresent()) {
-            player.sendMessage(Text.of("You have also deleted the adjacent " + otherBlockLock.get().getLockedObject() + " lock."));
-            Latch.lockManager.deleteLock(otherBlockLock.get().getLocation());
-        }
         return true;
     }
 
