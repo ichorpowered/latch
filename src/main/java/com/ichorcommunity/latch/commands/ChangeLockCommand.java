@@ -55,7 +55,12 @@ public class ChangeLockCommand implements CommandExecutor {
 
             Optional<String> optionalString = args.<String>getOne("name");
             if(optionalString.isPresent()) {
-                changeLock.setLockName(optionalString.get());
+                if(optionalString.get().length() <= 25) {
+                    changeLock.setLockName(optionalString.get());
+                } else {
+                    ((Player) src).sendMessage(Text.of("Lock names must be less than 25 characters long."));
+                    return CommandResult.empty();
+                }
             }
 
             Optional<LockType> optionalType = args.<LockType>getOne("type");

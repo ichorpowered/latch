@@ -13,13 +13,8 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class BaseCommand implements CommandExecutor {
-
-    Map<List<String>, CommandSpec> children = new HashMap<>();
 
     public final CommandSpec baseCommand = CommandSpec.builder()
             .description(Text.of("The base Latch command."))
@@ -31,6 +26,7 @@ public class BaseCommand implements CommandExecutor {
             .child(new ChangeLockCommand().getCommand(), "change")
             .child(new DisplayLockCommand().getCommand(), "info", "display")
             .child(new UnlockCommand().getCommand(), "open", "unlock")
+            .child(new ListCommand().getCommand(), "list", "displayall")
             .executor(this)
             .build();
 

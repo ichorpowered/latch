@@ -2,6 +2,7 @@ package com.ichorcommunity.latch.entities;
 
 
 import com.ichorcommunity.latch.enums.LockType;
+import com.ichorcommunity.latch.utils.LatchUtils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.user.UserStorageService;
@@ -10,6 +11,7 @@ import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,15 +32,11 @@ public class Lock {
     private String password = "";
     private HashSet<UUID> ableToAccess;
 
-    protected Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName) {
-        this(owner, type, location, lockedObjectName, new byte[0], "", new HashSet<>());
-    }
-
     public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password) {
-        this(owner, type, location, lockedObjectName, salt, password, new HashSet<>());
+        this(owner, LatchUtils.getRandomLockName(owner, lockedObjectName), type, location, lockedObjectName, salt, password, new HashSet<>());
     }
 
-    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password, HashSet<UUID> players) {
+    public Lock(UUID owner, String lockName, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password, HashSet<UUID> players) {
 
         this.owner = owner;
         this.type = type;
@@ -49,7 +47,7 @@ public class Lock {
 
         this.location = location;
 
-        this.name = "test";
+        this.name = lockName;
 
         ableToAccess = players;
     }
@@ -90,19 +88,15 @@ public class Lock {
         this.type = type;
     }
 
-    /*
-     * When changing the password, clear allowed members
-     */
     public void changePassword(String password) {
         this.password = password;
-        ableToAccess.clear();
     }
 
-    public void addAccess(UUID uuid) {
+    protected void addAccess(UUID uuid) {
         ableToAccess.add(uuid);
     }
 
-    public void removeAccess(UUID uuid) {
+    protected void removeAccess(UUID uuid) {
         ableToAccess.remove(uuid);
     }
 
@@ -144,6 +138,16 @@ public class Lock {
             return user.get().getName();
         }
         return "(owner name not found)";
+    }
+
+    public Optional<Location<World>> getFirstLocation() {
+        Optional<Location<World>> location = Optional.empty();
+        Iterator<Location<World>> itr = this.location.iterator();
+
+        if(itr.hasNext()) {
+            return Optional.of(itr.next());
+        }
+        return location;
     }
 
     public void setSalt(byte[] salt) {

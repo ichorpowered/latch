@@ -86,8 +86,37 @@ public class LockManager {
         if(!thisLock.canAccess(uniqueId)) {
             thisLock.addAccess(uniqueId);
             Latch.getStorageHandler().addLockAccess(thisLock, uniqueId);
+        }
+    }
+
+    public boolean isUniqueName(UUID playerUUID, String lockName) {
+        return Latch.getStorageHandler().isUniqueName(playerUUID, lockName);
+    }
+
+    public void addLockLocation(Lock lock, Location<World> location) {
+        if(!lock.getLocations().contains(location)) {
+            Latch.getStorageHandler().addLockLocation(lock, location);
+        }
+    }
+
+    public void removeAllLockAccess(Lock thisLock) {
+        thisLock.getAbleToAccess().clear();
+        Latch.getStorageHandler().removeAllLockAccess(thisLock);
+    }
+
+    public void removeLockAccess(Lock thisLock, UUID uniqueId) {
+        if(thisLock.canAccess(uniqueId)) {
+            thisLock.removeAccess(uniqueId);
+            Latch.getStorageHandler().removeLockAccess(thisLock, uniqueId);
 
         }
     }
 
+    public void updateLockAttributes(UUID originalOwner, String originalName, Lock lock) {
+        Latch.getStorageHandler().updateLockAttributes(originalOwner, originalName, lock);
+    }
+
+    public List<Lock> getPlayersLocks(UUID uniqueId) {
+        return Latch.getStorageHandler().getLocksByOwner(uniqueId);
+    }
 }

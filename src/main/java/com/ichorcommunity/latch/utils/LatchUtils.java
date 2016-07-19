@@ -18,6 +18,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.ichorcommunity.latch.Latch.getLogger;
 
@@ -93,4 +94,11 @@ public class LatchUtils {
         return password;
     }
 
+    public static String getRandomLockName(UUID owner, String lockedObjectName) {
+        return Latch.getStorageHandler().getRandomLockName(owner, lockedObjectName);
+    }
+
+    public static String getLocationString(Location<World> worldLocation) {
+        return "("+worldLocation.getBlockX()+","+worldLocation.getBlockY()+","+worldLocation.getBlockZ()+")";
+    }
 }

@@ -18,10 +18,13 @@ import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.util.Tristate;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Plugin(
         id = "latch",
@@ -65,10 +68,15 @@ public class Latch {
 
         registerListeners();
 
-        Sponge.getCommandManager().register(this, new BaseCommand().baseCommand, "latch","lock");
+        Sponge.getCommandManager().register(this, new BaseCommand().baseCommand, "latch", "lock");
         Sponge.getCommandManager().register(this, new UnlockCommand().getCommand(), "unlock", "unlatch");
 
-        TypeToken<List<String>> stringList = new TypeToken<List<String>>() {};
+        //Register permissions
+        Optional<PermissionService> ps = Sponge.getServiceManager().provide(PermissionService.class);
+        if(ps.isPresent()) {
+            ps.get().getUserSubjects().getDefaults().getSubjectData().setPermission(ps.get().getDefaults().getActiveContexts(), "latch.normal", Tristate.TRUE);
+        }
+
 
     }
 

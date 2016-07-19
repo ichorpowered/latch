@@ -58,7 +58,10 @@ public class ChangeBlockListener {
                         otherBlockLock = Latch.getLockManager().getLock(optionalOtherBlock.get());
                     }
                     if(otherBlockLock.isPresent()) {
-                        if( (!player.isPresent() || (player.isPresent() && !otherBlockLock.get().isOwner(player.get().getUniqueId()))) ) {
+                        if(player.isPresent() && otherBlockLock.get().isOwner(player.get().getUniqueId())) {
+                            Latch.getLockManager().addLockLocation(otherBlockLock.get(), bs.getFinal().getLocation().get());
+                            player.get().sendMessage(Text.of("You have expanded your " + otherBlockLock.get().getName() + " lock."));
+                        } else {
                             bs.setValid(false);
                             event.setCancelled(true);
                             if(player.isPresent()) {
