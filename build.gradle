@@ -1,5 +1,6 @@
 plugins {
     id 'org.spongepowered.plugin' version '0.6'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
 }
 
 group 'com.ichorcommunity.latch'
@@ -17,8 +18,25 @@ repositories {
         name = 'spongepowered-repo'
         url = 'https://repo.spongepowered.org/maven/'
     }
+    maven {
+        name = 'minecrell'
+        url = 'http://repo.minecrell.net/releases'
+    }
 }
 
 dependencies {
     compile 'org.spongepowered:spongeapi:5.0.0-SNAPSHOT'
+    compile 'net.minecrell.mcstats:statslite-sponge:0.2.2'
+}
+
+shadowJar {
+    dependencies {
+        include dependency('net.minecrell.mcstats:statslite-sponge')
+    }
+
+    relocate 'net.minecrell.mcstats', 'com.ichorcommunity.latch.mcstats'
+}
+
+artifacts {
+    archives shadowJar
 }

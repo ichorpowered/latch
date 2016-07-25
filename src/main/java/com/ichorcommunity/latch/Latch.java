@@ -9,6 +9,7 @@ import com.ichorcommunity.latch.listeners.ChangeBlockListener;
 import com.ichorcommunity.latch.listeners.InteractBlockListener;
 import com.ichorcommunity.latch.listeners.SpawnEntityListener;
 import com.ichorcommunity.latch.storage.SqlHandler;
+import net.minecrell.mcstats.SpongeStatsLite;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -17,6 +18,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.util.Tristate;
@@ -48,6 +50,9 @@ public class Latch {
     private static SqlHandler storageHandler;
 
     @Inject
+    public SpongeStatsLite stats;
+
+    @Inject
     public Latch(Logger logger, @DefaultConfig(sharedRoot = false) Path configPath) {
         Latch.logger = logger;
         Latch.configPath = configPath;
@@ -60,6 +65,11 @@ public class Latch {
     private ConfigurationLoader<CommentedConfigurationNode> configManager;
 
     private static Configuration config;
+
+    @Listener
+    public void onPreInitialization(GamePreInitializationEvent event) {
+        this.stats.start();
+    }
 
 
     @Listener
