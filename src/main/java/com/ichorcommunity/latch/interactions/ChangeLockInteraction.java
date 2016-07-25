@@ -73,6 +73,12 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
             return false;
         }
 
+        //Check to make sure, if they're assigning a new owner, the new owner is not at their limit
+        if(Latch.getLockManager().isPlayerAtLockLimit(newOwner == null ? lock.get().getOwner() : newOwner, type == null ? lock.get().getLockType() : type)) {
+            player.sendMessage(Text.of("You can't give a player a lock that would put them over the lock limit."));
+            return false;
+        }
+
         UUID originalOwner = lock.get().getOwner();
         String originalName = lock.get().getName();
 

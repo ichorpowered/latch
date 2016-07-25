@@ -11,6 +11,7 @@ import org.spongepowered.api.world.World;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,6 +20,7 @@ public class LockManager {
     private List<String> lockableBlocks = new ArrayList<String>();
     private List<String> restrictedBlocks = new ArrayList<String>();
     private List<String> protectBelowBlocks = new ArrayList<String>();
+    private HashMap<String, Integer> lockLimits = new HashMap<String, Integer>();
 
     private HashMap<UUID, AbstractLockInteraction> interactionData = new HashMap<UUID, AbstractLockInteraction>();
 
@@ -118,5 +120,19 @@ public class LockManager {
 
     public List<Lock> getPlayersLocks(UUID uniqueId) {
         return Latch.getStorageHandler().getLocksByOwner(uniqueId);
+    }
+
+    public void setLockLimits(HashMap<String,Integer> lockLimits) {
+        this.lockLimits.clear();
+        for(Map.Entry<String, Integer> limit : lockLimits.entrySet()) {
+            //Only add if limit >=0, otherwise no limit
+            if(limit.getValue() >= 0) {
+                this.lockLimits.put(limit.getKey().toLowerCase(), limit.getValue());
+            }
+        }
+    }
+
+    public boolean isPlayerAtLockLimit(UUID player, LockType type) {
+        return Latch.getStorageHandler().isPlayerAtLockLimit(player, type, lockLimits);
     }
 }

@@ -62,7 +62,10 @@ public class CreateLockInteraction implements AbstractLockInteraction {
             lockLocations.add(optionalOtherBlock.get());
         }
 
-        //TODO Check to see if the player is at their maximum # of locks
+        if(Latch.getLockManager().isPlayerAtLockLimit(player.getUniqueId(), type)) {
+            player.sendMessage(Text.of("You have reached the limit for locks."));
+            return false;
+        }
 
         //Fire the lock create event and create the lock if it's not cancelled (by other plugins)
         byte[] salt = LatchUtils.generateSalt();

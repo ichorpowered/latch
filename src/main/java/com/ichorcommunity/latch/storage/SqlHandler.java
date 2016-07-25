@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -537,5 +538,39 @@ public class SqlHandler {
         }
 
         return locks;
+    }
+
+    public boolean isPlayerAtLockLimit(UUID player, LockType type, HashMap<String, Integer> limits) {
+        String getLockTotals = "SELECT COUNT(ID) as TOTAL, SUM(CASE WHEN LOCK.LOCK_TYPE = ? THEN 1 ELSE 0 END) AS TYPE_TOTAL FROM LOCK WHERE LOCK.OWNER_UUID = ?";
+
+        //If a maximum isn't defined, no limit
+        if(!limits.containsKey("total") && !limits.containsKey(type.toString().toLowerCase())) {
+            return false;
+        }
+
+        try {
+            Connection connection = getConnection();
+            PreparedStatement ps = connection.prepareStatement(getLockTotals);
+            ps.setString(1, type.toString());
+            ps.setString(2, player.toString());
+
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()) {
+                //If total limit set and query says we're above that.. or if type limit is set and query says we're above that
+                return ( limits.containsKey("total") && rs.getInt("TOTAL") >= limits.get("total")) ||
+                        (limits.containsKey(type.toString().toLowerCase()) && rs.getInt("TYPE_TOTAL") >= limits.get(type.toString().toLowerCase()));
+
+            } else {
+                //no locks detected
+                return false;
+            }
+        } catch (SQLException e) {
+            getLogger().error("Error isPlayerAtLockLimit: " + player + ", " + type);
+            e.printStackTrace();
+        }
+
+        //Sql exception, prevent placement
+        return true;
     }
 }

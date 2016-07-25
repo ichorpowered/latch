@@ -54,7 +54,7 @@ public class UnlockLockInteraction implements AbstractLockInteraction {
                 locks.add(lock.get());
 
                 Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(blockstate);
-                Optional<Lock> otherBlockLock = Optional.ofNullable(null);
+                Optional<Lock> otherBlockLock = Optional.empty();
 
                 //If the block has another block that needs to be unlocked
                 if(optionalOtherBlock.isPresent()) {

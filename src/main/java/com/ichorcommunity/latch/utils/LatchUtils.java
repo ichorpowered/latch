@@ -55,11 +55,11 @@ public class LatchUtils {
         if(block != BlockSnapshot.NONE && block.getLocation().isPresent() && block.get(Keys.CONNECTED_DIRECTIONS).isPresent() ) {
             for(Direction direction : block.get(Keys.CONNECTED_DIRECTIONS).get()) {
                 if( block.getLocation().get().getBlockRelative(direction).getBlock().getType() == block.getState().getType()) {
-                    return Optional.ofNullable(block.getLocation().get().getBlockRelative(direction));
+                    return Optional.of(block.getLocation().get().getBlockRelative(direction));
                 }
             }
         }
-        return Optional.ofNullable(null);
+        return Optional.empty();
     }
 
     public static byte[] generateSalt() {

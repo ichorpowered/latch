@@ -9,7 +9,6 @@ import org.spongepowered.api.data.manipulator.mutable.common.AbstractData;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.mutable.Value;
 
-import java.security.cert.PKIXRevocationChecker;
 import java.util.Optional;
 
 import static com.ichorcommunity.latch.Latch.getLogger;
@@ -20,16 +19,13 @@ public class LatchData extends AbstractData<LatchData, ImmutableLatchData> {
 
     public LatchData() {
         this(false);
-        getLogger().info("Constructor #1 happened");
     }
 
     public LatchData(boolean isLocked) {
-        getLogger().info("Constructor #2: " + isLocked);
         this.isLocked = isLocked;
     }
 
     public Value<Boolean> isLocked() {
-        getLogger().info("Checking isLocked: " + this.isLocked);
         return Sponge.getRegistry().getValueFactory().createValue(LatchKeys.IS_LOCKED, this.isLocked, false);
     }
 

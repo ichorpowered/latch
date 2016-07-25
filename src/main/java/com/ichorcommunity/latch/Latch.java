@@ -23,6 +23,7 @@ import org.spongepowered.api.util.Tristate;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,8 +49,8 @@ public class Latch {
 
     @Inject
     public Latch(Logger logger, @DefaultConfig(sharedRoot = false) Path configPath) {
-        this.logger = logger;
-        this.configPath = configPath;
+        Latch.logger = logger;
+        Latch.configPath = configPath;
 
         storageHandler = new SqlHandler();
     }
@@ -91,9 +92,10 @@ public class Latch {
     }
 
     private void loadConfigurationData() {
-        List<String> configBlockNames = new ArrayList<String>();
-        List<String> restrictedBlockNames = new ArrayList<String>();
-        List<String> protectBelowBlocks = new ArrayList<String>();
+        List<String> configBlockNames = new ArrayList<>();
+        List<String> restrictedBlockNames = new ArrayList<>();
+        List<String> protectBelowBlocks = new ArrayList<>();
+        HashMap<String, Integer> lockLimits = new HashMap<String, Integer>();
 
         try {
             configBlockNames = getConfig().getNode("lockable_blocks").getList(TypeToken.of(String.class));
@@ -116,9 +118,17 @@ public class Latch {
             e.printStackTrace();
         }
 
+        try {
+            lockLimits = (HashMap<String, Integer>) getConfig().getNode("lock_limit").getValue(lockLimits);
+        } catch (Exception e) {
+            getLogger().error("Error loading lock limits");
+            e.printStackTrace();
+        }
+
         lockManager.setLockableBlocks(configBlockNames);
         lockManager.setRestrictedBlocks(restrictedBlockNames);
         lockManager.setProtectBelowBlocks(protectBelowBlocks);
+        lockManager.setLockLimits(lockLimits);
     }
 
     public static SqlHandler getStorageHandler() { return storageHandler;}

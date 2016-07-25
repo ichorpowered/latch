@@ -22,8 +22,6 @@ import java.util.Optional;
 
 public class ChangeBlockListener {
 
-    //TODO protect the block under locks (doors can still break)
-
     @Listener
     public void validateBlockPlacement(ChangeBlockEvent.Place event) {
         //Did a player cause this... if so use them for owner checks
@@ -51,7 +49,7 @@ public class ChangeBlockListener {
                 //If the block is a lockable block, make sure it's not connecting with someone else's lock
                 if( Latch.getLockManager().isLockableBlock(bs.getFinal().getState().getType())) {
                     Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(bs.getFinal());
-                    Optional<Lock> otherBlockLock = Optional.ofNullable(null);
+                    Optional<Lock> otherBlockLock = Optional.empty();
 
                     //If the block has another block that needs to be unlocked
                     if(optionalOtherBlock.isPresent()) {
