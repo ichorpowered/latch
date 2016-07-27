@@ -1,5 +1,29 @@
-package com.ichorcommunity.latch.entities;
+/*
+ * This file is part of Latch, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) Ichor Community <http://www.ichorcommunity.com>
+ * Copyright (c) Contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
+package com.ichorcommunity.latch.entities;
 
 import com.ichorcommunity.latch.Latch;
 import com.ichorcommunity.latch.enums.LockType;
@@ -17,12 +41,12 @@ import java.util.UUID;
 
 public class LockManager {
 
-    private List<String> lockableBlocks = new ArrayList<String>();
-    private List<String> restrictedBlocks = new ArrayList<String>();
-    private List<String> protectBelowBlocks = new ArrayList<String>();
-    private HashMap<String, Integer> lockLimits = new HashMap<String, Integer>();
+    private List<String> lockableBlocks = new ArrayList<>();
+    private List<String> restrictedBlocks = new ArrayList<>();
+    private List<String> protectBelowBlocks = new ArrayList<>();
+    private HashMap<String, Integer> lockLimits = new HashMap<>();
 
-    private HashMap<UUID, AbstractLockInteraction> interactionData = new HashMap<UUID, AbstractLockInteraction>();
+    private HashMap<UUID, AbstractLockInteraction> interactionData = new HashMap<>();
 
     public Optional<Lock> getLock(Location location) {
         return Latch.getStorageHandler().getLockByLocation(location);
