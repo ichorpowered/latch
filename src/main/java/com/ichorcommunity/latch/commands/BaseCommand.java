@@ -45,6 +45,7 @@ public class BaseCommand implements CommandExecutor {
             .description(Text.of("The base Latch command."))
             .permission("latch.normal")
             .child(new CreatePrivateLockCommand().getCommand(), "private")
+            .child(new CreatePublicLockCommand().getCommand(), "public")
             .child(new CreatePasswordLockCommand().getCommand(), "password")
             .child(new PersistCommand().getCommand(), "persist", "clear", "unpersist", "stop", "cancel")
             .child(new RemoveLockCommand().getCommand(), "remove", "rem")

@@ -26,7 +26,8 @@
 package com.ichorcommunity.latch.commands;
 
 import com.ichorcommunity.latch.Latch;
-import com.ichorcommunity.latch.interactions.DisplayLockInteraction;
+import com.ichorcommunity.latch.enums.LockType;
+import com.ichorcommunity.latch.interactions.CreateLockInteraction;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -39,14 +40,15 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-public class DisplayLockCommand implements CommandExecutor {
+public class CreatePublicLockCommand implements CommandExecutor {
 
     private CommandFlags.Builder flagBuilder = GenericArguments.flags();
 
     public CommandCallable getCommand() {
         return CommandSpec.builder()
-                .description(Text.of("Display information of a lock"))
-                .permission("latch.normal.info")
+                .description(Text.of("Create a public lock"))
+                .extendedDescription(Text.of(" on the next block placed/clicked."))
+                .permission("latch.normal.create.public")
                 .executor(this)
                 .arguments(GenericArguments.optionalWeak(
                         flagBuilder
@@ -60,12 +62,12 @@ public class DisplayLockCommand implements CommandExecutor {
 
         if(src instanceof Player) {
 
-            DisplayLockInteraction displayLock = new DisplayLockInteraction(((Player) src).getUniqueId());
-            displayLock.setPersistance(args.hasAny("p"));
+            CreateLockInteraction privateLock = new CreateLockInteraction(((Player) src).getUniqueId(), LockType.PUBLIC, "");
+            privateLock.setPersistance(args.hasAny("p"));
 
-            Latch.getLockManager().setInteractionData(((Player) src).getUniqueId(), displayLock);
+            Latch.getLockManager().setInteractionData(((Player) src).getUniqueId(), privateLock);
 
-            ((Player) src).sendMessage(Text.of("You will display information of the next lock you click."));
+            ((Player) src).sendMessage(Text.of("You will lock the next latchable block you click or place."));
 
             return CommandResult.success();
         }

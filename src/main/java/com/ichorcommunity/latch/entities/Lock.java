@@ -147,7 +147,7 @@ public class Lock {
     }
 
     public boolean canAccess(UUID uniqueId) {
-        return ableToAccess.contains(uniqueId) || owner.equals(uniqueId);
+        return ableToAccess.contains(uniqueId) || owner.equals(uniqueId) || type == LockType.PUBLIC;
     }
 
     public String getPassword() {
