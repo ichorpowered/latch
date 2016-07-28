@@ -53,6 +53,9 @@ public class HelpCommand implements CommandExecutor {
         contents.add(LatchUtils.formatHelpText("/latch persist", "Continue applying the last Latch command run on block click/place",
                 Text.builder().append(Text.of("Run again or /latch stop to stop applying the last Latch command")).build()));
 
+        contents.add(LatchUtils.formatHelpText("/latch info", "Display information about the next lock clicked",
+                Text.builder().append(Text.of("Add -p to persist")).build()));
+
         contents.add(LatchUtils.formatHelpText("/latch list", "List all of your locks",
                 Text.builder().append(Text.of("/latch list [player] to list another player's (if you have permission)")).build()));
 
