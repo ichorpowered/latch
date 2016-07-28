@@ -31,6 +31,9 @@ import com.ichorcommunity.latch.entities.Lock;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -125,5 +128,14 @@ public class LatchUtils {
 
     public static String getLocationString(Location<World> worldLocation) {
         return "("+worldLocation.getBlockX()+","+worldLocation.getBlockY()+","+worldLocation.getBlockZ()+")";
+    }
+
+    public static Text formatHelpText(String command, String description, Text extendedDescription) {
+        return Text.of(Text.builder(command)
+                .color(TextColors.GOLD)
+                .onClick(TextActions.suggestCommand(command))
+                .onHover(TextActions.showText(extendedDescription))
+                .build(),Text.of(TextColors.GRAY, " - ", description));
+
     }
 }
