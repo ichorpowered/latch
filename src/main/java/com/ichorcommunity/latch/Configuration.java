@@ -55,6 +55,11 @@ class Configuration {
 
     private void loadDefaults() {
 
+        //Should we add latch.normal to default permissions?
+        if(configNode.getNode("add_default_permissions").isVirtual()) {
+            configNode.getNode("add_default_permissions").setValue(false);
+        }
+
         //Blocks we're able to lock
         if(configNode.getNode("lockable_blocks").isVirtual()) {
             List<String> lockableBlocks = new ArrayList<>();

@@ -108,9 +108,11 @@ public class Latch {
         Sponge.getCommandManager().register(this, new UnlockCommand().getCommand(), "unlock", "unlatch");
 
         //Register permissions
-        Optional<PermissionService> ps = Sponge.getServiceManager().provide(PermissionService.class);
-        if(ps.isPresent()) {
-            ps.get().getUserSubjects().getDefaults().getSubjectData().setPermission(ps.get().getDefaults().getActiveContexts(), "latch.normal", Tristate.TRUE);
+        if(getConfig().getNode("add_default_permissions").getBoolean()) {
+            Optional<PermissionService> ps = Sponge.getServiceManager().provide(PermissionService.class);
+            if (ps.isPresent()) {
+                ps.get().getUserSubjects().getDefaults().getSubjectData().setPermission(ps.get().getDefaults().getActiveContexts(), "latch.normal", Tristate.TRUE);
+            }
         }
 
 

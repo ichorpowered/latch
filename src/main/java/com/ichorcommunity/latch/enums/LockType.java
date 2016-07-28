@@ -34,7 +34,8 @@ public enum LockType {
     /*
      * Accessible by the group
      */
-    GUILD,
+    //TODO implement Guild lock (integration with Guilds)
+    //GUILD,
 
     /*
      * Requires a password every time to use
