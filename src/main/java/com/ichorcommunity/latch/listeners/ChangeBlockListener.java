@@ -185,14 +185,21 @@ public class ChangeBlockListener {
         boolean protectFromExplosives = event.getCause().first(Explosive.class).isPresent() && Latch.getConfig().getNode("protect_from_explosives").getBoolean(true);
 
         if(!protectFromExplosives) {
-            return;
-        }
+            //Delete the locks destroyed by the explosion
+            for( Transaction<BlockSnapshot> bs : event.getTransactions()) {
+                if (bs.isValid() && bs.getOriginal().getLocation().isPresent()) {
+                    if(Latch.getLockManager().getLock(bs.getOriginal().getLocation().get()).isPresent()) {
+                        Latch.getLockManager().deleteLock(bs.getOriginal().getLocation().get(), false);
+                    }
+                }
+            }
+        } else {
+            for (Transaction<BlockSnapshot> bs : event.getTransactions()) {
+                if (bs.isValid() && bs.getOriginal().getLocation().isPresent()) {
 
-        for( Transaction<BlockSnapshot> bs : event.getTransactions()) {
-            if (bs.isValid() && bs.getOriginal().getLocation().isPresent()) {
-
-                if(Latch.getLockManager().getLock(bs.getOriginal().getLocation().get()).isPresent()) {
-                    bs.setValid(false);
+                    if (Latch.getLockManager().getLock(bs.getOriginal().getLocation().get()).isPresent()) {
+                        bs.setValid(false);
+                    }
                 }
             }
         }
