@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.ichorcommunity.latch'
-version '0.0.1'
+version '0.0.2'
 
 apply plugin: 'java'
 description = 'A locking plugin which optionally allows you to lockpick those locks.'

@@ -57,7 +57,7 @@ import java.util.Optional;
 @Plugin(
         id = "latch",
         name = "Latch",
-        version = "0.0.1",
+        version = "0.0.2",
         description = "A locking plugin which optionally allows you to lockpick those locks.",
         url = "http://ichorcommunity.com/",
         authors = {
