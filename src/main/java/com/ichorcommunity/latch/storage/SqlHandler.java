@@ -238,7 +238,7 @@ public class SqlHandler {
 
     public void addLockAccess(Lock thisLock, UUID player) {
 
-        String addPlayerAccess = "INSERT INTO LOCK_PLAYERS(LOCK_ID, PLAYER_UUID) VALUES ?, ?";
+        String addPlayerAccess = "INSERT INTO LOCK_PLAYERS(LOCK_ID, PLAYER_UUID) VALUES (?, ?)";
 
         try {
             Optional<Integer> id = getLockID(thisLock);
