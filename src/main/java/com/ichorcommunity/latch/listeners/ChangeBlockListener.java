@@ -84,6 +84,7 @@ public class ChangeBlockListener {
                         if(player.isPresent() && otherBlockLock.get().isOwner(player.get().getUniqueId())) {
                             Latch.getLockManager().addLockLocation(otherBlockLock.get(), bs.getFinal().getLocation().get());
                             player.get().sendMessage(Text.of("You have expanded your " + otherBlockLock.get().getName() + " lock."));
+                            return; //return to allow expanding locks while having a command persisted
                         } else {
                             bs.setValid(false);
                             event.setCancelled(true);
