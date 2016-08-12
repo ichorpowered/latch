@@ -47,7 +47,7 @@ public class InteractBlockListener {
     @Include( {InteractBlockEvent.Primary.class, InteractBlockEvent.Secondary.class})
     public void onPlayerClick(InteractBlockEvent event, @Root Player player) {
         //Special code to handle shift secondary clicking (placing a block)
-        if(event instanceof InteractBlockEvent.Secondary && player.get(Keys.IS_SNEAKING).isPresent() && player.get(Keys.IS_SNEAKING).get()) {
+        if(event instanceof InteractBlockEvent.Secondary && player.get(Keys.IS_SNEAKING).orElse(false)) {
             if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent() && player.getItemInHand(HandTypes.MAIN_HAND).get().getItem().getBlock().isPresent()) {
                 if(event.getTargetBlock().getLocation().isPresent() && event.getTargetBlock().getLocation().get().getBlockRelative(event.getTargetSide()).getBlockType() == BlockTypes.AIR) {
                     //If they're sneaking and have an item(block) in their hand, and are clicking to replace air... let the blockplace handle it
