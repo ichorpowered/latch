@@ -27,6 +27,7 @@ package com.ichorcommunity.latch;
 
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
+
 import com.ichorcommunity.latch.commands.BaseCommand;
 import com.ichorcommunity.latch.commands.UnlockCommand;
 import com.ichorcommunity.latch.entities.LockManager;
@@ -34,10 +35,9 @@ import com.ichorcommunity.latch.listeners.ChangeBlockListener;
 import com.ichorcommunity.latch.listeners.InteractBlockListener;
 import com.ichorcommunity.latch.listeners.SpawnEntityListener;
 import com.ichorcommunity.latch.storage.SqlHandler;
+
 import net.minecrell.mcstats.SpongeStatsLite;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
@@ -54,10 +54,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+
 @Plugin(
         id = "latch",
         name = "Latch",
-        version = "0.0.2",
+        version = "0.0.3",
         description = "A locking plugin which optionally allows you to lockpick those locks.",
         url = "http://ichorcommunity.com/",
         authors = {
