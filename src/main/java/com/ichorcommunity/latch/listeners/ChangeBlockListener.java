@@ -52,10 +52,15 @@ public class ChangeBlockListener {
         //Did a player cause this... if so use them for owner checks
         Optional<Player> player = event.getCause().last(Player.class);
 
-        //For each of the lockable blocks... make sure we're not impacting another lock the player is not the owner of
+        //Get a player's lock interaction (if present)
+        Optional<AbstractLockInteraction> lockInteraction = player.map( p -> Latch.getLockManager().getInteractionData(p.getUniqueId()));
+
+        //Variable to see if a lock is created -- this way we don't duplicate messages if a lock gets expanded (like placing a door)
+        boolean interactionSuccessful = false;
+
+        //For each of the lockable blocks...
         for( Transaction<BlockSnapshot> bs : event.getTransactions()) {
             if (bs.isValid() && bs.getFinal().getLocation().isPresent()) {
-
                 //If the block is a restricted block, make sure it's not being placed near a lock
                 if( Latch.getLockManager().isRestrictedBlock(bs.getFinal().getState().getType())) {
                     for(Lock lock : LatchUtils.getAdjacentLocks(bs.getFinal().getLocation().get())) {
@@ -66,7 +71,7 @@ public class ChangeBlockListener {
                             if(player.isPresent()) {
                                 player.get().sendMessage(Text.of("You can't place that type of block near a lock you don't own."));
                             }
-                            break;
+                            continue;
                         }
                     }
                 }
@@ -83,44 +88,42 @@ public class ChangeBlockListener {
                     if(otherBlockLock.isPresent()) {
                         if(player.isPresent() && otherBlockLock.get().isOwner(player.get().getUniqueId())) {
                             Latch.getLockManager().addLockLocation(otherBlockLock.get(), bs.getFinal().getLocation().get());
-                            player.get().sendMessage(Text.of("You have expanded your " + otherBlockLock.get().getName() + " lock."));
-                            return; //return to allow expanding locks while having a command persisted
+                            if (!interactionSuccessful) {
+                                player.get().sendMessage(Text.of("You have expanded your " + otherBlockLock.get().getName() + " lock."));
+                            }
+                            continue; //break to allow expanding locks while having a command persisted
                         } else {
                             bs.setValid(false);
                             event.setCancelled(true);
                             if(player.isPresent()) {
                                 player.get().sendMessage(Text.of("You can't place that type of block near a lock you don't own."));
                             }
-                            break;
+                            continue;
                         }
                     }
                 }
 
-            }
-        }
+                //If the player has interaction data
+                if(lockInteraction.isPresent()) {
+                    //Check all of the blocks and apply the interaction
+                    //Could cancel the block placement here if it fails -- but Meronat decided no
+                    if (bs.isValid() && bs.getFinal().getLocation().isPresent() && isSolidBlock(bs.getFinal().getState())) {
 
-        if(!player.isPresent()) {
-            return;
-        }
+                        boolean result = lockInteraction.get().handleInteraction(player.get(), bs.getFinal().getLocation().get(), bs.getFinal());
+                        bs.setValid(result);
 
-        //If the player has interaction data
-        if(Latch.getLockManager().hasInteractionData(player.get().getUniqueId())) {
+                        //Set interactionSuccessful to true so we don't send expanded messages (for doors)
+                        if (result) {
+                            interactionSuccessful = true;
+                        }
 
-            AbstractLockInteraction lockInteraction = Latch.getLockManager().getInteractionData(player.get().getUniqueId());
+                    }
 
-            //Check all of the blocks and apply the interaction
-            //Could cancel the block placement here if it fails -- but Meronat decided no
-            for( Transaction<BlockSnapshot> bs : event.getTransactions()) {
-                if (bs.isValid() && bs.getFinal().getLocation().isPresent() && isSolidBlock(bs.getFinal().getState())) {
-
-                    boolean result = lockInteraction.handleInteraction(player.get(), bs.getFinal().getLocation().get(), bs.getFinal());
-                    bs.setValid(result);
-
+                    if(!lockInteraction.get().shouldPersist()) {
+                        Latch.getLockManager().removeInteractionData(player.get().getUniqueId());
+                    }
                 }
-            }
 
-            if(!lockInteraction.shouldPersist()) {
-                Latch.getLockManager().removeInteractionData(player.get().getUniqueId());
             }
         }
     }
@@ -137,15 +140,13 @@ public class ChangeBlockListener {
                 if(Latch.getLockManager().isProtectBelowBlocks(bs.getOriginal().getLocation().get().getBlockRelative(Direction.UP).getBlockType()) &&
                         Latch.getLockManager().getLock(bs.getOriginal().getLocation().get().getBlockRelative(Direction.UP)).isPresent()) {
                     bs.setValid(false);
+                    continue;
                 }
 
                 //If lock is present and the player is NOT the owner
                 if(lock.isPresent() && !lock.get().isOwner(player.getUniqueId())) {
                     bs.setValid(false);
-                }
-
-                //Delete the lock
-                if(lock.isPresent()) {
+                } else if(lock.isPresent()) {
                     Latch.getLockManager().deleteLock(bs.getOriginal().getLocation().get(), false);
                 }
             }
