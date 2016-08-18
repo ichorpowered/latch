@@ -61,7 +61,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 @Plugin(
         id = "latch",
         name = "Latch",
-        version = "0.0.3",
+        version = "0.0.4",
         description = "A locking plugin which optionally allows you to lockpick those locks.",
         url = "http://ichorcommunity.com/",
         authors = {
@@ -85,8 +85,6 @@ public class Latch {
     public Latch(Logger logger, @DefaultConfig(sharedRoot = false) Path configPath) {
         Latch.logger = logger;
         Latch.configPath = configPath;
-
-        storageHandler = new SqlHandler();
     }
 
     @Inject
@@ -104,6 +102,8 @@ public class Latch {
     @Listener
     public void onGameInit(GameInitializationEvent event) {
         config = new Configuration(configManager);
+        storageHandler = new SqlHandler();
+
         loadConfigurationData();
 
         registerListeners();
