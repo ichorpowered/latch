@@ -28,7 +28,6 @@ package com.ichorcommunity.latch.storage;
 import com.ichorcommunity.latch.Latch;
 import com.ichorcommunity.latch.entities.Lock;
 import com.ichorcommunity.latch.enums.LockType;
-
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.sql.SqlService;
 import org.spongepowered.api.world.Location;

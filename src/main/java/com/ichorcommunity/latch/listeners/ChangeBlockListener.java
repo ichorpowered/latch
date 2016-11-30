@@ -95,9 +95,7 @@ public class ChangeBlockListener {
                         } else {
                             bs.setValid(false);
                             event.setCancelled(true);
-                            if(player.isPresent()) {
-                                player.get().sendMessage(Text.of("You can't place that type of block near a lock you don't own."));
-                            }
+                            player.ifPresent(p -> p.sendMessage(Text.of("You can't place that type of block near a lock you don't own.")));
                             continue;
                         }
                     }
@@ -211,10 +209,7 @@ public class ChangeBlockListener {
     //So let's limit our block placing to just solid blocks
     private boolean isSolidBlock(BlockState bs) {
         Optional<MatterProperty> mp = bs.getProperty(MatterProperty.class);
-        if(mp.isPresent() && mp.get().getValue() == MatterProperty.Matter.SOLID) {
-            return true;
-        }
-        return false;
+        return mp.isPresent() && mp.get().getValue() == MatterProperty.Matter.SOLID;
     }
 
 

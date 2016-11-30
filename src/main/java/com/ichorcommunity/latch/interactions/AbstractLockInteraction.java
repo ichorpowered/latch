@@ -37,7 +37,6 @@ public interface AbstractLockInteraction {
 
     boolean shouldPersist();
 
-    void setPersistance(boolean persist);
-
+    void setPersistence(boolean persist);
 
 }

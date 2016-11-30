@@ -39,6 +39,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 public class CreatePublicLockCommand implements CommandExecutor {
 
@@ -62,17 +63,19 @@ public class CreatePublicLockCommand implements CommandExecutor {
 
         if(src instanceof Player) {
 
-            CreateLockInteraction privateLock = new CreateLockInteraction(((Player) src).getUniqueId(), LockType.PUBLIC, "");
-            privateLock.setPersistance(args.hasAny("p"));
+            Player player = (Player) src;
 
-            Latch.getLockManager().setInteractionData(((Player) src).getUniqueId(), privateLock);
+            CreateLockInteraction privateLock = new CreateLockInteraction(player.getUniqueId(), LockType.PUBLIC, "");
+            privateLock.setPersistence(args.hasAny("p"));
 
-            ((Player) src).sendMessage(Text.of("You will lock the next latchable block you click or place."));
+            Latch.getLockManager().setInteractionData(player.getUniqueId(), privateLock);
+
+            player.sendMessage(Text.of("You will lock the next latchable block you click or place."));
 
             return CommandResult.success();
         }
 
-        return CommandResult.empty();
+        throw new CommandException(Text.of(TextColors.DARK_RED, "You must be a player to use this command."));
     }
 
 }

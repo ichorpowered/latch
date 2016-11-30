@@ -83,7 +83,7 @@ public class UnlockLockInteraction implements AbstractLockInteraction {
 
                 //If the block has another block that needs to be unlocked
                 if(optionalOtherBlock.isPresent()) {
-                    otherBlockLock = Optional.ofNullable(Latch.getLockManager().getLock(optionalOtherBlock.get()).get());
+                    otherBlockLock = Optional.of(Latch.getLockManager().getLock(optionalOtherBlock.get()).get());
                 }
                 if(otherBlockLock.isPresent()) {
                     if(!otherBlockLock.get().getPassword().equalsIgnoreCase(password)) {
@@ -113,7 +113,7 @@ public class UnlockLockInteraction implements AbstractLockInteraction {
     }
 
     @Override
-    public void setPersistance(boolean persist) {
+    public void setPersistence(boolean persist) {
         this.persisting = persist;
     }
 }

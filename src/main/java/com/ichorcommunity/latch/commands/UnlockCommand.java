@@ -63,20 +63,22 @@ public class UnlockCommand implements CommandExecutor {
 
         if(src instanceof Player) {
 
-            Optional<String> password = args.<String>getOne("password");
+            Optional<String> password = args.getOne("password");
+
+            Player player = (Player) src;
 
             if(!password.isPresent())  {
-                ((Player) src).sendMessage(Text.of("You must specify a password to unlock locks."));
+                player.sendMessage(Text.of("You must specify a password to unlock locks."));
                 return CommandResult.empty();
             }
 
             UnlockLockInteraction unlockLock = new UnlockLockInteraction(((Player) src).getUniqueId(), password.get());
 
-            unlockLock.setPersistance(args.hasAny("p"));
+            unlockLock.setPersistence(args.hasAny("p"));
 
-            Latch.getLockManager().setInteractionData(((Player) src).getUniqueId(), unlockLock);
+            Latch.getLockManager().setInteractionData(player.getUniqueId(), unlockLock);
 
-            ((Player) src).sendMessage(Text.of("You will unlock the next lock you click."));
+            player.sendMessage(Text.of("You will unlock the next lock you click."));
 
             return CommandResult.success();
         }

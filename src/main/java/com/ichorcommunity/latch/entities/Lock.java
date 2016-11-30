@@ -135,12 +135,8 @@ public class Lock {
 
         if(userStorageService.isPresent()) {
             for(UUID uuid : ableToAccess) {
-                Optional<User> user = userStorageService.get().get(uuid);
-                if(user.isPresent()) {
-                    names.add(user.get().getName());
-                }
+                userStorageService.get().get(uuid).ifPresent(u -> names.add(u.getName()));
             }
-
         }
 
         return names;

@@ -39,6 +39,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
 
@@ -68,10 +69,12 @@ public class CreatePasswordLockCommand implements CommandExecutor {
 
         if(src instanceof Player) {
             //Check for password
-            Optional<String> password = args.<String>getOne("password");
+            Optional<String> password = args.getOne("password");
+
+            Player player = (Player) src;
 
             if(!password.isPresent()) {
-                ((Player) src).sendMessage(Text.of("Missing a password: /latch password [password]"));
+                player.sendMessage(Text.of("Missing a password: /latch password [password]"));
                 return CommandResult.empty();
             }
 
@@ -82,16 +85,16 @@ public class CreatePasswordLockCommand implements CommandExecutor {
                 typeToUse= LockType.PASSWORD_ONCE;
             }
 
-            CreateLockInteraction passwordLock = new CreateLockInteraction(((Player) src).getUniqueId(), typeToUse, password.get());
-            passwordLock.setPersistance(args.hasAny("p"));
+            CreateLockInteraction passwordLock = new CreateLockInteraction(player.getUniqueId(), typeToUse, password.get());
+            passwordLock.setPersistence(args.hasAny("p"));
 
             Latch.getLockManager().setInteractionData(((Player) src).getUniqueId(), passwordLock);
 
-            ((Player) src).sendMessage(Text.of("You will lock the next latchable block you click or place."));
+            player.sendMessage(Text.of("You will lock the next latchable block you click or place."));
 
             return CommandResult.success();
         }
 
-        return CommandResult.empty();
+        throw new CommandException(Text.of(TextColors.DARK_RED, "You must be a player to use this command."));
     }
 }

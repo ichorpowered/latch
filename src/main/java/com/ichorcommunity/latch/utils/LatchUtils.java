@@ -26,10 +26,9 @@
 package com.ichorcommunity.latch.utils;
 
 import com.google.common.collect.ImmutableList;
-
 import com.ichorcommunity.latch.Latch;
 import com.ichorcommunity.latch.entities.Lock;
-
+import com.ichorcommunity.latch.entities.LockManager;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.key.Keys;
@@ -41,6 +40,8 @@ import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -50,9 +51,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 
 import static com.ichorcommunity.latch.Latch.getLogger;
 
@@ -72,14 +70,13 @@ public class LatchUtils {
     }
 
     public static List<Lock> getAdjacentLocks(Location location) {
-        List<Lock> lockList = new ArrayList();
+        List<Lock> lockList = new ArrayList<>();
+
+        LockManager lockManager = Latch.getLockManager();
 
         for( Direction d : adjacentDirections) {
-            if(Latch.getLockManager().isLockableBlock(location.getBlockRelative(d).getBlock().getType())) {
-                Optional<Lock> lock = Latch.getLockManager().getLock(location.getBlockRelative(d));
-                if(lock.isPresent()) {
-                    lockList.add(lock.get());
-                }
+            if(lockManager.isLockableBlock(location.getBlockRelative(d).getBlock().getType())) {
+                lockManager.getLock(location.getBlockRelative(d)).ifPresent(lockList::add);
             }
         }
         return lockList;

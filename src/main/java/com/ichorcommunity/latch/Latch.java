@@ -27,7 +27,6 @@ package com.ichorcommunity.latch;
 
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
-
 import com.ichorcommunity.latch.commands.BaseCommand;
 import com.ichorcommunity.latch.commands.UnlockCommand;
 import com.ichorcommunity.latch.entities.LockManager;
@@ -35,9 +34,10 @@ import com.ichorcommunity.latch.listeners.ChangeBlockListener;
 import com.ichorcommunity.latch.listeners.InteractBlockListener;
 import com.ichorcommunity.latch.listeners.SpawnEntityListener;
 import com.ichorcommunity.latch.storage.SqlHandler;
-
 import net.minecrell.mcstats.SpongeStatsLite;
-
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
@@ -52,16 +52,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
-
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 @Plugin(
         id = "latch",
         name = "Latch",
-        version = "0.0.4",
+        version = "0.0.5",
         description = "A locking plugin which optionally allows you to lockpick those locks.",
         url = "http://ichorcommunity.com/",
         authors = {
@@ -79,7 +74,7 @@ public class Latch {
     private static SqlHandler storageHandler;
 
     @Inject
-    public SpongeStatsLite stats;
+    private SpongeStatsLite stats;
 
     @Inject
     public Latch(Logger logger, @DefaultConfig(sharedRoot = false) Path configPath) {
@@ -113,12 +108,10 @@ public class Latch {
 
         //Register permissions
         if(getConfig().getNode("add_default_permissions").getBoolean()) {
-            Optional<PermissionService> ps = Sponge.getServiceManager().provide(PermissionService.class);
-            if (ps.isPresent()) {
-                ps.get().getUserSubjects().getDefaults().getSubjectData().setPermission(ps.get().getDefaults().getActiveContexts(), "latch.normal", Tristate.TRUE);
-            }
+            Sponge.getServiceManager().provide(PermissionService.class).ifPresent(
+                    p -> p.getUserSubjects().getDefaults().getSubjectData()
+                            .setPermission(p.getDefaults().getActiveContexts(), "latch.normal", Tristate.TRUE));
         }
-
 
     }
 

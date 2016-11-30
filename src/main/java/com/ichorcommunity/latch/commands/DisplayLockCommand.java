@@ -38,6 +38,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 public class DisplayLockCommand implements CommandExecutor {
 
@@ -60,17 +61,20 @@ public class DisplayLockCommand implements CommandExecutor {
 
         if(src instanceof Player) {
 
-            DisplayLockInteraction displayLock = new DisplayLockInteraction(((Player) src).getUniqueId());
-            displayLock.setPersistance(args.hasAny("p"));
+            Player player = (Player) src;
 
-            Latch.getLockManager().setInteractionData(((Player) src).getUniqueId(), displayLock);
+            DisplayLockInteraction displayLock = new DisplayLockInteraction(player.getUniqueId());
+            displayLock.setPersistence(args.hasAny("p"));
 
-            ((Player) src).sendMessage(Text.of("You will display information of the next lock you click."));
+            Latch.getLockManager().setInteractionData(player.getUniqueId(), displayLock);
+
+            player.sendMessage(Text.of("You will display information of the next lock you click."));
 
             return CommandResult.success();
         }
 
-        return CommandResult.empty();
+        throw new CommandException(Text.of(TextColors.DARK_RED, "You must be a player to use this command."));
+
     }
 
 }

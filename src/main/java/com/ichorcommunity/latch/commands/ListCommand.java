@@ -71,11 +71,12 @@ public class ListCommand implements CommandExecutor {
         User userToUse = args.<User>getOne("owner").get();
 
         //If the user doesn't have the permission to check someone else's lock, default to them
-        if( src instanceof User && !src.hasPermission("latch.admin.list")) {
-            userToUse = (User) src;
-        } else {
-            src.sendMessage(Text.of("You don't have permission to use this command."));
-            return CommandResult.empty();
+        if (src instanceof User) {
+            if (!src.hasPermission("latch.admin.list")) {
+                userToUse = (User) src;
+            }
+        } else if (!src.hasPermission("latch.admin.list")) {
+            throw new CommandException(Text.of(TextColors.DARK_RED, "You do not have permission to use this command."));
         }
 
         String displayName = src.getName().equalsIgnoreCase(userToUse.getName()) ? "Your" : userToUse.getName()+"'s";

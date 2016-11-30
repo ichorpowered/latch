@@ -119,7 +119,7 @@ public class CreateLockInteraction implements AbstractLockInteraction {
     }
 
     @Override
-    public void setPersistance(boolean persist) {
+    public void setPersistence(boolean persist) {
         this.persisting = persist;
     }
 

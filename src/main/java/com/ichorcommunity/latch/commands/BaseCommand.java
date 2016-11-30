@@ -75,7 +75,7 @@ public class BaseCommand implements CommandExecutor {
                         .build())
                 .build();
 
-        source.sendMessage(Text.of(TextColors.DARK_GREEN, Sponge.getPluginManager().getPlugin("latch").get().getName(), " v", Sponge.getPluginManager().getPlugin("latch").get().getVersion().get()));
+        source.sendMessage(Text.of(TextColors.DARK_GREEN, "Latch", " v", Sponge.getPluginManager().getPlugin("latch").get().getVersion().get()));
         source.sendMessage(Text.of(TextColors.GRAY, "Created by ", StringUtils.join(Sponge.getPluginManager().getPlugin("latch").get().getAuthors(), ", ")));
         source.sendMessage(help);
 

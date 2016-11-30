@@ -1,10 +1,10 @@
 plugins {
-    id 'org.spongepowered.plugin' version '0.6'
-    id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id 'org.spongepowered.plugin' version '0.8'
+    id 'com.github.johnrengelman.shadow' version '1.2.4'
 }
 
 group 'com.ichorcommunity.latch'
-version '0.0.4'
+version '0.0.5'
 
 apply plugin: 'java'
 description = 'A locking plugin which optionally allows you to lockpick those locks.'
@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.spongepowered:spongeapi:5.0.0-SNAPSHOT'
+    compile 'org.spongepowered:spongeapi:6.0.0-SNAPSHOT'
     compile 'net.minecrell.mcstats:statslite-sponge:0.2.2'
 }
 

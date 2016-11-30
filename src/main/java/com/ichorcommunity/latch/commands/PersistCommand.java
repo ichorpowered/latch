@@ -38,6 +38,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 public class PersistCommand implements CommandExecutor {
 
@@ -56,23 +57,25 @@ public class PersistCommand implements CommandExecutor {
 
         if(src instanceof Player) {
 
-            if(!Latch.getLockManager().hasInteractionData(((Player) src).getUniqueId())) {
-                ((Player) src).sendMessage(Text.of("You must have run a latch command to persist/clear it."));
+            Player player = (Player) src;
+
+            if(!Latch.getLockManager().hasInteractionData(player.getUniqueId())) {
+                player.sendMessage(Text.of("You must have run a latch command to persist/clear it."));
                 return CommandResult.empty();
             }
 
-            AbstractLockInteraction interaction = Latch.getLockManager().getInteractionData(((Player) src).getUniqueId());
-            interaction.setPersistance(!interaction.shouldPersist());
+            AbstractLockInteraction interaction = Latch.getLockManager().getInteractionData(player.getUniqueId());
+            interaction.setPersistence(!interaction.shouldPersist());
 
             if(interaction.shouldPersist()) {
-                ((Player) src).sendMessage(Text.of("Your latch command will now persist."));
+                player.sendMessage(Text.of("Your latch command will now persist."));
             } else {
                 Latch.getLockManager().removeInteractionData(((Player) src).getUniqueId());
-                ((Player) src).sendMessage(Text.of("Your latch command has been cleared."));
+                player.sendMessage(Text.of("Your latch command has been cleared."));
             }
             return CommandResult.success();
         }
 
-        return CommandResult.empty();
+        throw new CommandException(Text.of(TextColors.DARK_RED, "You must be a player to use this command."));
     }
 }

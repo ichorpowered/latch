@@ -40,6 +40,7 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -71,58 +72,60 @@ public class ChangeLockCommand implements CommandExecutor {
 
         if(src instanceof Player) {
 
+            Player player = (Player) src;
+
             if( !(args.hasAny("name") || args.hasAny("type") || args.hasAny("owner") || args.hasAny("password") || args.hasAny("add") || args.hasAny("remove")) ) {
-                ((Player) src).sendMessage(Text.of("You must specify at least one attribute to change."));
+                player.sendMessage(Text.of("You must specify at least one attribute to change."));
                 return CommandResult.empty();
             }
 
             ChangeLockInteraction changeLock = new ChangeLockInteraction(((Player) src).getUniqueId());
 
-            Optional<String> optionalString = args.<String>getOne("name");
+            Optional<String> optionalString = args.getOne("name");
             if(optionalString.isPresent()) {
                 if(optionalString.get().length() <= 25) {
                     changeLock.setLockName(optionalString.get());
                 } else {
-                    ((Player) src).sendMessage(Text.of("Lock names must be less than 25 characters long."));
+                    player.sendMessage(Text.of("Lock names must be less than 25 characters long."));
                     return CommandResult.empty();
                 }
             }
 
-            Optional<LockType> optionalType = args.<LockType>getOne("type");
+            Optional<LockType> optionalType = args.getOne("type");
             if(optionalType.isPresent()) {
                 changeLock.setType(optionalType.get());
             }
 
-            Optional<User> optionalUser = args.<User>getOne("owner");
+            Optional<User> optionalUser = args.getOne("owner");
             if(optionalUser.isPresent()) {
                 changeLock.setNewOwner(optionalUser.get().getUniqueId());
             }
 
-            optionalString = args.<String>getOne("password");
+            optionalString = args.getOne("password");
             if(optionalString.isPresent()) {
                 changeLock.setPassword(optionalString.get());
             }
 
-            Collection<User> members = args.<User>getAll("add");
+            Collection<User> members = args.getAll("add");
             if(members.size() > 0) {
                 changeLock.setMembersToAdd(members);
             }
 
-             members = args.<User>getAll("remove");
+             members = args.getAll("remove");
             if(members.size() > 0) {
                 changeLock.setMembersToRemove(members);
             }
 
-            changeLock.setPersistance(args.hasAny("p"));
+            changeLock.setPersistence(args.hasAny("p"));
 
             Latch.getLockManager().setInteractionData(((Player) src).getUniqueId(), changeLock);
 
-            ((Player) src).sendMessage(Text.of("You will change the next lock you click."));
+            player.sendMessage(Text.of("You will change the next lock you click."));
 
             return CommandResult.success();
         }
 
-        return CommandResult.empty();
+        throw new CommandException(Text.of(TextColors.DARK_RED, "You must be a player to use this command."));
     }
 
 }
