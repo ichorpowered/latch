@@ -41,9 +41,11 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.GuavaCollectors;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class ChangeLockCommand implements CommandExecutor {
 
@@ -79,7 +81,7 @@ public class ChangeLockCommand implements CommandExecutor {
                 return CommandResult.empty();
             }
 
-            ChangeLockInteraction changeLock = new ChangeLockInteraction(((Player) src).getUniqueId());
+            ChangeLockInteraction changeLock = new ChangeLockInteraction(player.getUniqueId());
 
             Optional<String> optionalString = args.getOne("name");
             if(optionalString.isPresent()) {
@@ -106,21 +108,23 @@ public class ChangeLockCommand implements CommandExecutor {
                 changeLock.setPassword(optionalString.get());
             }
 
-            Collection<User> members = args.getAll("add");
+            List<UUID> members = args.<User>getAll("add").stream().map(User::getUniqueId).collect(GuavaCollectors.toImmutableList());
+
             if(members.size() > 0) {
                 changeLock.setMembersToAdd(members);
             }
 
-             members = args.getAll("remove");
+            members = args.<User>getAll("remove").stream().map(User::getUniqueId).collect(GuavaCollectors.toImmutableList());
+
             if(members.size() > 0) {
                 changeLock.setMembersToRemove(members);
             }
 
             changeLock.setPersistence(args.hasAny("p"));
 
-            Latch.getLockManager().setInteractionData(((Player) src).getUniqueId(), changeLock);
+            Latch.getLockManager().setInteractionData(player.getUniqueId(), changeLock);
 
-            player.sendMessage(Text.of("You will change the next lock you click."));
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will change the next lock you click."));
 
             return CommandResult.success();
         }

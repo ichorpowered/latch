@@ -92,11 +92,19 @@ public class Latch {
 
     @Listener
     public void onPreInitialization(GamePreInitializationEvent event) {
-        this.stats.start();
+        // TODO Replace stats
+        //this.stats.start();
     }
 
     @Listener
     public void onGameInit(GameInitializationEvent event) {
+
+        // TODO Add donation lock
+        // TODO Configure if redstone can interact with lock
+        // TODO Add admin bypass, PurgeALL command
+        // TODO Colorize command messages
+        // TODO Lock visualize command
+
         config = new Configuration(configManager);
         storageHandler = new SqlHandler();
 

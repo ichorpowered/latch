@@ -70,7 +70,22 @@ class Configuration {
             lockableBlocks.add(BlockTypes.CHEST.getId());
             lockableBlocks.add(BlockTypes.TRAPPED_CHEST.getId());
 
-            // TODO Add shulker boxes
+            /*lockableBlocks.add(BlockTypes.BLACK_SHULKER_BOX.getId());
+            lockableBlocks.add(BlockTypes.BLUE_SHULKER_BOX.getId());
+            lockableBlocks.add(BlockTypes.BROWN_SHULKER_BOX.getId());
+            lockableBlocks.add(BlockTypes.CYAN_SHULKER_BOX.getId());
+            lockableBlocks.add(BlockTypes.GRAY_SHULKER_BOX.getId());
+            lockableBlocks.add(BlockTypes.GREEN_SHULKER_BOX.getId());
+            lockableBlocks.add(BlockTypes.LIGHT_BLUE_SHULKER_BOX.getId());
+            lockableBlocks.add(BlockTypes.LIME_SHULKER_BOX.getId());
+            lockableBlocks.add(BlockTypes.MAGENTA_SHULKER_BOX.getId());
+            lockableBlocks.add(BlockTypes.ORANGE_SHULKER_BOX.getId());
+            lockableBlocks.add(BlockTypes.PINK_SHULKER_BOX.getId());
+            lockableBlocks.add(BlockTypes.PURPLE_SHULKER_BOX.getId());
+            lockableBlocks.add(BlockTypes.RED_SHULKER_BOX.getId());
+            lockableBlocks.add(BlockTypes.SILVER_SHULKER_BOX.getId());
+            lockableBlocks.add(BlockTypes.WHITE_SHULKER_BOX.getId());
+            lockableBlocks.add(BlockTypes.YELLOW_SHULKER_BOX.getId());*/
 
             lockableBlocks.add(BlockTypes.BREWING_STAND.getId());
             lockableBlocks.add(BlockTypes.JUKEBOX.getId());

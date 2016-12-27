@@ -31,7 +31,6 @@ import com.ichorcommunity.latch.enums.LockType;
 import com.ichorcommunity.latch.utils.LatchUtils;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -48,8 +47,8 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
     private String password;
     private String lockName;
     private UUID newOwner;
-    private Collection<User> membersToAdd;
-    private Collection<User> membersToRemove;
+    private Collection<UUID> membersToAdd;
+    private Collection<UUID> membersToRemove;
 
     private boolean persisting = false;
 
@@ -74,11 +73,11 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
         this.newOwner = newOwner;
     }
 
-    public void setMembersToAdd(Collection<User> members) {
+    public void setMembersToAdd(Collection<UUID> members) {
         this.membersToAdd = members;
     }
 
-    public void setMembersToRemove(Collection<User> members) {
+    public void setMembersToRemove(Collection<UUID> members) {
         this.membersToRemove = members;
     }
 
@@ -128,13 +127,13 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
             lock.get().setOwner(newOwner);
         }
         if(membersToAdd != null) {
-            for(User user : membersToAdd) {
-                Latch.getLockManager().addLockAccess(lock.get(), user.getUniqueId());
+            for(UUID u : membersToAdd) {
+                Latch.getLockManager().addLockAccess(lock.get(), u);
             }
         }
         if(membersToRemove != null) {
-            for(User user : membersToRemove) {
-                Latch.getLockManager().removeLockAccess(lock.get(), user.getUniqueId());
+            for(UUID u : membersToRemove) {
+                Latch.getLockManager().removeLockAccess(lock.get(), u);
             }
         }
 
