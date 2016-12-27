@@ -1,9 +1,8 @@
 plugins {
     id 'org.spongepowered.plugin' version '0.8.1'
-    id 'com.github.johnrengelman.shadow' version '1.2.4'
 }
 
-group 'com.ichorcommunity.latch'
+group 'com.meronat.latch'
 version '0.0.5'
 
 apply plugin: 'java'
@@ -26,17 +25,4 @@ repositories {
 
 dependencies {
     compile 'org.spongepowered:spongeapi:6.0.0-SNAPSHOT'
-    compile 'net.minecrell.mcstats:statslite-sponge:0.2.2'
-}
-
-shadowJar {
-    dependencies {
-        include dependency('net.minecrell.mcstats:statslite-sponge')
-    }
-
-    relocate 'net.minecrell.mcstats', 'com.ichorcommunity.latch.mcstats'
-}
-
-artifacts {
-    archives shadowJar
 }
