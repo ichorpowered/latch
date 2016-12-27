@@ -1,7 +1,7 @@
 /*
  * This file is part of Latch, licensed under the MIT License (MIT).
  *
- * Copyright (c) Ichor Community <http://www.ichorcommunity.com>
+ * Copyright (c) IchorPowered <https://github.com/IchorPowered>
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy

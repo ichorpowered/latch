@@ -1,7 +1,7 @@
 /*
  * This file is part of Latch, licensed under the MIT License (MIT).
  *
- * Copyright (c) Ichor Community <http://www.ichorcommunity.com>
+ * Copyright (c) IchorPowered <https://github.com/IchorPowered>
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -41,7 +41,7 @@ import javax.annotation.Nonnull;
 
 public class BaseCommand implements CommandExecutor {
 
-    public final CommandSpec baseCommand = CommandSpec.builder()
+    private final CommandSpec baseCommand = CommandSpec.builder()
             .description(Text.of("The base Latch command."))
             .permission("latch.normal")
             .child(new CreatePrivateLockCommand().getCommand(), "private")
@@ -80,5 +80,11 @@ public class BaseCommand implements CommandExecutor {
         source.sendMessage(help);
 
         return CommandResult.success();
+    }
+
+    public CommandSpec getCommand() {
+
+        return this.baseCommand;
+
     }
 }

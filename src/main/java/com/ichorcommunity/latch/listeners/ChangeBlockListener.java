@@ -1,7 +1,7 @@
 /*
  * This file is part of Latch, licensed under the MIT License (MIT).
  *
- * Copyright (c) Ichor Community <http://www.ichorcommunity.com>
+ * Copyright (c) IchorPowered <https://github.com/IchorPowered>
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -68,10 +68,7 @@ public class ChangeBlockListener {
                         if( (!player.isPresent() || (player.isPresent() && !lock.isOwner(player.get().getUniqueId()))) ) {
                             bs.setValid(false);
                             event.setCancelled(true);
-                            if(player.isPresent()) {
-                                player.get().sendMessage(Text.of("You can't place that type of block near a lock you don't own."));
-                            }
-                            continue;
+                            player.ifPresent(p -> p.sendMessage(Text.of("You can't place that type of block near a lock you don't own.")));
                         }
                     }
                 }

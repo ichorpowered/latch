@@ -1,7 +1,7 @@
 /*
  * This file is part of Latch, licensed under the MIT License (MIT).
  *
- * Copyright (c) Ichor Community <http://www.ichorcommunity.com>
+ * Copyright (c) IchorPowered <https://github.com/IchorPowered>
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -41,6 +41,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
@@ -52,6 +53,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Plugin(
         id = "latch",
@@ -93,7 +95,6 @@ public class Latch {
         this.stats.start();
     }
 
-
     @Listener
     public void onGameInit(GameInitializationEvent event) {
         config = new Configuration(configManager);
@@ -103,10 +104,10 @@ public class Latch {
 
         registerListeners();
 
-        Sponge.getCommandManager().register(this, new BaseCommand().baseCommand, "latch", "lock");
+        Sponge.getCommandManager().register(this, new BaseCommand().getCommand(), "latch", "lock");
         Sponge.getCommandManager().register(this, new UnlockCommand().getCommand(), "unlock", "unlatch");
 
-        //Register permissions
+        // Register base permission node.
         if(getConfig().getNode("add_default_permissions").getBoolean()) {
             Sponge.getServiceManager().provide(PermissionService.class).ifPresent(
                     p -> p.getUserSubjects().getDefaults().getSubjectData()
@@ -120,9 +121,13 @@ public class Latch {
     }
 
     private void registerListeners() {
-        Sponge.getEventManager().registerListeners(this, new ChangeBlockListener());
-        Sponge.getEventManager().registerListeners(this, new InteractBlockListener());
-        Sponge.getEventManager().registerListeners(this, new SpawnEntityListener());
+
+        EventManager eventManager = Sponge.getEventManager();
+
+        eventManager.registerListeners(this, new ChangeBlockListener());
+        eventManager.registerListeners(this, new InteractBlockListener());
+        eventManager.registerListeners(this, new SpawnEntityListener());
+
     }
 
     private void loadConfigurationData() {
@@ -153,8 +158,8 @@ public class Latch {
         }
 
         try {
-            lockLimits = (HashMap<String, Integer>) getConfig().getNode("lock_limit").getValue(lockLimits);
-        } catch (Exception e) {
+            lockLimits = (HashMap<String, Integer>) getConfig().getNode("lock_limit").getValue(new TypeToken<Map<String, Integer>>() {});
+        } catch (ObjectMappingException e) {
             getLogger().error("Error loading lock limits");
             e.printStackTrace();
         }
@@ -165,13 +170,20 @@ public class Latch {
         lockManager.setLockLimits(lockLimits);
     }
 
-    public static SqlHandler getStorageHandler() { return storageHandler;}
+    public static SqlHandler getStorageHandler() {
+        return storageHandler;
+    }
 
-    public static LockManager getLockManager() { return lockManager;}
+    public static LockManager getLockManager() {
+        return lockManager;
+    }
 
     public static CommentedConfigurationNode getConfig() {
         return config.getConfigurationNode();
     }
 
-    public static Path getConfigPatch() { return configPath; }
+    public static Path getConfigPatch() {
+        return configPath;
+    }
+
 }

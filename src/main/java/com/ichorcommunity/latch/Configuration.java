@@ -1,7 +1,7 @@
 /*
  * This file is part of Latch, licensed under the MIT License (MIT).
  *
- * Copyright (c) Ichor Community <http://www.ichorcommunity.com>
+ * Copyright (c) IchorPowered <https://github.com/IchorPowered>
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,15 +25,18 @@
 
 package com.ichorcommunity.latch;
 
+import com.google.common.reflect.TypeToken;
 import com.ichorcommunity.latch.enums.LockType;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.spongepowered.api.block.BlockTypes;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class Configuration {
 
@@ -63,8 +66,11 @@ class Configuration {
         //Blocks we're able to lock
         if(configNode.getNode("lockable_blocks").isVirtual()) {
             List<String> lockableBlocks = new ArrayList<>();
+
             lockableBlocks.add(BlockTypes.CHEST.getId());
             lockableBlocks.add(BlockTypes.TRAPPED_CHEST.getId());
+
+            // TODO Add shulker boxes
 
             lockableBlocks.add(BlockTypes.BREWING_STAND.getId());
             lockableBlocks.add(BlockTypes.JUKEBOX.getId());
@@ -127,7 +133,12 @@ class Configuration {
             limits.put(LockType.PASSWORD_ALWAYS.toString().toLowerCase(), 2);
             limits.put(LockType.PASSWORD_ONCE.toString().toLowerCase(), 2);
 
-            configNode.getNode("lock_limit").setValue(limits);
+            try {
+                configNode.getNode("lock_limit").setValue(new TypeToken<Map<String, Integer>>() {}, limits);
+            } catch (ObjectMappingException e) {
+                configNode.getNode("lock_limit").setValue(limits);
+                e.printStackTrace();
+            }
         }
     }
 
