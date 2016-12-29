@@ -142,8 +142,12 @@ public class Lock {
         return names;
     }
 
-    public boolean canAccess(UUID uniqueId) {
+    public boolean canView(UUID uniqueId) {
         return ableToAccess.contains(uniqueId) || owner.equals(uniqueId) || type == LockType.PUBLIC || type == LockType.DONATION;
+    }
+
+    public boolean canAccess(UUID uniqueId) {
+        return ableToAccess.contains(uniqueId) || owner.equals(uniqueId) || type == LockType.DONATION;
     }
 
     public String getPassword() {
