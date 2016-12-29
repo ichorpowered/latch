@@ -30,8 +30,9 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.impl.AbstractEvent;
 
-public class LockCreateEvent implements Event, Cancellable  {
+public class LockCreateEvent extends AbstractEvent implements Cancellable  {
 
     private final Cause cause;
     private final Player creator;
