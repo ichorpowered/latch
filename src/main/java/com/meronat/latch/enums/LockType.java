@@ -55,7 +55,6 @@ public enum LockType {
     /*
      * Allows all players to deposit items, only the owner to withdraw
      */
-    // TODO Implement donation chests
-    //DONATION;
+    DONATION;
 
 }

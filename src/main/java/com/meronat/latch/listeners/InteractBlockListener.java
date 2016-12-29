@@ -27,21 +27,58 @@ package com.meronat.latch.listeners;
 
 import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
+import com.meronat.latch.enums.LockType;
 import com.meronat.latch.interactions.AbstractLockInteraction;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
+import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.filter.type.Include;
+import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
+import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.text.Text;
 
+import java.util.Iterator;
 import java.util.Optional;
 
 public class InteractBlockListener {
+
+    @Listener
+    public void onClickInventory(ClickInventoryEvent event, @First Player player) {
+
+        //Make sure we have a transaction to validate
+        if( event.getTransactions().size() <= 0) {
+            return;
+        }
+
+        SlotTransaction slotTransaction = event.getTransactions().get(0);
+
+        //If the player is interacting with a TileEntityCarrier
+        if( slotTransaction.getSlot().parent() instanceof TileEntityCarrier ) {
+            //If the final item is NONE (or amount is less) person is trying to withdraw (so we care about it)
+            if (slotTransaction.getFinal().getType() == ItemTypes.NONE || slotTransaction.getFinal().getCount() < slotTransaction.getOriginal().getCount()) {
+                //Then check to see if there's a lock
+                Optional<Lock> lock = Latch.getLockManager().getLock(((TileEntityCarrier) slotTransaction.getSlot().parent()).getLocation());
+
+                //If there's a donation lock the player CANNOT access
+                if(lock.isPresent() && lock.get().getLockType() == LockType.DONATION && !lock.get().canAccess(player.getUniqueId())) {
+                    //Cancel the event
+                    event.setCancelled(true);
+                }
+            }
+
+        }
+    }
 
     @Listener
     @Include( {InteractBlockEvent.Primary.class, InteractBlockEvent.Secondary.class})

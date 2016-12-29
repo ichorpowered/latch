@@ -143,7 +143,7 @@ public class Lock {
     }
 
     public boolean canAccess(UUID uniqueId) {
-        return ableToAccess.contains(uniqueId) || owner.equals(uniqueId) || type == LockType.PUBLIC;
+        return ableToAccess.contains(uniqueId) || owner.equals(uniqueId) || type == LockType.PUBLIC || type == LockType.DONATION;
     }
 
     public String getPassword() {
