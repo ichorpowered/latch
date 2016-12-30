@@ -27,14 +27,14 @@ package com.meronat.latch;
 
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
-import com.meronat.latch.commands.BaseCommand;
-import com.meronat.latch.listeners.SpawnEntityListener;
-import com.meronat.latch.storage.SqlHandler;
 import com.meronat.latch.bstats.Metrics;
+import com.meronat.latch.commands.BaseCommand;
 import com.meronat.latch.commands.UnlockCommand;
 import com.meronat.latch.entities.LockManager;
 import com.meronat.latch.listeners.ChangeBlockListener;
 import com.meronat.latch.listeners.InteractBlockListener;
+import com.meronat.latch.listeners.SpawnEntityListener;
+import com.meronat.latch.storage.SqlHandler;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -57,7 +57,7 @@ import java.util.Map;
 @Plugin(
         id = "latch",
         name = "Latch",
-        version = "0.0.5",
+        version = "0.1.0",
         description = "A locking plugin which optionally allows you to lockpick those locks.",
         url = "http://ichorcommunity.com/",
         authors = {
@@ -92,10 +92,8 @@ public class Latch {
     @Listener
     public void onGameInit(GameInitializationEvent event) {
 
-        // TODO Add donation lock
         // TODO Configure if redstone can interact with lock
         // TODO Add admin bypass, PurgeALL command
-        // TODO Colorize command messages
         // TODO Lock visualize command
 
         config = new Configuration(configManager);

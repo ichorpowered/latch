@@ -60,22 +60,25 @@ public class PersistCommand implements CommandExecutor {
             Player player = (Player) src;
 
             if(!Latch.getLockManager().hasInteractionData(player.getUniqueId())) {
-                player.sendMessage(Text.of("You must have run a latch command to persist/clear it."));
-                return CommandResult.empty();
+                throw new CommandException(Text.of(TextColors.RED, "You must have run a latch command to persist/clear it."));
             }
 
             AbstractLockInteraction interaction = Latch.getLockManager().getInteractionData(player.getUniqueId());
             interaction.setPersistence(!interaction.shouldPersist());
 
             if(interaction.shouldPersist()) {
-                player.sendMessage(Text.of("Your latch command will now persist."));
+                player.sendMessage(Text.of(TextColors.DARK_GREEN, "Your latch command will now persist."));
             } else {
                 Latch.getLockManager().removeInteractionData(((Player) src).getUniqueId());
-                player.sendMessage(Text.of("Your latch command has been cleared."));
+                player.sendMessage(Text.of(TextColors.DARK_GREEN, "Your latch command has been cleared."));
             }
+
             return CommandResult.success();
+
         }
 
-        throw new CommandException(Text.of(TextColors.DARK_RED, "You must be a player to use this command."));
+        throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
+
     }
+
 }

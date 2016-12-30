@@ -68,12 +68,13 @@ public class DisplayLockCommand implements CommandExecutor {
 
             Latch.getLockManager().setInteractionData(player.getUniqueId(), displayLock);
 
-            player.sendMessage(Text.of("You will display information of the next lock you click."));
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will display information of the next lock you click."));
 
             return CommandResult.success();
+
         }
 
-        throw new CommandException(Text.of(TextColors.DARK_RED, "You must be a player to use this command."));
+        throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
 
     }
 

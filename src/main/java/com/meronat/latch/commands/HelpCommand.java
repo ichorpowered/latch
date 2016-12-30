@@ -62,7 +62,10 @@ public class HelpCommand implements CommandExecutor {
                 Text.builder().append(Text.of("Add -p to persist")).build()));
 
         contents.add(LatchUtils.formatHelpText("/latch password [password]", "Create a password lock with the specified password",
-                Text.builder().append(Text.of("Add -p to persist",Text.NEW_LINE,"Add -o to only require a password the first time")).build()));
+                Text.builder().append(Text.of("Add -p to persist", Text.NEW_LINE,"Add -o to only require a password the first time")).build()));
+
+        contents.add(LatchUtils.formatHelpText("/latch donation", "Create a donation chest which everyone can add to",
+                Text.builder().append(Text.of("Add -p to persist")).build()));
 
         contents.add(LatchUtils.formatHelpText("/latch change", "Change the attributes of one of your locks (hover for flags)",
                 Text.builder().append(Text.of("--name=[name] to rename the lock",Text.NEW_LINE,
@@ -88,12 +91,14 @@ public class HelpCommand implements CommandExecutor {
                 Text.builder().append(Text.of("Or use /latch open [password]")).build()));
 
         Sponge.getServiceManager().provide(PaginationService.class).get().builder()
-                .title(Text.of(TextColors.GRAY, "[ ", TextColors.DARK_GREEN, "Latch Help", TextColors.GRAY, " ]"))
+                .title(Text.of(TextColors.DARK_GREEN, " Latch Help "))
                 .linesPerPage(15)
                 .padding(Text.of(TextColors.GRAY, "="))
                 .contents(contents)
                 .sendTo(src);
 
         return CommandResult.success();
+
     }
+
 }

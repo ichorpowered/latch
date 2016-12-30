@@ -35,6 +35,7 @@ import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -57,20 +58,20 @@ public class CreateLockInteraction implements AbstractLockInteraction {
     }
 
     @Override
-    public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockstate) {
+    public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockState) {
         //Check to see if another lock is present
         if(Latch.getLockManager().getLock(location).isPresent()) {
-            player.sendMessage(Text.of("There is already a lock here."));
+            player.sendMessage(Text.of(TextColors.RED, "There is already a lock here."));
             return false;
         }
 
         //Make sure it's a lockable block
-        if(!Latch.getLockManager().isLockableBlock(blockstate.getState().getType())) {
-            player.sendMessage(Text.of("That is not a lockable block: " + blockstate.getState().getType()));
+        if(!Latch.getLockManager().isLockableBlock(blockState.getState().getType())) {
+            player.sendMessage(Text.of(TextColors.RED, "That is not a lockable block: ", TextColors.GRAY, blockState.getState().getType()));
             return false;
         }
 
-        Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(blockstate);
+        Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(blockState);
 
         HashSet<Location<World>> lockLocations = new HashSet<>();
         lockLocations.add(location);
@@ -81,14 +82,14 @@ public class CreateLockInteraction implements AbstractLockInteraction {
             Optional<Lock> otherLock = Latch.getLockManager().getLock(optionalOtherBlock.get());
             if( otherLock.isPresent() && !otherLock.get().isOwner(player.getUniqueId()) ) {
                 //Shouldn't happen if we've configured this correctly - but just in case...
-                player.sendMessage(Text.of("Another lock already present on the double block - delete locks and try again."));
+                player.sendMessage(Text.of(TextColors.RED, "Another lock already present on the double block - delete locks and try again."));
                 return false;
             }
             lockLocations.add(optionalOtherBlock.get());
         }
 
         if(Latch.getLockManager().isPlayerAtLockLimit(player.getUniqueId(), type)) {
-            player.sendMessage(Text.of("You have reached the limit for locks."));
+            player.sendMessage(Text.of(TextColors.RED, "You have reached the limit for locks."));
             return false;
         }
 
@@ -96,7 +97,7 @@ public class CreateLockInteraction implements AbstractLockInteraction {
         byte[] salt = LatchUtils.generateSalt();
 
         LockCreateEvent lockCreateEvent = new LockCreateEvent(player,
-                new Lock(player.getUniqueId(), type, lockLocations, LatchUtils.getBlockNameFromType(blockstate.getState().getType()), salt, LatchUtils.hashPassword(password, salt)),
+                new Lock(player.getUniqueId(), type, lockLocations, LatchUtils.getBlockNameFromType(blockState.getState().getType()), salt, LatchUtils.hashPassword(password, salt)),
                 Cause.source(player).build());
 
         Sponge.getEventManager().post(lockCreateEvent);
@@ -107,10 +108,12 @@ public class CreateLockInteraction implements AbstractLockInteraction {
         }
 
         //Notify the player
-        player.sendMessage(Text.of("You have created a " + lockCreateEvent.getLock().getLockType() + " lock, " + lockCreateEvent.getLock().getName()));
+        player.sendMessage(Text.of(TextColors.DARK_GREEN, "You have created a ", TextColors.GRAY, lockCreateEvent.getLock().getLockType(),
+                TextColors.DARK_GREEN, " lock called: ", TextColors.GRAY, lockCreateEvent.getLock().getName()));
         Latch.getLockManager().createLock(lockCreateEvent.getLock());
 
         return true;
+
     }
 
     @Override

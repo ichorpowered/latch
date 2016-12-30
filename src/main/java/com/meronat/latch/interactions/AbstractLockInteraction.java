@@ -33,7 +33,7 @@ import org.spongepowered.api.world.World;
 public interface AbstractLockInteraction {
 
     //Must take in BlockSnapshot for when this fires in events - need the "original" or "final" depending on event
-    boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockstate);
+    boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockState);
 
     boolean shouldPersist();
 

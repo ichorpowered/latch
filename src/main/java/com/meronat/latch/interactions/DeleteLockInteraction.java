@@ -30,6 +30,7 @@ import com.meronat.latch.entities.Lock;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -47,22 +48,24 @@ public class DeleteLockInteraction implements AbstractLockInteraction {
     }
 
     @Override
-    public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockstate) {
+    public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockState) {
         Optional<Lock> lock = Latch.getLockManager().getLock(location);
         //Check to see if another lock is present
         if(!lock.isPresent()) {
-            player.sendMessage(Text.of("There is no lock there."));
+            player.sendMessage(Text.of(TextColors.RED, "There is no lock there."));
             return false;
         }
 
         //Check to make sure they're the owner
         if(!lock.get().isOwner(player.getUniqueId())) {
-            player.sendMessage(Text.of("You're not the owner of this lock."));
+            player.sendMessage(Text.of(TextColors.RED, "You're not the owner of this lock."));
             return false;
         }
 
-        player.sendMessage(Text.of("You have deleted this " + lock.get().getLockedObject() + " lock."));
         Latch.getLockManager().deleteLock(location, true);
+
+        player.sendMessage(Text.of(TextColors.DARK_GREEN, "You have deleted this ", TextColors.GRAY,
+                lock.get().getLockedObject(), TextColors.DARK_GREEN, " lock."));
 
         return true;
     }

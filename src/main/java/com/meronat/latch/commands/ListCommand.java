@@ -76,7 +76,7 @@ public class ListCommand implements CommandExecutor {
                 userToUse = (User) src;
             }
         } else if (!src.hasPermission("latch.admin.list")) {
-            throw new CommandException(Text.of(TextColors.DARK_RED, "You do not have permission to use this command."));
+            throw new CommandException(Text.of(TextColors.RED, "You do not have permission to use this command."));
         }
 
         String displayName = src.getName().equalsIgnoreCase(userToUse.getName()) ? "Your" : userToUse.getName()+"'s";
@@ -93,7 +93,7 @@ public class ListCommand implements CommandExecutor {
         }
 
         Sponge.getServiceManager().provide(PaginationService.class).get().builder()
-                .title(Text.of(TextColors.GRAY, "[ ", TextColors.DARK_GREEN, displayName + " Locks", TextColors.GRAY, " ]"))
+                .title(Text.of(TextColors.DARK_GREEN, displayName + " Locks "))
                 .header(Text.of(TextColors.GRAY, "There are ", TextColors.WHITE, locks.size(), TextColors.GRAY, " lock(s):"))
                 .linesPerPage(10)
                 .padding(Text.of(TextColors.GRAY, "="))

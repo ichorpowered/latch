@@ -28,7 +28,6 @@ package com.meronat.latch.commands;
 import com.meronat.latch.Latch;
 import com.meronat.latch.enums.LockType;
 import com.meronat.latch.interactions.CreateLockInteraction;
-
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -71,12 +70,13 @@ public class CreateDonationLockCommand implements CommandExecutor {
 
             Latch.getLockManager().setInteractionData(player.getUniqueId(), privateLock);
 
-            player.sendMessage(Text.of("You will lock the next latchable block you click or place."));
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will lock the next latchable block you click or place."));
 
             return CommandResult.success();
         }
 
-        throw new CommandException(Text.of(TextColors.DARK_RED, "You must be a player to use this command."));
+        throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
+
     }
 
 }

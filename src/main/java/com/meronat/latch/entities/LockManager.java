@@ -26,8 +26,8 @@
 package com.meronat.latch.entities;
 
 import com.meronat.latch.Latch;
-import com.meronat.latch.interactions.AbstractLockInteraction;
 import com.meronat.latch.enums.LockType;
+import com.meronat.latch.interactions.AbstractLockInteraction;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;

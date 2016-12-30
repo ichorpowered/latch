@@ -26,13 +26,14 @@
 package com.meronat.latch.enums;
 
 public enum LockType {
+
     /*
      * Accessible by everyone
      */
     PUBLIC,
 
     /*
-     * Accessible by the group
+     * Accessible by everyone in the guild
      */
     //TODO implement Guild lock (integration with Guilds)
     //GUILD,

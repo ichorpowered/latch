@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.meronat.latch'
-version '0.0.5'
+version '0.1.0'
 
 apply plugin: 'java'
 description = 'A locking plugin which optionally allows you to lockpick those locks.'
@@ -25,5 +25,5 @@ repositories {
 }
 
 dependencies {
-    compile 'org.spongepowered:spongeapi:6.0.0-SNAPSHOT'
+    compile 'org.spongepowered:spongeapi:5.1.0-SNAPSHOT'
 }

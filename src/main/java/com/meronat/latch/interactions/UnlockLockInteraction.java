@@ -32,6 +32,7 @@ import com.meronat.latch.utils.LatchUtils;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -52,7 +53,7 @@ public class UnlockLockInteraction implements AbstractLockInteraction {
     }
 
     @Override
-    public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockstate) {
+    public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockState) {
         Optional<Lock> lock = Latch.getLockManager().getLock(location);
         //Check to see if another lock is present
         if(!lock.isPresent()) {
@@ -68,7 +69,7 @@ public class UnlockLockInteraction implements AbstractLockInteraction {
         //Check the password
         if(Latch.getLockManager().isPasswordCompatibleLock(lock.get())) {
             if( !LatchUtils.hashPassword(password, lock.get().getSalt()).equals(lock.get().getPassword())) {
-                player.sendMessage(Text.of("The password you tried is incorrect."));
+                player.sendMessage(Text.of(TextColors.RED, "The password you tried is incorrect."));
                 return false;
             }
 
@@ -78,7 +79,7 @@ public class UnlockLockInteraction implements AbstractLockInteraction {
                 ArrayList<Lock> locks = new ArrayList<>();
                 locks.add(lock.get());
 
-                Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(blockstate);
+                Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(blockState);
                 Optional<Lock> otherBlockLock = Optional.empty();
 
                 //If the block has another block that needs to be unlocked
@@ -87,7 +88,7 @@ public class UnlockLockInteraction implements AbstractLockInteraction {
                 }
                 if(otherBlockLock.isPresent()) {
                     if(!otherBlockLock.get().getPassword().equalsIgnoreCase(password)) {
-                        player.sendMessage(Text.of("The adjacent lock does not have the same password."));
+                        player.sendMessage(Text.of(TextColors.RED, "The adjacent lock does not have the same password."));
                     } else {
                         locks.add(otherBlockLock.get());
                     }
@@ -97,11 +98,11 @@ public class UnlockLockInteraction implements AbstractLockInteraction {
                 for(Lock thisLock : locks) {
                     Latch.getLockManager().addLockAccess(thisLock, player.getUniqueId());
                 }
-                player.sendMessage(Text.of("Unlocking the password lock for future access."));
+                player.sendMessage(Text.of(TextColors.DARK_GREEN, "Unlocking the password lock for future access."));
             }
             return true;
         } else {
-            player.sendMessage(Text.of("That is not a password lock."));
+            player.sendMessage(Text.of(TextColors.RED, "That is not a password lock."));
         }
         //Default state
         return false;

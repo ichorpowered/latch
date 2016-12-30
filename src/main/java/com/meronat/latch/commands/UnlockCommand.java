@@ -38,6 +38,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
 
@@ -68,8 +69,7 @@ public class UnlockCommand implements CommandExecutor {
             Player player = (Player) src;
 
             if(!password.isPresent())  {
-                player.sendMessage(Text.of("You must specify a password to unlock locks."));
-                return CommandResult.empty();
+                throw new CommandException(Text.of(TextColors.RED, "You must specify a password to unlock locks."));
             }
 
             UnlockLockInteraction unlockLock = new UnlockLockInteraction(((Player) src).getUniqueId(), password.get());
@@ -78,12 +78,13 @@ public class UnlockCommand implements CommandExecutor {
 
             Latch.getLockManager().setInteractionData(player.getUniqueId(), unlockLock);
 
-            player.sendMessage(Text.of("You will unlock the next lock you click."));
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will unlock the next lock you click."));
 
             return CommandResult.success();
         }
 
-        return CommandResult.empty();
+        throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
+
     }
 
 }

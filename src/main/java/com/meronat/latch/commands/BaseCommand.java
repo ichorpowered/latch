@@ -60,7 +60,10 @@ public class BaseCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(@Nonnull CommandSource source, CommandContext args) throws CommandException {
-        Text help = Text.builder("Click here for ")
+
+        source.sendMessage(Text.of(TextColors.DARK_GREEN, "Latch", " v", Sponge.getPluginManager().getPlugin("latch").get().getVersion().get()));
+        source.sendMessage(Text.of(TextColors.GRAY, "Created by ", StringUtils.join(Sponge.getPluginManager().getPlugin("latch").get().getAuthors(), ", ")));
+        source.sendMessage(Text.builder("Click here for ")
                 .color(TextColors.GRAY)
                 .onClick(TextActions.runCommand("latch help"))
                 .onHover(TextActions.showText(Text.of("/latch help")))
@@ -72,13 +75,7 @@ public class BaseCommand implements CommandExecutor {
                                 .color(TextColors.GRAY)
                                 .onClick(TextActions.runCommand("/latch help"))
                                 .onHover(TextActions.showText(Text.of("/latch help")))
-                                .build())
-                        .build())
-                .build();
-
-        source.sendMessage(Text.of(TextColors.DARK_GREEN, "Latch", " v", Sponge.getPluginManager().getPlugin("latch").get().getVersion().get()));
-        source.sendMessage(Text.of(TextColors.GRAY, "Created by ", StringUtils.join(Sponge.getPluginManager().getPlugin("latch").get().getAuthors(), ", ")));
-        source.sendMessage(help);
+                                .build()).build()).build());
 
         return CommandResult.success();
     }

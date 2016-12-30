@@ -77,8 +77,7 @@ public class ChangeLockCommand implements CommandExecutor {
             Player player = (Player) src;
 
             if( !(args.hasAny("name") || args.hasAny("type") || args.hasAny("owner") || args.hasAny("password") || args.hasAny("add") || args.hasAny("remove")) ) {
-                player.sendMessage(Text.of("You must specify at least one attribute to change."));
-                return CommandResult.empty();
+                throw new CommandException(Text.of(TextColors.RED, "You must specify at least one attribute to change."));
             }
 
             ChangeLockInteraction changeLock = new ChangeLockInteraction(player.getUniqueId());
@@ -88,25 +87,20 @@ public class ChangeLockCommand implements CommandExecutor {
                 if(optionalString.get().length() <= 25) {
                     changeLock.setLockName(optionalString.get());
                 } else {
-                    player.sendMessage(Text.of("Lock names must be less than 25 characters long."));
-                    return CommandResult.empty();
+                    throw new CommandException(Text.of(TextColors.RED, "Lock names must be less than 25 characters long."));
                 }
             }
 
-            Optional<LockType> optionalType = args.getOne("type");
-            if(optionalType.isPresent()) {
-                changeLock.setType(optionalType.get());
-            }
+            // If type argument is present, change the type of lock to the one specified.
+            args.<LockType>getOne("type").ifPresent(changeLock::setType);
 
-            Optional<User> optionalUser = args.getOne("owner");
-            if(optionalUser.isPresent()) {
-                changeLock.setNewOwner(optionalUser.get().getUniqueId());
-            }
+            // If owner argument is present, set the new owner of the lock.
+            args.<User>getOne("owner").ifPresent(user -> changeLock.setNewOwner(user.getUniqueId()));
 
-            optionalString = args.getOne("password");
-            if(optionalString.isPresent()) {
-                changeLock.setPassword(optionalString.get());
-            }
+            // If password argument is present, set the new password of the lock.
+            args.<String>getOne("password").ifPresent(changeLock::setPassword);
+
+            // TODO Fix adding and removing all users
 
             List<UUID> members = args.<User>getAll("add").stream().map(User::getUniqueId).collect(GuavaCollectors.toImmutableList());
 
@@ -127,9 +121,11 @@ public class ChangeLockCommand implements CommandExecutor {
             player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will change the next lock you click."));
 
             return CommandResult.success();
+
         }
 
-        throw new CommandException(Text.of(TextColors.DARK_RED, "You must be a player to use this command."));
+        throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
+
     }
 
 }

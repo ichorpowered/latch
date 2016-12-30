@@ -28,7 +28,6 @@ package com.meronat.latch.events;
 import com.meronat.latch.entities.Lock;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
-import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 
@@ -67,4 +66,5 @@ public class LockCreateEvent extends AbstractEvent implements Cancellable  {
     public Cause getCause() {
         return cause;
     }
+
 }

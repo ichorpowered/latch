@@ -27,11 +27,10 @@ package com.meronat.latch.interactions;
 
 import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -49,15 +48,14 @@ public class DisplayLockInteraction implements AbstractLockInteraction {
     }
 
     @Override
-    public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockstate) {
+    public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockState) {
+
         Optional<Lock> lock = Latch.getLockManager().getLock(location);
         //Check to see if another lock is present
         if(!lock.isPresent()) {
-            player.sendMessage(Text.of("There is no lock there."));
+            player.sendMessage(Text.of(TextColors.RED, "There is no lock there."));
             return false;
         }
-
-        Optional<UserStorageService> userStorageService = Sponge.getGame().getServiceManager().provide(UserStorageService.class);
 
         player.sendMessage(Text.of("Lock name: " + lock.get().getName() + ", Type: " + lock.get().getLockType()));
         player.sendMessage(Text.of("Owner: " + lock.get().getOwnerName()));

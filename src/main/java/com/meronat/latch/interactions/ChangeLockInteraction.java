@@ -32,6 +32,7 @@ import com.meronat.latch.utils.LatchUtils;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -83,23 +84,23 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
 
 
     @Override
-    public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockstate) {
+    public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockState) {
         Optional<Lock> lock = Latch.getLockManager().getLock(location);
         //Check to see if another lock is present
         if(!lock.isPresent()) {
-            player.sendMessage(Text.of("There is no lock there."));
+            player.sendMessage(Text.of(TextColors.RED, "There is no lock there."));
             return false;
         }
 
         //Check to make sure they're the owner
         if(!lock.get().isOwner(player.getUniqueId())) {
-            player.sendMessage(Text.of("You're not the owner of this lock."));
+            player.sendMessage(Text.of(TextColors.RED, "You are not the owner of this lock."));
             return false;
         }
 
         //Check to make sure, if they're assigning a new owner, the new owner is not at their limit
         if(Latch.getLockManager().isPlayerAtLockLimit(newOwner == null ? lock.get().getOwner() : newOwner, type == null ? lock.get().getLockType() : type)) {
-            player.sendMessage(Text.of("You can't give a player a lock that would put them over the lock limit."));
+            player.sendMessage(Text.of(TextColors.RED, "You cannot give a player a lock that would put them over the lock limit."));
             return false;
         }
 
@@ -142,8 +143,10 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
             Latch.getLockManager().updateLockAttributes(originalOwner, originalName, lock.get());
         }
 
-        player.sendMessage(Text.of("Lock data has been updated."));
+        player.sendMessage(Text.of(TextColors.DARK_GREEN, "Lock data has been successfully updated."));
+
         return true;
+
     }
 
     @Override
@@ -155,4 +158,5 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
     public void setPersistence(boolean persist) {
         this.persisting = persist;
     }
+
 }
