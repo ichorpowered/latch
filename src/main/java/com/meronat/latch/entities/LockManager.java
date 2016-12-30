@@ -46,6 +46,8 @@ public class LockManager {
     private List<String> protectBelowBlocks = new ArrayList<>();
     private HashMap<String, Integer> lockLimits = new HashMap<>();
 
+    private boolean protectFromRedstone = true;
+
     private HashMap<UUID, AbstractLockInteraction> interactionData = new HashMap<>();
 
     public Optional<Lock> getLock(Location location) {
@@ -158,5 +160,13 @@ public class LockManager {
 
     public boolean isPlayerAtLockLimit(UUID player, LockType type) {
         return Latch.getStorageHandler().isPlayerAtLockLimit(player, type, lockLimits);
+    }
+
+    public boolean getProtectFromRedstone() {
+        return protectFromRedstone;
+    }
+
+    public void setProtectFromRedstone(boolean protectFromRedstone) {
+        this.protectFromRedstone = protectFromRedstone;
     }
 }

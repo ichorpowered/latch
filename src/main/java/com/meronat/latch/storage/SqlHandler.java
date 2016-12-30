@@ -71,6 +71,7 @@ public class SqlHandler {
                 "LOCKED_OBJECT varchar(50) NOT NULL, " +
                 "PASSWORD varchar(256) NOT NULL, " +
                 "SALT varchar(64) NOT NULL, " +
+                "REDSTONE_PROTECT BOOLEAN NOT NULL, " +
                 "PRIMARY KEY(ID), CONSTRAINT UQ_OWNER_NAME UNIQUE (OWNER_UUID, LOCK_NAME) )";
 
         String createLocationTable = "CREATE TABLE IF NOT EXISTS LOCK_LOCATIONS (" +
@@ -108,7 +109,7 @@ public class SqlHandler {
         try (
                 Connection connection = getConnection();
                 PreparedStatement ps = connection.prepareStatement(
-                        "SELECT ID, OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD FROM LOCK_LOCATIONS JOIN LOCK ON (LOCK_LOCATIONS.LOCK_ID = LOCK.ID) "
+                        "SELECT ID, OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD, REDSTONE_PROTECT FROM LOCK_LOCATIONS JOIN LOCK ON (LOCK_LOCATIONS.LOCK_ID = LOCK.ID) "
                                 + "WHERE LOCK_LOCATIONS.WORLD_UUID = ? AND LOCK_LOCATIONS.X = ? AND LOCK_LOCATIONS.Y = ? AND LOCK_LOCATIONS.Z = ?")
         ) {
             ps.setObject(1, location.getExtent().getUniqueId());
@@ -129,7 +130,8 @@ public class SqlHandler {
                             tempLock.getString("LOCKED_OBJECT"),
                             tempLock.getBytes("SALT"),
                             tempLock.getString("PASSWORD"),
-                            getAbleToAccessByID(tempLock.getInt("ID"))));
+                            getAbleToAccessByID(tempLock.getInt("ID")),
+                            tempLock.getBoolean("REDSTONE_PROTECT")));
                 }
             }
 
@@ -269,7 +271,7 @@ public class SqlHandler {
         try (
                 Connection connection = getConnection();
                 PreparedStatement psLock = connection.prepareStatement(
-                        "INSERT INTO LOCK(OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD) VALUES (?, ?, ?, ?, ?, ?)",
+                        "INSERT INTO LOCK(OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD, REDSTONE_PROTECT) VALUES (?, ?, ?, ?, ?, ?, ?)",
                         PreparedStatement.RETURN_GENERATED_KEYS);
                 PreparedStatement psLocations = connection.prepareStatement("INSERT INTO LOCK_LOCATIONS(LOCK_ID, WORLD_UUID, X, Y, Z) VALUES (?, ?, ?, ?, ?)");
                 PreparedStatement psPlayers = connection.prepareStatement("INSERT INTO LOCK_PLAYERS(LOCK_ID, PLAYER_UUID) VALUES (?, ?)");
@@ -480,15 +482,16 @@ public class SqlHandler {
         try (
                 Connection connection = getConnection();
                 PreparedStatement ps = connection.prepareStatement(
-                        "UPDATE LOCK SET OWNER_UUID = ?, LOCK_NAME = ?, LOCK_TYPE = ?, PASSWORD = ?, SALT = ? WHERE OWNER_UUID = ? AND LOCK_NAME = ?");
+                        "UPDATE LOCK SET OWNER_UUID = ?, LOCK_NAME = ?, LOCK_TYPE = ?, PASSWORD = ?, SALT = ?, REDSTONE_PROTECT = ? WHERE OWNER_UUID = ? AND LOCK_NAME = ?");
         ) {
             ps.setString(1, thisLock.getOwner().toString());
             ps.setString(2, thisLock.getName());
             ps.setString(3, thisLock.getLockType().toString());
             ps.setString(4, thisLock.getPassword());
             ps.setBytes(5, thisLock.getSalt());
-            ps.setString(6, originalOwner.toString());
-            ps.setString(7, originalName);
+            ps.setBoolean(6, thisLock.getProtectFromRedstone());
+            ps.setString(7, originalOwner.toString());
+            ps.setString(8, originalName);
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -520,7 +523,7 @@ public class SqlHandler {
         try (
                 Connection connection = getConnection();
                 PreparedStatement ps = connection.prepareStatement(
-                        "SELECT ID, OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD FROM LOCK WHERE OWNER_UUID = ?");
+                        "SELECT ID, OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD, REDSTONE_PROTECT FROM LOCK WHERE OWNER_UUID = ?");
         ) {
             ps.setString(1, uniqueId.toString());
 
@@ -536,7 +539,8 @@ public class SqlHandler {
                             rs.getString("LOCKED_OBJECT"),
                             rs.getBytes("SALT"),
                             rs.getString("PASSWORD"),
-                            getAbleToAccessByID(rs.getInt("ID"))));
+                            getAbleToAccessByID(rs.getInt("ID")),
+                            rs.getBoolean("REDSTONE_PROTECT")));
                 }
             }
         } catch (SQLException e) {

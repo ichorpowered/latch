@@ -52,6 +52,7 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
     private Collection<UUID> membersToRemove;
 
     private boolean persisting = false;
+    private Boolean protectFromRedstone;
 
 
     public ChangeLockInteraction(UUID player) {
@@ -81,6 +82,9 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
     public void setMembersToRemove(Collection<UUID> members) {
         this.membersToRemove = members;
     }
+
+    public void setProtectFromRedstone(Boolean protectFromRedstone) { this.protectFromRedstone = protectFromRedstone; }
+
 
 
     @Override
@@ -137,9 +141,12 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
                 Latch.getLockManager().removeLockAccess(lock.get(), u);
             }
         }
+        if(protectFromRedstone != null) {
+            lock.get().setProtectFromRedstone(protectFromRedstone);
+        }
 
         //Update the base lock elements
-        if(lockName != null || type != null || password != null || newOwner != null) {
+        if(lockName != null || type != null || password != null || newOwner != null || protectFromRedstone != null) {
             Latch.getLockManager().updateLockAttributes(originalOwner, originalName, lock.get());
         }
 

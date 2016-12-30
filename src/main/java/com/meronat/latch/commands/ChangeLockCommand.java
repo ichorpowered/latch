@@ -64,6 +64,7 @@ public class ChangeLockCommand implements CommandExecutor {
                                 .valueFlag(GenericArguments.string(Text.of("password")), "-password")
                                 .valueFlag(GenericArguments.user(Text.of("add")), "-add")
                                 .valueFlag(GenericArguments.user(Text.of("remove")), "-remove")
+                                .valueFlag(GenericArguments.bool(Text.of("redstone")), "-redstone")
                                 .permissionFlag("latch.normal.persist", "persist", "p")
                                 .buildWith(GenericArguments.none())))
                 .build();
@@ -76,7 +77,7 @@ public class ChangeLockCommand implements CommandExecutor {
 
             Player player = (Player) src;
 
-            if( !(args.hasAny("name") || args.hasAny("type") || args.hasAny("owner") || args.hasAny("password") || args.hasAny("add") || args.hasAny("remove")) ) {
+            if( !(args.hasAny("name") || args.hasAny("type") || args.hasAny("owner") || args.hasAny("password") || args.hasAny("add") || args.hasAny("remove") || args.hasAny("redstone")) ) {
                 throw new CommandException(Text.of(TextColors.RED, "You must specify at least one attribute to change."));
             }
 
@@ -113,6 +114,8 @@ public class ChangeLockCommand implements CommandExecutor {
             }
 
             changeLock.setPersistence(args.hasAny("p"));
+
+            args.<Boolean>getOne("redstone").ifPresent(changeLock::setProtectFromRedstone);
 
             Latch.getLockManager().setInteractionData(player.getUniqueId(), changeLock);
 

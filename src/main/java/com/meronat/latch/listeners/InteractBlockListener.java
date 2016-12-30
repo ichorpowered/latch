@@ -109,7 +109,9 @@ public class InteractBlockListener {
             //Otherwise we only care if it's a lock
             if(Latch.getLockManager().isLockableBlock(event.getTargetBlock().getState().getType())) {
                 Optional<Lock> optionalLock = Latch.getLockManager().getLock(event.getTargetBlock().getLocation().get());
-                if(optionalLock.isPresent() && !optionalLock.get().canView(player.getUniqueId())) {
+
+                //If there's a lock (non-donation) that the player shouldn't be able to access
+                if(optionalLock.isPresent() && optionalLock.get().getLockType() != LockType.DONATION && !optionalLock.get().canAccess(player.getUniqueId()) ) {
                     player.sendMessage(Text.of("You can't access this lock."));
                     event.setCancelled(true);
                 }

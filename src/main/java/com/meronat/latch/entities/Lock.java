@@ -55,12 +55,13 @@ public class Lock {
     private byte[] salt = new byte[8];
     private String password = "";
     private HashSet<UUID> ableToAccess;
+    private boolean protectFromRedstone;
 
-    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password) {
-        this(owner, LatchUtils.getRandomLockName(owner, lockedObjectName), type, location, lockedObjectName, salt, password, new HashSet<>());
+    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password, boolean protectFromRedstone) {
+        this(owner, LatchUtils.getRandomLockName(owner, lockedObjectName), type, location, lockedObjectName, salt, password, new HashSet<>(), protectFromRedstone);
     }
 
-    public Lock(UUID owner, String lockName, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password, HashSet<UUID> players) {
+    public Lock(UUID owner, String lockName, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password, HashSet<UUID> players, boolean protectFromRedstone) {
 
         this.owner = owner;
         this.type = type;
@@ -74,6 +75,8 @@ public class Lock {
         this.name = lockName;
 
         ableToAccess = players;
+
+        this.protectFromRedstone = protectFromRedstone;
     }
 
     protected HashSet<Location<World>> getLocations() {
@@ -142,10 +145,6 @@ public class Lock {
         return names;
     }
 
-    public boolean canView(UUID uniqueId) {
-        return ableToAccess.contains(uniqueId) || owner.equals(uniqueId) || type == LockType.PUBLIC || type == LockType.DONATION;
-    }
-
     public boolean canAccess(UUID uniqueId) {
         return ableToAccess.contains(uniqueId) || owner.equals(uniqueId) || type == LockType.PUBLIC;
     }
@@ -180,5 +179,13 @@ public class Lock {
 
     public byte[] getSalt() {
         return this.salt;
+    }
+
+    public void setProtectFromRedstone(boolean protectFromRedstone) {
+        this.protectFromRedstone = protectFromRedstone;
+    }
+
+    public boolean getProtectFromRedstone() {
+        return protectFromRedstone;
     }
 }

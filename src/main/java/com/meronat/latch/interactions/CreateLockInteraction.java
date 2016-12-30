@@ -97,7 +97,7 @@ public class CreateLockInteraction implements AbstractLockInteraction {
         byte[] salt = LatchUtils.generateSalt();
 
         LockCreateEvent lockCreateEvent = new LockCreateEvent(player,
-                new Lock(player.getUniqueId(), type, lockLocations, LatchUtils.getBlockNameFromType(blockState.getState().getType()), salt, LatchUtils.hashPassword(password, salt)),
+                new Lock(player.getUniqueId(), type, lockLocations, LatchUtils.getBlockNameFromType(blockState.getState().getType()), salt, LatchUtils.hashPassword(password, salt), Latch.getLockManager().getProtectFromRedstone()),
                 Cause.source(player).build());
 
         Sponge.getEventManager().post(lockCreateEvent);

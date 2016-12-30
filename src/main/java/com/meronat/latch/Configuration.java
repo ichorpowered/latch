@@ -70,7 +70,7 @@ class Configuration {
             lockableBlocks.add(BlockTypes.CHEST.getId());
             lockableBlocks.add(BlockTypes.TRAPPED_CHEST.getId());
 
-            /*lockableBlocks.add(BlockTypes.BLACK_SHULKER_BOX.getId());
+            lockableBlocks.add(BlockTypes.BLACK_SHULKER_BOX.getId());
             lockableBlocks.add(BlockTypes.BLUE_SHULKER_BOX.getId());
             lockableBlocks.add(BlockTypes.BROWN_SHULKER_BOX.getId());
             lockableBlocks.add(BlockTypes.CYAN_SHULKER_BOX.getId());
@@ -85,7 +85,7 @@ class Configuration {
             lockableBlocks.add(BlockTypes.RED_SHULKER_BOX.getId());
             lockableBlocks.add(BlockTypes.SILVER_SHULKER_BOX.getId());
             lockableBlocks.add(BlockTypes.WHITE_SHULKER_BOX.getId());
-            lockableBlocks.add(BlockTypes.YELLOW_SHULKER_BOX.getId());*/
+            lockableBlocks.add(BlockTypes.YELLOW_SHULKER_BOX.getId());
 
             lockableBlocks.add(BlockTypes.BREWING_STAND.getId());
             lockableBlocks.add(BlockTypes.JUKEBOX.getId());
@@ -143,10 +143,10 @@ class Configuration {
         if(configNode.getNode("lock_limit").isVirtual()) {
             HashMap<String, Integer> limits = new HashMap<>();
             limits.put("total", 5);
-            limits.put(LockType.PUBLIC.toString().toLowerCase(), 2);
-            limits.put(LockType.PRIVATE.toString().toLowerCase(), 3);
-            limits.put(LockType.PASSWORD_ALWAYS.toString().toLowerCase(), 2);
-            limits.put(LockType.PASSWORD_ONCE.toString().toLowerCase(), 2);
+
+            for(LockType type : LockType.values()) {
+                limits.put(type.toString().toLowerCase(), 2);
+            }
 
             try {
                 configNode.getNode("lock_limit").setValue(new TypeToken<Map<String, Integer>>() {}, limits);
@@ -155,6 +155,12 @@ class Configuration {
                 e.printStackTrace();
             }
         }
+
+        //Do we allow redstone protection?
+        if(configNode.getNode("protect_from_redstone").isVirtual()) {
+            configNode.getNode("protect_from_redstone").setValue(true);
+        }
+
     }
 
     private void saveConfig() {

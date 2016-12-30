@@ -63,6 +63,7 @@ public class DisplayLockInteraction implements AbstractLockInteraction {
                 lock.getLockedObject().substring(0, 1).toUpperCase() + lock.getLockedObject().substring(1) + ": ", TextColors.GRAY, lock.getName()));
         player.sendMessage(Text.of(TextColors.DARK_GREEN, "Owner: ", TextColors.GRAY, lock.getOwnerName()));
         player.sendMessage(Text.of(TextColors.DARK_GREEN, "Accessors: ", TextColors.GRAY, String.join(", ", lock.getAbleToAccessNames())));
+        player.sendMessage(Text.of(TextColors.DARK_GREEN, "Protect from Redstone: ", TextColors.GRAY, lock.getProtectFromRedstone()));
 
         //Return false to cancel interactions when using this command
         return false;
