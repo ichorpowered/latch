@@ -50,20 +50,23 @@ public class DisplayLockInteraction implements AbstractLockInteraction {
     @Override
     public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockState) {
 
-        Optional<Lock> lock = Latch.getLockManager().getLock(location);
+        Optional<Lock> optionalLock = Latch.getLockManager().getLock(location);
         //Check to see if another lock is present
-        if(!lock.isPresent()) {
+        if(!optionalLock.isPresent()) {
             player.sendMessage(Text.of(TextColors.RED, "There is no lock there."));
             return false;
         }
 
-        player.sendMessage(Text.of("Lock name: " + lock.get().getName() + ", Type: " + lock.get().getLockType()));
-        player.sendMessage(Text.of("Owner: " + lock.get().getOwnerName()));
-        player.sendMessage(Text.of("Locked object: " + lock.get().getLockedObject()));
-        player.sendMessage(Text.of("Players: " + String.join(", ", lock.get().getAbleToAccessNames())));
+        Lock lock = optionalLock.get();
+
+        player.sendMessage(Text.of(TextColors.DARK_GREEN, lock.getLockType().getHumanReadable() +
+                lock.getLockedObject().substring(0, 1).toUpperCase() + lock.getLockedObject().substring(1) + ": ", TextColors.GRAY, lock.getName()));
+        player.sendMessage(Text.of(TextColors.DARK_GREEN, "Owner: ", TextColors.GRAY, lock.getOwnerName()));
+        player.sendMessage(Text.of(TextColors.DARK_GREEN, "Accessors: ", TextColors.GRAY, String.join(", ", lock.getAbleToAccessNames())));
 
         //Return false to cancel interactions when using this command
         return false;
+
     }
 
     @Override

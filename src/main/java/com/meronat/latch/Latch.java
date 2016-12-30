@@ -70,7 +70,7 @@ public class Latch {
     private static Logger logger;
     private static Path configPath;
 
-    private static LockManager lockManager = new LockManager();
+    private static final LockManager lockManager = new LockManager();
 
     private static SqlHandler storageHandler;
 

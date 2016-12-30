@@ -55,6 +55,8 @@ public class BaseCommand implements CommandExecutor {
             .child(new UnlockCommand().getCommand(), "open", "unlock")
             .child(new ListCommand().getCommand(), "list", "displayall")
             .child(new HelpCommand().getCommand(), "help")
+            .child(new AddAccessorCommand().getCommand(), "add", "plus")
+            .child(new RemoveAccessorCommand().getCommand(), "remove", "minus")
             .executor(this)
             .build();
 

@@ -45,7 +45,7 @@ import java.util.Optional;
 
 public class CreatePasswordLockCommand implements CommandExecutor {
 
-    private CommandFlags.Builder flagBuilder = GenericArguments.flags();
+    private final CommandFlags.Builder flagBuilder = GenericArguments.flags();
 
     public CommandCallable getCommand() {
         return CommandSpec.builder()

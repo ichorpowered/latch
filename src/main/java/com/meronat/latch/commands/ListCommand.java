@@ -48,7 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ListCommand implements CommandExecutor {
-    private CommandFlags.Builder flagBuilder = GenericArguments.flags();
+    private final CommandFlags.Builder flagBuilder = GenericArguments.flags();
 
     public CommandCallable getCommand() {
         return CommandSpec.builder()

@@ -44,7 +44,7 @@ import java.util.Optional;
 
 public class UnlockCommand implements CommandExecutor {
 
-    private CommandFlags.Builder flagBuilder = GenericArguments.flags();
+    private final CommandFlags.Builder flagBuilder = GenericArguments.flags();
 
     public CommandCallable getCommand() {
         return CommandSpec.builder()

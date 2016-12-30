@@ -41,7 +41,7 @@ import java.util.Map;
 class Configuration {
 
     private CommentedConfigurationNode configNode;
-    private ConfigurationLoader<CommentedConfigurationNode> configManager;
+    private final ConfigurationLoader<CommentedConfigurationNode> configManager;
 
     public Configuration(ConfigurationLoader<CommentedConfigurationNode> configManager) {
         this.configManager = configManager;

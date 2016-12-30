@@ -49,7 +49,7 @@ import java.util.UUID;
 
 public class ChangeLockCommand implements CommandExecutor {
 
-    private CommandFlags.Builder flagBuilder = GenericArguments.flags();
+    private final CommandFlags.Builder flagBuilder = GenericArguments.flags();
 
     public CommandCallable getCommand() {
         return CommandSpec.builder()
@@ -99,8 +99,6 @@ public class ChangeLockCommand implements CommandExecutor {
 
             // If password argument is present, set the new password of the lock.
             args.<String>getOne("password").ifPresent(changeLock::setPassword);
-
-            // TODO Fix adding and removing all users
 
             List<UUID> members = args.<User>getAll("add").stream().map(User::getUniqueId).collect(GuavaCollectors.toImmutableList());
 
