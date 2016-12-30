@@ -28,6 +28,7 @@ package com.meronat.latch.interactions;
 import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.data.property.block.IndirectlyPoweredProperty;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;

@@ -33,6 +33,7 @@ import com.meronat.latch.commands.UnlockCommand;
 import com.meronat.latch.entities.LockManager;
 import com.meronat.latch.listeners.ChangeBlockListener;
 import com.meronat.latch.listeners.InteractBlockListener;
+import com.meronat.latch.listeners.NotifyNeighborListener;
 import com.meronat.latch.listeners.SpawnEntityListener;
 import com.meronat.latch.storage.SqlHandler;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -126,6 +127,11 @@ public class Latch {
         eventManager.registerListeners(this, new ChangeBlockListener());
         eventManager.registerListeners(this, new InteractBlockListener());
         eventManager.registerListeners(this, new SpawnEntityListener());
+
+        //Only register this listener if we need to protect from Redstone
+        if(getLockManager().getProtectFromRedstone()) {
+            eventManager.registerListeners(this, new NotifyNeighborListener());
+        }
 
     }
 
