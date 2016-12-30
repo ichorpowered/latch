@@ -282,6 +282,7 @@ public class SqlHandler {
             psLock.setString(4, lock.getLockedObject());
             psLock.setBytes(5, lock.getSalt());
             psLock.setString(6, lock.getPassword());
+            psLock.setBoolean(7, lock.getProtectFromRedstone());
 
             psLock.executeUpdate();
 
