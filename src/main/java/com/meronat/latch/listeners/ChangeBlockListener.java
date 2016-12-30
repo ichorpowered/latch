@@ -39,6 +39,8 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.chat.ChatTypes;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -68,7 +70,7 @@ public class ChangeBlockListener {
                         if( (!player.isPresent() || (player.isPresent() && !lock.isOwner(player.get().getUniqueId()))) ) {
                             bs.setValid(false);
                             event.setCancelled(true);
-                            player.ifPresent(p -> p.sendMessage(Text.of("You can't place that type of block near a lock you don't own.")));
+                            player.ifPresent(p -> p.sendMessage(Text.of(TextColors.RED, "You can't place that type of block near a lock you don't own.")));
                         }
                     }
                 }
@@ -86,13 +88,14 @@ public class ChangeBlockListener {
                         if(player.isPresent() && otherBlockLock.get().isOwner(player.get().getUniqueId())) {
                             Latch.getLockManager().addLockLocation(otherBlockLock.get(), bs.getFinal().getLocation().get());
                             if (!interactionSuccessful) {
-                                player.get().sendMessage(Text.of("You have expanded your " + otherBlockLock.get().getName() + " lock."));
+                                player.get().sendMessage(ChatTypes.ACTION_BAR, Text.of(TextColors.DARK_GREEN,
+                                        "You have expanded your " + otherBlockLock.get().getName() + " lock."));
                             }
                             continue; //break to allow expanding locks while having a command persisted
                         } else {
                             bs.setValid(false);
                             event.setCancelled(true);
-                            player.ifPresent(p -> p.sendMessage(Text.of("You can't place that type of block near a lock you don't own.")));
+                            player.ifPresent(p -> p.sendMessage(Text.of(TextColors.RED, "You can't place that type of block near a lock you don't own.")));
                             continue;
                         }
                     }

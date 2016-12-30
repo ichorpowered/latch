@@ -158,7 +158,7 @@ class Configuration {
 
         //Do we allow redstone protection?
         if(configNode.getNode("protect_from_redstone").isVirtual()) {
-            configNode.getNode("protect_from_redstone").setValue(true);
+            configNode.getNode("protect_from_redstone").setValue(false);
         }
 
     }

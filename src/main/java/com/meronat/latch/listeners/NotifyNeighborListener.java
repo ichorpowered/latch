@@ -25,42 +25,16 @@
 
 package com.meronat.latch.listeners;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.noise.module.combiner.Power;
 import com.meronat.latch.Latch;
-import com.meronat.latch.entities.Lock;
-import com.meronat.latch.entities.LockManager;
-import com.meronat.latch.interactions.AbstractLockInteraction;
-import com.meronat.latch.utils.LatchUtils;
-
 import org.spongepowered.api.block.BlockSnapshot;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.block.tileentity.TileEntity;
-import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
-import org.spongepowered.api.data.Transaction;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.property.block.IndirectlyPoweredProperty;
-import org.spongepowered.api.data.property.block.MatterProperty;
-import org.spongepowered.api.data.property.block.PoweredProperty;
-import org.spongepowered.api.entity.explosive.Explosive;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
-import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
 
 public class NotifyNeighborListener {
+
+    /* Does not seem to always return true even if the block is powered, look to re-implement this in the future.
 
     //Cover all the ways the block could be powered
     private boolean isPowered(Location<?> location) {
@@ -69,24 +43,22 @@ public class NotifyNeighborListener {
                 (location.getProperty(IndirectlyPoweredProperty.class).isPresent() && location.getProperty(IndirectlyPoweredProperty.class).get().getValue());
     }
 
+    */
+
     @Listener
     public void notifyNeighbors(NotifyNeighborBlockEvent event, @First BlockSnapshot cause) {
         cause.getLocation().ifPresent(worldLocation -> {
-            if(cause.getState().getType() == BlockTypes.REDSTONE_TORCH || cause.getState().getType() == BlockTypes.REDSTONE_WIRE ) {
-                Latch.getLogger().info(cause.getState().getType().toString() + isPowered(worldLocation) + "," + cause.getApplicableProperties().toString());
-                Latch.getLogger().info("Is data present: " + worldLocation.get(Keys.POWER) + " or present on bs " + cause.get(Keys.POWER));
-                Latch.getLogger().info("Is powered data present: " + worldLocation.get(Keys.POWERED) + " or present on bs " + cause.get(Keys.POWERED));
+            for (Direction d : event.getOriginalNeighbors().keySet()) {
+                Latch.getLockManager().getLock(worldLocation.getBlockRelative(d)).ifPresent(lock -> {
+                    if (lock.getProtectFromRedstone()) {
+                        event.getNeighbors().remove(d);
+                    }
+                });
+
             }
-            if(isPowered(worldLocation)) {
-                for (Direction d : event.getOriginalNeighbors().keySet()) {
-                    Latch.getLockManager().getLock(worldLocation.getBlockRelative(d)).ifPresent(lock -> {
-                        if (lock.getProtectFromRedstone()) {
-                            event.getNeighbors().remove(d);
-                        }
-                    });
-                }
-            }
+
         });
+
     }
 
 }

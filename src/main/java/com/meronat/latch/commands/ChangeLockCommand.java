@@ -81,6 +81,12 @@ public class ChangeLockCommand implements CommandExecutor {
                 throw new CommandException(Text.of(TextColors.RED, "You must specify at least one attribute to change."));
             }
 
+            if (args.hasAny("redstone") && !Latch.getConfig().getNode("protect_from_redstone").getBoolean(true)) {
+
+                throw new CommandException(Text.of(TextColors.DARK_RED, "Protection from redstone is disabled for all locks."));
+
+            }
+
             ChangeLockInteraction changeLock = new ChangeLockInteraction(player.getUniqueId());
 
             Optional<String> optionalString = args.getOne("name");

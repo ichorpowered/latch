@@ -1,5 +1,6 @@
 package com.meronat.latch.commands;
 
+import com.meronat.latch.Latch;
 import com.meronat.latch.interactions.ChangeLockInteraction;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
@@ -28,8 +29,8 @@ public class RemoveAccessorCommand implements CommandExecutor {
                 .description(Text.of("Remove a player from a locked block of yours."))
                 .permission("latch.normal.change")
                 .executor(this)
-                .arguments(GenericArguments.optionalWeak(GenericArguments.allOf(GenericArguments.user(Text.of("remove")))))
-                .arguments(GenericArguments.optionalWeak(
+                .arguments(GenericArguments.optionalWeak(GenericArguments.allOf(GenericArguments.user(Text.of("remove")))),
+                        GenericArguments.optionalWeak(
                         flagBuilder
                                 .permissionFlag("latch.normal.persist", "persist", "p")
                                 .buildWith(GenericArguments.none())))
@@ -40,22 +41,24 @@ public class RemoveAccessorCommand implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
         if (!(src instanceof Player)) {
-
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
-
         }
+
+        Player player = (Player) src;
 
         List<UUID> members = args.<User>getAll("remove").stream().map(User::getUniqueId).collect(GuavaCollectors.toImmutableList());
 
-        ChangeLockInteraction changeLock = new ChangeLockInteraction(((Player) src).getUniqueId());
+        ChangeLockInteraction removePlayers = new ChangeLockInteraction(player.getUniqueId());
 
         if(members.size() > 0) {
-            changeLock.setMembersToAdd(members);
+            removePlayers.setMembersToRemove(members);
         } else {
             throw new CommandException(Text.of(TextColors.RED, "You must specify a user to remove."));
         }
 
-        src.sendMessage(Text.of(TextColors.DARK_GREEN, "You will remove them on the next lock of yours you click."));
+        Latch.getLockManager().setInteractionData(player.getUniqueId(), removePlayers);
+
+        player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will remove them on the next lock of yours you click."));
 
         return CommandResult.success();
 

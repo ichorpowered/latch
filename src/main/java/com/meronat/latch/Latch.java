@@ -173,7 +173,7 @@ public class Latch {
         lockManager.setRestrictedBlocks(restrictedBlockNames);
         lockManager.setProtectBelowBlocks(protectBelowBlocks);
         lockManager.setLockLimits(lockLimits);
-        lockManager.setProtectFromRedstone(getConfig().getNode("protect_from_redstone").getBoolean(true));
+        lockManager.setProtectFromRedstone(getConfig().getNode("protect_from_redstone").getBoolean(false));
     }
 
     public static SqlHandler getStorageHandler() {

@@ -1,5 +1,6 @@
 package com.meronat.latch.commands;
 
+import com.meronat.latch.Latch;
 import com.meronat.latch.interactions.ChangeLockInteraction;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
@@ -28,8 +29,8 @@ public class AddAccessorCommand implements CommandExecutor {
                 .description(Text.of("Add a player to a locked block of yours."))
                 .permission("latch.normal.change")
                 .executor(this)
-                .arguments(GenericArguments.optionalWeak(GenericArguments.allOf(GenericArguments.user(Text.of("add")))))
-                .arguments(GenericArguments.optionalWeak(
+                .arguments(GenericArguments.optionalWeak(GenericArguments.allOf(GenericArguments.user(Text.of("add")))),
+                        GenericArguments.optionalWeak(
                         flagBuilder
                                 .permissionFlag("latch.normal.persist", "persist", "p")
                                 .buildWith(GenericArguments.none())))
@@ -40,22 +41,24 @@ public class AddAccessorCommand implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
         if (!(src instanceof Player)) {
-
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
-
         }
+
+        Player player = (Player) src;
 
         List<UUID> members = args.<User>getAll("add").stream().map(User::getUniqueId).collect(GuavaCollectors.toImmutableList());
 
-        ChangeLockInteraction changeLock = new ChangeLockInteraction(((Player) src).getUniqueId());
+        ChangeLockInteraction addPlayers = new ChangeLockInteraction(player.getUniqueId());
 
         if(members.size() > 0) {
-            changeLock.setMembersToAdd(members);
+            addPlayers.setMembersToAdd(members);
         } else {
             throw new CommandException(Text.of(TextColors.RED, "You must specify a user to add."));
         }
 
-        src.sendMessage(Text.of(TextColors.DARK_GREEN, "You will add them on the next lock of yours you click."));
+        Latch.getLockManager().setInteractionData(player.getUniqueId(), addPlayers);
+
+        player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will add them on the next lock of yours you click."));
 
         return CommandResult.success();
 

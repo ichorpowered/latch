@@ -44,6 +44,7 @@ import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
 
@@ -112,7 +113,7 @@ public class InteractBlockListener {
 
                 //If there's a lock (non-donation) that the player shouldn't be able to access
                 if(optionalLock.isPresent() && optionalLock.get().getLockType() != LockType.DONATION && !optionalLock.get().canAccess(player.getUniqueId()) ) {
-                    player.sendMessage(Text.of("You can't access this lock."));
+                    player.sendMessage(Text.of(TextColors.RED, "You can't access this lock."));
                     event.setCancelled(true);
                 }
             }

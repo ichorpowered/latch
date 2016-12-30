@@ -28,7 +28,6 @@ package com.meronat.latch.interactions;
 import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
 import org.spongepowered.api.block.BlockSnapshot;
-import org.spongepowered.api.data.property.block.IndirectlyPoweredProperty;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -60,11 +59,15 @@ public class DisplayLockInteraction implements AbstractLockInteraction {
 
         Lock lock = optionalLock.get();
 
-        player.sendMessage(Text.of(TextColors.DARK_GREEN, lock.getLockType().getHumanReadable() +
+        player.sendMessage(Text.of(TextColors.GOLD, "Latch Info - " + "X: " + location.getBlockX() + " Y: " + location.getBlockY() + " Z: " + location.getBlockZ()));
+        player.sendMessage(Text.of(TextColors.DARK_GREEN, lock.getLockType().getHumanReadable() + " " +
                 lock.getLockedObject().substring(0, 1).toUpperCase() + lock.getLockedObject().substring(1) + ": ", TextColors.GRAY, lock.getName()));
         player.sendMessage(Text.of(TextColors.DARK_GREEN, "Owner: ", TextColors.GRAY, lock.getOwnerName()));
         player.sendMessage(Text.of(TextColors.DARK_GREEN, "Accessors: ", TextColors.GRAY, String.join(", ", lock.getAbleToAccessNames())));
-        player.sendMessage(Text.of(TextColors.DARK_GREEN, "Protect from Redstone: ", TextColors.GRAY, lock.getProtectFromRedstone()));
+
+        if (Latch.getConfig().getNode("protect_from_redstone").getBoolean(false)) {
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "Protect from Redstone: ", TextColors.GRAY, lock.getProtectFromRedstone()));
+        }
 
         //Return false to cancel interactions when using this command
         return false;

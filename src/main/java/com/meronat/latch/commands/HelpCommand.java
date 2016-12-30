@@ -25,6 +25,7 @@
 
 package com.meronat.latch.commands;
 
+import com.meronat.latch.Latch;
 import com.meronat.latch.utils.LatchUtils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCallable;
@@ -56,39 +57,60 @@ public class HelpCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(@Nonnull CommandSource src, CommandContext args) throws CommandException {
+
         List<Text> contents = new ArrayList<>();
 
         contents.add(LatchUtils.formatHelpText("/latch private","Create a private lock",
-                Text.builder().append(Text.of("Add -p to persist")).build()));
+                Text.of("Add -p to persist")));
 
         contents.add(LatchUtils.formatHelpText("/latch password [password]", "Create a password lock with the specified password",
-                Text.builder().append(Text.of("Add -p to persist", Text.NEW_LINE,"Add -o to only require a password the first time")).build()));
+                Text.of("Add -p to persist", Text.NEW_LINE,"Add -o to only require a password the first time")));
 
         contents.add(LatchUtils.formatHelpText("/latch donation", "Create a donation chest which everyone can add to",
-                Text.builder().append(Text.of("Add -p to persist")).build()));
+                Text.of("Add -p to persist")));
+
+        Text changeHelp = Text.of("--name=[name] to rename the lock", Text.NEW_LINE,
+                "--type=[PRIVATE, PASSWORD_ALWAYS, PASSWORD_ONCE] to change the lock type", Text.NEW_LINE,
+                "--password=[password] change the password of the lock (resets access list)", Text.NEW_LINE,
+                "--add=[player] add the player to the lock access list", Text.NEW_LINE,
+                "--remove=[player] remove the player from the lock access list", Text.NEW_LINE,
+                "--owner=[player] give the lock to another player");
+
+        if (Latch.getConfig().getNode("protect_from_redstone").getBoolean(true)) {
+
+            changeHelp = Text.of("--name=[name] to rename the lock", Text.NEW_LINE,
+                    "--type=[PRIVATE, PASSWORD_ALWAYS, PASSWORD_ONCE] to change the lock type", Text.NEW_LINE,
+                    "--password=[password] change the password of the lock (resets access list)", Text.NEW_LINE,
+                    "--add=[player] add the player to the lock access list", Text.NEW_LINE,
+                    "--remove=[player] remove the player from the lock access list", Text.NEW_LINE,
+                    "--owner=[player] give the lock to another player", Text.NEW_LINE,
+                    "--redstone[true/false] enable or disable redstone protection");
+
+        }
 
         contents.add(LatchUtils.formatHelpText("/latch change", "Change the attributes of one of your locks (hover for flags)",
-                Text.builder().append(Text.of("--name=[name] to rename the lock",Text.NEW_LINE,
-                        "--type=[PRIVATE, PASSWORD_ALWAYS, PASSWORD_ONCE] to change the lock type",Text.NEW_LINE,
-                        "--password=[password] change the password of the lock (resets access list)",Text.NEW_LINE,
-                        "--add=[player] add the player to the lock access list",Text.NEW_LINE,
-                        "--remove=[player] remove the player from the lock access list",Text.NEW_LINE,
-                        "--owner=[player] give the lock to another player")).build()));
+                changeHelp));
 
-        contents.add(LatchUtils.formatHelpText("/latch remove", "Remove a lock you're the owner of",
-                Text.builder().append(Text.of("Add -p to persist")).build()));
+        contents.add(LatchUtils.formatHelpText("/latch delete", "Remove a lock you're the owner of",
+                Text.of("Add -p to persist")));
 
         contents.add(LatchUtils.formatHelpText("/latch persist", "Continue applying the last Latch command run on block click/place",
-                Text.builder().append(Text.of("Run again or /latch stop to stop applying the last Latch command")).build()));
+                Text.of("Run again or /latch stop to stop applying the last Latch command")));
 
         contents.add(LatchUtils.formatHelpText("/latch info", "Display information about the next lock clicked",
-                Text.builder().append(Text.of("Add -p to persist")).build()));
+                Text.of("Add -p to persist")));
 
         contents.add(LatchUtils.formatHelpText("/latch list", "List all of your locks",
-                Text.builder().append(Text.of("/latch list [player] to list another player's (if you have permission)")).build()));
+                Text.of("/latch list [player] to list another player's (if you have permission)")));
 
         contents.add(LatchUtils.formatHelpText("/unlock [password]", "Attempt to open a lock with this password",
-                Text.builder().append(Text.of("Or use /latch open [password]")).build()));
+                Text.of("Or use /latch open [password]")));
+
+        contents.add(LatchUtils.formatHelpText("/latch add [user]", "Adds the specified user to one of your locks",
+                Text.of("Add -p to persist")));
+
+        contents.add(LatchUtils.formatHelpText("/latch remove [user]", "Removes the specified user from one of your locks",
+                Text.of("Add -p to persist")));
 
         Sponge.getServiceManager().provide(PaginationService.class).get().builder()
                 .title(Text.of(TextColors.DARK_GREEN, " Latch Help "))
