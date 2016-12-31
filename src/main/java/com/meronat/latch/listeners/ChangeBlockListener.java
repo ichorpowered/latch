@@ -105,6 +105,12 @@ public class ChangeBlockListener {
                 if(lockInteraction.isPresent()) {
                     //Check all of the blocks and apply the interaction
                     //Could cancel the block placement here if it fails -- but Meronat decided no
+
+                    // Make sure it is a player trying to complete the lock interaction.
+                    if (!(event.getCause().root() instanceof Player)) {
+                        return;
+                    }
+
                     if (bs.isValid() && bs.getFinal().getLocation().isPresent() && isSolidBlock(bs.getFinal().getState())) {
 
                         boolean result = lockInteraction.get().handleInteraction(player.get(), bs.getFinal().getLocation().get(), bs.getFinal());
