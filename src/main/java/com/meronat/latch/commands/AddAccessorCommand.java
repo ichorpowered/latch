@@ -29,7 +29,7 @@ public class AddAccessorCommand implements CommandExecutor {
                 .description(Text.of("Add a player to a locked block of yours."))
                 .permission("latch.normal.change")
                 .executor(this)
-                .arguments(GenericArguments.optionalWeak(GenericArguments.allOf(GenericArguments.user(Text.of("add")))),
+                .arguments(GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.user(Text.of("add")))),
                         GenericArguments.optionalWeak(
                         flagBuilder
                                 .permissionFlag("latch.normal.persist", "persist", "p")

@@ -89,67 +89,69 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
 
     @Override
     public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockState) {
-        Optional<Lock> lock = Latch.getLockManager().getLock(location);
+        Optional<Lock> optionalLock = Latch.getLockManager().getLock(location);
         //Check to see if another lock is present
-        if(!lock.isPresent()) {
+        if(!optionalLock.isPresent()) {
             player.sendMessage(Text.of(TextColors.RED, "There is no lock there."));
             return false;
         }
 
+        Lock lock = optionalLock.get();
+
         //Check to make sure they're the owner
-        if(!lock.get().isOwner(player.getUniqueId())) {
+        if(!lock.isOwner(player.getUniqueId())) {
             player.sendMessage(Text.of(TextColors.RED, "You are not the owner of this lock."));
             return false;
         }
 
         //Check to make sure, if they're assigning a new owner, the new owner is not at their limit
         if(newOwner != null || type != null) {
-            if (Latch.getLockManager().isPlayerAtLockLimit(newOwner == null ? lock.get().getOwner() : newOwner, type == null ? lock.get().getLockType() : type)) {
+            if (Latch.getLockManager().isPlayerAtLockLimit(newOwner == null ? lock.getOwner() : newOwner, type == null ? lock.getLockType() : type)) {
                 player.sendMessage(Text.of(TextColors.RED, "You cannot change this lock due to lock limits."));
                 return false;
             }
         }
 
-        UUID originalOwner = lock.get().getOwner();
-        String originalName = lock.get().getName();
+        UUID originalOwner = lock.getOwner();
+        String originalName = lock.getName();
 
         if(type != null) {
-            lock.get().setType(type);
+            lock.setType(type);
         }
         if(password != null) {
-            lock.get().setSalt(LatchUtils.generateSalt());
-            lock.get().changePassword(LatchUtils.hashPassword(password, lock.get().getSalt()));
+            lock.setSalt(LatchUtils.generateSalt());
+            lock.changePassword(LatchUtils.hashPassword(password, lock.getSalt()));
 
             //If changing password, need to clear out ability to access
-            Latch.getLockManager().removeAllLockAccess(lock.get());
+            Latch.getLockManager().removeAllLockAccess(lock);
         }
         if(lockName != null) {
-            lock.get().setName(lockName);
+            lock.setName(lockName);
         }
         if(newOwner != null) {
             //If assigning to a new owner - need to validate the name
-            if(!Latch.getLockManager().isUniqueName(newOwner, lock.get().getName())) {
-                lock.get().setName(LatchUtils.getRandomLockName(newOwner, lock.get().getLockedObject()));
+            if(!Latch.getLockManager().isUniqueName(newOwner, lock.getName())) {
+                lock.setName(LatchUtils.getRandomLockName(newOwner, lock.getLockedObject()));
             }
-            lock.get().setOwner(newOwner);
+            lock.setOwner(newOwner);
         }
         if(membersToAdd != null) {
             for(UUID u : membersToAdd) {
-                Latch.getLockManager().addLockAccess(lock.get(), u);
+                Latch.getLockManager().addLockAccess(lock, u);
             }
         }
         if(membersToRemove != null) {
             for(UUID u : membersToRemove) {
-                Latch.getLockManager().removeLockAccess(lock.get(), u);
+                Latch.getLockManager().removeLockAccess(lock, u);
             }
         }
         if(protectFromRedstone != null) {
-            lock.get().setProtectFromRedstone(protectFromRedstone);
+            lock.setProtectFromRedstone(protectFromRedstone);
         }
 
         //Update the base lock elements
         if(lockName != null || type != null || password != null || newOwner != null || protectFromRedstone != null) {
-            Latch.getLockManager().updateLockAttributes(originalOwner, originalName, lock.get());
+            Latch.getLockManager().updateLockAttributes(originalOwner, originalName, lock);
         }
 
         player.sendMessage(Text.of(TextColors.DARK_GREEN, "Lock data has been successfully updated."));

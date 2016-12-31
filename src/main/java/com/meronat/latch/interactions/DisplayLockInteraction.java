@@ -59,7 +59,6 @@ public class DisplayLockInteraction implements AbstractLockInteraction {
 
         Lock lock = optionalLock.get();
 
-        player.sendMessage(Text.of(TextColors.GOLD, "Latch Info - " + "X: " + location.getBlockX() + " Y: " + location.getBlockY() + " Z: " + location.getBlockZ()));
         player.sendMessage(Text.of(TextColors.DARK_GREEN, lock.getLockType().getHumanReadable() + " " +
                 lock.getLockedObject().substring(0, 1).toUpperCase() + lock.getLockedObject().substring(1) + ": ", TextColors.GRAY, lock.getName()));
         player.sendMessage(Text.of(TextColors.DARK_GREEN, "Owner: ", TextColors.GRAY, lock.getOwnerName()));

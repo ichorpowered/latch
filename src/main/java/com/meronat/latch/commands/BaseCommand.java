@@ -49,7 +49,7 @@ public class BaseCommand implements CommandExecutor {
             .child(new CreatePublicLockCommand().getCommand(), "public")
             .child(new CreatePasswordLockCommand().getCommand(), "password")
             .child(new PersistCommand().getCommand(), "persist", "clear", "unpersist", "stop", "cancel")
-            .child(new RemoveLockCommand().getCommand(), "delete", "removelock", "unlock")
+            .child(new RemoveLockCommand().getCommand(), "delete", "removelock")
             .child(new ChangeLockCommand().getCommand(), "change")
             .child(new DisplayLockCommand().getCommand(), "info", "display")
             .child(new UnlockCommand().getCommand(), "open", "unlock")

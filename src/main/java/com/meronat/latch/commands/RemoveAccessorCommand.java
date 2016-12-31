@@ -29,7 +29,7 @@ public class RemoveAccessorCommand implements CommandExecutor {
                 .description(Text.of("Remove a player from a locked block of yours."))
                 .permission("latch.normal.change")
                 .executor(this)
-                .arguments(GenericArguments.optionalWeak(GenericArguments.allOf(GenericArguments.user(Text.of("remove")))),
+                .arguments(GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.user(Text.of("remove")))),
                         GenericArguments.optionalWeak(
                         flagBuilder
                                 .permissionFlag("latch.normal.persist", "persist", "p")

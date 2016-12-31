@@ -142,10 +142,10 @@ class Configuration {
         //Lock limit per enum
         if(configNode.getNode("lock_limit").isVirtual()) {
             HashMap<String, Integer> limits = new HashMap<>();
-            limits.put("total", 5);
+            limits.put("total", 24);
 
             for(LockType type : LockType.values()) {
-                limits.put(type.toString().toLowerCase(), 2);
+                limits.put(type.toString().toLowerCase(), 8);
             }
 
             try {
