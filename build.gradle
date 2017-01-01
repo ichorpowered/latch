@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.meronat.latch'
-version '0.1.0'
+version '0.1.1'
 
 apply plugin: 'java'
 description = 'A locking plugin which optionally allows you to lockpick those locks.'
@@ -13,14 +13,10 @@ targetCompatibility = 1.8
 compileJava.options.encoding = 'UTF-8'
 
 repositories {
-    mavenCentral()
+    jcenter()
     maven {
         name = 'spongepowered-repo'
         url = 'https://repo.spongepowered.org/maven/'
-    }
-    maven {
-        name = 'minecrell'
-        url = 'http://repo.minecrell.net/releases'
     }
 }
 
