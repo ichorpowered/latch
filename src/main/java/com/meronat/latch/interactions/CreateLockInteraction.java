@@ -93,12 +93,20 @@ public class CreateLockInteraction implements AbstractLockInteraction {
             return false;
         }
 
-        //Fire the lock create event and create the lock if it's not cancelled (by other plugins)
-        byte[] salt = LatchUtils.generateSalt();
+        Lock lock = new Lock(player.getUniqueId(), type, lockLocations, LatchUtils.getBlockNameFromType(blockState.getState().getType()), Latch.getLockManager().getProtectFromRedstone());
 
-        LockCreateEvent lockCreateEvent = new LockCreateEvent(player,
-                new Lock(player.getUniqueId(), type, lockLocations, LatchUtils.getBlockNameFromType(blockState.getState().getType()), salt, LatchUtils.hashPassword(password, salt), Latch.getLockManager().getProtectFromRedstone()),
-                Cause.source(player).build());
+        if (type.equals(LockType.PASSWORD_ALWAYS) || type.equals(LockType.PASSWORD_ONCE)) {
+
+            //Fire the lock create event and create the lock if it's not cancelled (by other plugins)
+            byte[] salt = LatchUtils.generateSalt();
+
+            lock.setSalt(salt);
+
+            lock.changePassword(LatchUtils.hashPassword(password, salt));
+
+        }
+
+        LockCreateEvent lockCreateEvent = new LockCreateEvent(player, lock, Cause.source(player).build());
 
         Sponge.getEventManager().post(lockCreateEvent);
 

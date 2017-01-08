@@ -79,6 +79,18 @@ public class Lock {
         this.protectFromRedstone = protectFromRedstone;
     }
 
+    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, boolean protectFromRedstone) {
+
+        this.owner = owner;
+        this.name = LatchUtils.getRandomLockName(owner, lockedObjectName);
+        this.type = type;
+        this.lockedObjectName = lockedObjectName;
+        this.location = location;
+        this.protectFromRedstone = protectFromRedstone;
+        this.ableToAccess = new HashSet<>();
+
+    }
+
     protected HashSet<Location<World>> getLocations() {
         return location;
     }

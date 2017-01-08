@@ -78,7 +78,15 @@ public class UnlockCommand implements CommandExecutor {
 
             Latch.getLockManager().setInteractionData(player.getUniqueId(), unlockLock);
 
-            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will unlock the next lock you click."));
+            if (args.hasAny("p")) {
+
+                player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will unlock all locks you click until you type \"latch persist\"."));
+
+            } else {
+
+                player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will unlock the next lock you click."));
+
+            }
 
             return CommandResult.success();
         }

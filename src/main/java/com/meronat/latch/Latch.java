@@ -58,7 +58,7 @@ import java.util.Map;
 @Plugin(
         id = "latch",
         name = "Latch",
-        version = "0.1.1",
+        version = "0.2.0",
         description = "A locking plugin which optionally allows you to lockpick those locks.",
         url = "http://ichorcommunity.com/",
         authors = {

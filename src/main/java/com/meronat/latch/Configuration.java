@@ -144,7 +144,7 @@ class Configuration {
         //Lock limit per enum
         if(configNode.getNode("lock_limit").isVirtual()) {
             HashMap<String, Integer> limits = new HashMap<>();
-            limits.put("total", 24);
+            limits.put("total", 30);
 
             for(LockType type : LockType.values()) {
                 limits.put(type.toString().toLowerCase(), 8);
@@ -161,6 +161,10 @@ class Configuration {
         //Do we allow redstone protection?
         if(configNode.getNode("protect_from_redstone").isVirtual()) {
             configNode.getNode("protect_from_redstone").setValue(false);
+        }
+
+        if (configNode.getNode("auto_lock_on_placement").isVirtual()) {
+            configNode.getNode("auto_lock_on_placement").setValue(false);
         }
 
     }

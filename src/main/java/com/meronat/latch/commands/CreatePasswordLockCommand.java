@@ -79,18 +79,26 @@ public class CreatePasswordLockCommand implements CommandExecutor {
             }
 
             //Default to the always password if no flag present
-            LockType typeToUse = LockType.PASSWORD_ALWAYS;
+            LockType type = LockType.PASSWORD_ALWAYS;
 
             if(args.hasAny("o")) {
-                typeToUse= LockType.PASSWORD_ONCE;
+                type = LockType.PASSWORD_ONCE;
             }
 
-            CreateLockInteraction passwordLock = new CreateLockInteraction(player.getUniqueId(), typeToUse, password.get());
+            CreateLockInteraction passwordLock = new CreateLockInteraction(player.getUniqueId(), type, password.get());
             passwordLock.setPersistence(args.hasAny("p"));
 
-            Latch.getLockManager().setInteractionData(((Player) src).getUniqueId(), passwordLock);
+            Latch.getLockManager().setInteractionData(player.getUniqueId(), passwordLock);
 
-            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will lock the next latchable block you click or place."));
+            if (args.hasAny("p")) {
+
+                player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will lock all latchable blocks you click or place until you type \"latch persist\"."));
+
+            } else {
+
+                player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will lock the next latchable block you click or place."));
+
+            }
 
             return CommandResult.success();
 

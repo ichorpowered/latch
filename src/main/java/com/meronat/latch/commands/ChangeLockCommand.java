@@ -125,7 +125,15 @@ public class ChangeLockCommand implements CommandExecutor {
 
             Latch.getLockManager().setInteractionData(player.getUniqueId(), changeLock);
 
-            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will change the next lock you click."));
+            if (args.hasAny("p")) {
+
+                player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will change all locks you click until you type \"/latch persist\"."));
+
+            } else {
+
+                player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will change the next lock you click."));
+
+            }
 
             return CommandResult.success();
 

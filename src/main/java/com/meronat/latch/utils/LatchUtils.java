@@ -26,6 +26,7 @@
 package com.meronat.latch.utils;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.BaseEncoding;
 import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
 import com.meronat.latch.entities.LockManager;
@@ -53,9 +54,6 @@ import java.util.Set;
 import java.util.UUID;
 
 public class LatchUtils {
-
-    private static final int ITERATIONS = 1000;
-    private static final int KEY_LENGTH = 256;
 
     private static final ImmutableList<Direction> adjacentDirections =
             ImmutableList.of(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
@@ -103,32 +101,27 @@ public class LatchUtils {
     // TODO Increase security of passwords
 
     public static byte[] generateSalt() {
-        SecureRandom random = new SecureRandom();
 
         byte[] salt = new byte[8];
-        random.nextBytes(salt);
+
+        new SecureRandom().nextBytes(salt);
 
         return salt;
+
     }
 
     public static String hashPassword(String password, byte[] salt) {
-        char[] passwordChars = password.toCharArray();
 
-        PBEKeySpec spec = new PBEKeySpec(
-                passwordChars,
-                salt,
-                ITERATIONS,
-                KEY_LENGTH
-        );
+        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 1000, 256);
+
         try {
             SecretKeyFactory key = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
-            byte[] hashedPassword = key.generateSecret(spec).getEncoded();
-            return new String(hashedPassword);
+            return BaseEncoding.base16().encode(key.generateSecret(spec).getEncoded());
         } catch (NoSuchAlgorithmException e) {
             Latch.getLogger().error("Password algorithm not detected. Password will be stored as plaintext.");
             e.printStackTrace();
         } catch (InvalidKeySpecException e) {
-            Latch.getLogger().error("Password has an invalid key. Password wil be stored as plaintext.");
+            Latch.getLogger().error("Password has an invalid key. Password will be stored as plaintext.");
             e.printStackTrace();
         }
         return password;

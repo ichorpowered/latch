@@ -50,6 +50,8 @@ public class AddAccessorCommand implements CommandExecutor {
 
         ChangeLockInteraction addPlayers = new ChangeLockInteraction(player.getUniqueId());
 
+        addPlayers.setPersistence(args.hasAny("p"));
+
         if(members.size() > 0) {
             addPlayers.setMembersToAdd(members);
         } else {
@@ -58,7 +60,15 @@ public class AddAccessorCommand implements CommandExecutor {
 
         Latch.getLockManager().setInteractionData(player.getUniqueId(), addPlayers);
 
-        player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will add them on the next lock of yours you click."));
+        if (args.hasAny("p")) {
+
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will add them on all locks you click until you type \"latch persist\"."));
+
+        } else {
+
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will add them on the next lock of yours you click."));
+
+        }
 
         return CommandResult.success();
 

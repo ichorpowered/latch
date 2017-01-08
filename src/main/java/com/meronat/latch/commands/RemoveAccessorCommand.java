@@ -50,6 +50,8 @@ public class RemoveAccessorCommand implements CommandExecutor {
 
         ChangeLockInteraction removePlayers = new ChangeLockInteraction(player.getUniqueId());
 
+        removePlayers.setPersistence(args.hasAny("p"));
+
         if(members.size() > 0) {
             removePlayers.setMembersToRemove(members);
         } else {
@@ -58,7 +60,15 @@ public class RemoveAccessorCommand implements CommandExecutor {
 
         Latch.getLockManager().setInteractionData(player.getUniqueId(), removePlayers);
 
-        player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will remove them on the next lock of yours you click."));
+        if (args.hasAny("p")) {
+
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will remove them on all locks you click until you type \"latch persist\"."));
+
+        } else {
+
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will remove them on the next lock of yours you click."));
+
+        }
 
         return CommandResult.success();
 

@@ -70,7 +70,16 @@ public class CreateDonationLockCommand implements CommandExecutor {
 
             Latch.getLockManager().setInteractionData(player.getUniqueId(), privateLock);
 
-            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will lock the next latchable block you click or place."));
+
+            if (args.hasAny("p")) {
+
+                player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will lock all latchable blocks you click or place until you type \"latch persist\"."));
+
+            } else {
+
+                player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will lock the next latchable block you click or place."));
+
+            }
 
             return CommandResult.success();
         }
