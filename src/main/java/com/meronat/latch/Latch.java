@@ -127,11 +127,7 @@ public class Latch {
         eventManager.registerListeners(this, new ChangeBlockListener());
         eventManager.registerListeners(this, new InteractBlockListener());
         eventManager.registerListeners(this, new SpawnEntityListener());
-
-        //Only register this listener if we need to protect from Redstone
-        if(getLockManager().getProtectFromRedstone()) {
-            eventManager.registerListeners(this, new NotifyNeighborListener());
-        }
+        eventManager.registerListeners(this, new NotifyNeighborListener());
 
     }
 

@@ -25,40 +25,74 @@
 
 package com.meronat.latch.listeners;
 
+import com.flowpowered.noise.module.combiner.Power;
 import com.meronat.latch.Latch;
+import com.meronat.latch.entities.Lock;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.mutable.block.RedstonePoweredData;
+import org.spongepowered.api.data.property.block.IndirectlyPoweredProperty;
+import org.spongepowered.api.data.property.block.PoweredProperty;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.event.filter.cause.Last;
+import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Locatable;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
 
 public class NotifyNeighborListener {
 
-    /* Does not seem to always return true even if the block is powered, look to re-implement this in the future.
-
     //Cover all the ways the block could be powered
-    private boolean isPowered(Location<?> location) {
+    /*private boolean isPowered(Location<?> location) {
         return (location.get(Keys.POWER).isPresent() && location.get(Keys.POWER).get() > 0) ||
                 (location.getProperty(PoweredProperty.class).isPresent() && location.getProperty(PoweredProperty.class).get().getValue()) ||
                 (location.getProperty(IndirectlyPoweredProperty.class).isPresent() && location.getProperty(IndirectlyPoweredProperty.class).get().getValue());
+    }*/
+
+    private boolean isPiston(BlockType type) {
+        return type == BlockTypes.PISTON || type == BlockTypes.PISTON_EXTENSION ||
+            type == BlockTypes.PISTON_HEAD || type == BlockTypes.STICKY_PISTON;
     }
 
-    */
+    private boolean protectLockFromRedstone(Location<World> location) {
+        Optional<Lock> lock = Latch.getLockManager().getLock(location);
+        return lock.isPresent() && lock.get().getProtectFromRedstone();
+    }
 
+    /*This listener handles the below scenarios:
+        -A piston moving the lock
+        -Breaking the block below a lock dependent upon it
+        -Redstone affecting the lock
+    */
+    //TODO Could this be improved? Is this querying too often? +Reevaluate once Sponge modifies redstone data
     @Listener
     public void notifyNeighbors(NotifyNeighborBlockEvent event, @First BlockSnapshot cause) {
         cause.getLocation().ifPresent(worldLocation -> {
-            for (Direction d : event.getOriginalNeighbors().keySet()) {
-                Latch.getLockManager().getLock(worldLocation.getBlockRelative(d)).ifPresent(lock -> {
-                    if (lock.getProtectFromRedstone()) {
-                        event.getNeighbors().remove(d);
-                    }
-                });
-
+            //If the cause is a Piston (to prevent it from breaking/modifying locks)
+            //OR the cause is powered and our config blocks redstone we want to stop the notification
+            if (isPiston(cause.getState().getType())) {
+                event.getNeighbors().entrySet().removeIf(neighbor ->
+                    Latch.getLockManager()
+                        .getLock(worldLocation.getBlockRelative(neighbor.getKey())).isPresent()
+                );
+            } else if (Latch.getLockManager().getProtectFromRedstone()) {
+                event.getNeighbors().entrySet().removeIf(neighbor ->
+                    protectLockFromRedstone(worldLocation.getBlockRelative(neighbor.getKey())));
             }
-
         });
 
     }
+
+
 
 }

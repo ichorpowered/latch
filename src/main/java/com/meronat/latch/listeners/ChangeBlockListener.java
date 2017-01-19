@@ -33,13 +33,16 @@ import com.meronat.latch.interactions.CreateLockInteraction;
 import com.meronat.latch.utils.LatchUtils;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.tileentity.Piston;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.entity.explosive.Explosive;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.event.world.ExplosionEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
@@ -207,53 +210,23 @@ public class ChangeBlockListener {
     }
 
     @Listener
-    public void onBlockBrokenTileEntity(ChangeBlockEvent.Post event) {
-        //Player and explosion listeners handled elsewhere - this is for other events (like pistons)
-        //Can't explicitly look for pistons in the cause because if blocks are chained the piston is not in the cause
-        if(event.getCause().root() instanceof Player || event.getCause().first(Explosive.class).isPresent()) {
-            return;
-        }
+    public void onBlockBrokenByExplosion(ExplosionEvent.Post event) {
+        if(Latch.getConfig().getNode("protect_from_explosives").getBoolean(true)) {
+            //If we're supposed to protect from explosions, invalidate the transaction
+            for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
+                if (transaction.isValid() && transaction.getOriginal().getLocation().isPresent()) {
 
-        //If the post event is affecting a lock... invalidate the new blocksnapshot
-        for( Transaction<BlockSnapshot> bs : event.getTransactions()) {
-            if(bs.isValid() && bs.getOriginal().getLocation().isPresent()) {
-                //If the block is below a block we need to protect the below blocks of...
-                //Potentially Sponge issue - should be able to detect these blocks
-                if(Latch.getLockManager().isProtectBelowBlocks(bs.getOriginal().getLocation().get().getBlockRelative(Direction.UP).getBlockType()) &&
-                        Latch.getLockManager().getLock(bs.getOriginal().getLocation().get().getBlockRelative(Direction.UP)).isPresent()) {
-                    bs.setValid(false);
-                    event.setCancelled(true);
-                    break;
-                }
-
-                if(Latch.getLockManager().isLockableBlock(bs.getOriginal().getState().getType()) && Latch.getLockManager().getLock(bs.getOriginal().getLocation().get()).isPresent()) {
-                        bs.setValid(false);
-                        event.setCancelled(true);
-                }
-            }
-        }
-    }
-
-    @Listener
-    public void onBlockBrokenByExplosion(ChangeBlockEvent.Break event) {
-        //If there's a lock broken by an explosion, need to evaluate it
-        boolean protectFromExplosives = event.getCause().first(Explosive.class).isPresent() && Latch.getConfig().getNode("protect_from_explosives").getBoolean(true);
-
-        if(!protectFromExplosives) {
-            //Delete the locks destroyed by the explosion
-            for( Transaction<BlockSnapshot> bs : event.getTransactions()) {
-                if (bs.isValid() && bs.getOriginal().getLocation().isPresent()) {
-                    if(Latch.getLockManager().getLock(bs.getOriginal().getLocation().get()).isPresent()) {
-                        Latch.getLockManager().deleteLock(bs.getOriginal().getLocation().get(), false);
+                    if (Latch.getLockManager().getLock(transaction.getOriginal().getLocation().get()).isPresent()) {
+                        transaction.setValid(false);
                     }
                 }
             }
         } else {
-            for (Transaction<BlockSnapshot> bs : event.getTransactions()) {
+            //Otherwise we should delete the locks destroyed by the explosion
+            for( Transaction<BlockSnapshot> bs : event.getTransactions()) {
                 if (bs.isValid() && bs.getOriginal().getLocation().isPresent()) {
-
-                    if (Latch.getLockManager().getLock(bs.getOriginal().getLocation().get()).isPresent()) {
-                        bs.setValid(false);
+                    if(Latch.getLockManager().getLock(bs.getOriginal().getLocation().get()).isPresent()) {
+                        Latch.getLockManager().deleteLock(bs.getOriginal().getLocation().get(), false);
                     }
                 }
             }
