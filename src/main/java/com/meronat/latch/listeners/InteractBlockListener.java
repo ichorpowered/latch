@@ -42,23 +42,43 @@ import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.filter.type.Include;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.item.inventory.InventoryArchetype;
+import org.spongepowered.api.item.inventory.InventoryArchetypes;
+import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
+import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import java.util.Iterator;
 import java.util.Optional;
 
 public class InteractBlockListener {
 
     @Listener
     public void onClickInventory(ClickInventoryEvent event, @First Player player) {
-
         //Make sure we have a transaction to validate
         if( event.getTransactions().size() <= 0) {
             return;
         }
 
-        SlotTransaction slotTransaction = event.getTransactions().get(0);
+        boolean shiftClicking = event instanceof ClickInventoryEvent.Shift;
+
+        SlotTransaction slotTransaction = null;
+
+        //Get the transaction BEFORE the first one that is the player putting it in their inventory
+        //TODO rework this once Sponge addresses SlotTransactions present in ClickInventoryEvents
+        Iterator<SlotTransaction> itr = event.getTransactions().listIterator();
+        while(itr.hasNext()) {
+            SlotTransaction st = itr.next();
+
+            if( st.getSlot().parent() instanceof PlayerInventory) {
+                break;
+            }
+            slotTransaction = st;
+        }
 
         //If the player is interacting with a TileEntityCarrier
         if( slotTransaction.getSlot().parent() instanceof TileEntityCarrier ) {
@@ -69,7 +89,22 @@ public class InteractBlockListener {
 
                 //If there's a donation lock the player CANNOT access
                 if(lock.isPresent() && lock.get().getLockType() == LockType.DONATION && !lock.get().canAccess(player.getUniqueId())) {
-                    //Cancel the event
+                    //Ideally cancel the event, but Sponge stacks up SlotTransactions that occur on the chest while a
+                    //player has the window open (i.e. this even will show slot transactions that occur from other players
+                    //between the main player's "clicks")
+
+                    itr = event.getTransactions().iterator();
+
+                    while(itr.hasNext()) {
+                        SlotTransaction st = itr.next();
+
+                        if( st.equals(slotTransaction)) {
+                            break;
+                        } else {
+                            itr.remove();
+                        }
+                    }
+
                     event.setCancelled(true);
                 }
             }
@@ -122,6 +157,3 @@ public class InteractBlockListener {
     }
 
 }
-
-
-
