@@ -99,7 +99,7 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
         Lock lock = optionalLock.get();
 
         //Check to make sure they're the owner
-        if(!lock.isOwner(player.getUniqueId())) {
+        if(!lock.isOwnerOrBypassing(player.getUniqueId())) {
             player.sendMessage(Text.of(TextColors.RED, "You are not the owner of this lock."));
             return false;
         }

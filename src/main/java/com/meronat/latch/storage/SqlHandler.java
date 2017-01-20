@@ -374,12 +374,57 @@ public class SqlHandler {
 
                 connection.close();
             } catch (SQLException e) {
-                getLogger().error("Error deleteLock for location: " + location.toString());
-                e.printStackTrace();
+                    getLogger().error("Error deleteLock for location: " + location.toString());
+                    e.printStackTrace();
             }
         } else {
             getLogger().error("Error deleteLock for location (ID not found): " + location.toString());
         }
+    }
+
+    public void deleteLocksForPlayer(UUID player) {
+
+        try (
+            Connection connection = getConnection();
+            PreparedStatement ps = connection.prepareStatement("SELECT ID FROM LOCK WHERE OWNER_UUID = ?");
+        ) {
+
+            ps.setString(1, player.toString());
+
+            try (
+                    ResultSet rs = ps.executeQuery();
+            ) {
+
+                while (rs.next()) {
+
+                    try (
+                        PreparedStatement psLocations = connection.prepareStatement("DELETE FROM LOCK_LOCATIONS WHERE LOCK_ID = ?");
+                        PreparedStatement psAccessors = connection.prepareStatement("DELETE FROM LOCK_PLAYERS WHERE LOCK_ID = ?");
+                        PreparedStatement psLocks = connection.prepareStatement("DELETE FROM LOCK WHERE ID = ?");
+                    ) {
+
+                        String lockId = rs.getString(1);
+
+                        psLocations.setString(1, lockId);
+                        psAccessors.setString(1, lockId);
+                        psLocks.setString(1, lockId);
+
+                        psLocations.execute();
+                        psAccessors.execute();
+                        psLocks.execute();
+
+                    }
+
+                }
+
+            }
+
+        } catch (SQLException e) {
+
+            getLogger().error("Error deleting locks for player: " + player.toString());
+
+        }
+
     }
 
     public boolean isUniqueName(UUID playerUUID, String lockName) {

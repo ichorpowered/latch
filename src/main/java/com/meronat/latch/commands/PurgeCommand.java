@@ -26,24 +26,28 @@
 package com.meronat.latch.commands;
 
 import com.meronat.latch.Latch;
-import com.meronat.latch.interactions.AbstractLockInteraction;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-public class PersistCommand implements CommandExecutor {
+import java.util.Optional;
+
+public class PurgeCommand implements CommandExecutor {
 
     public CommandCallable getCommand() {
         return CommandSpec.builder()
-                .description(Text.of("Persist or clear a persisted latch command"))
-                .permission("latch.normal.persist")
+                .description(Text.of("Set yourself to be bypassing."))
+                .permission("latch.normal.purge")
+                .arguments(GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.user(Text.of("target")))))
                 .executor(this)
                 .build();
     }
@@ -51,29 +55,54 @@ public class PersistCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        if(src instanceof Player) {
+        Optional<User> optionalUser = args.getOne("target");
 
-            Player player = (Player) src;
+        User user;
 
-            if(!Latch.getLockManager().hasInteractionData(player.getUniqueId())) {
-                throw new CommandException(Text.of(TextColors.RED, "You must have run a latch command to persist/clear it."));
-            }
+        if (src instanceof User) {
 
-            AbstractLockInteraction interaction = Latch.getLockManager().getInteractionData(player.getUniqueId());
-            interaction.setPersistence(!interaction.shouldPersist());
+            if (optionalUser.isPresent()) {
 
-            if(interaction.shouldPersist()) {
-                player.sendMessage(Text.of(TextColors.DARK_GREEN, "Your latch command will now persist."));
+                if (src.hasPermission("latch.admin.purge")) {
+
+                    user = optionalUser.get();
+
+                } else {
+
+                    throw new CommandException(Text.of(TextColors.RED, "You do not have permission to specify a player to purge."));
+
+                }
+
             } else {
-                Latch.getLockManager().removeInteractionData(((Player) src).getUniqueId());
-                player.sendMessage(Text.of(TextColors.DARK_GREEN, "Your latch command has been cleared."));
+
+                user = (User) src;
+
             }
 
-            return CommandResult.success();
+        } else if (src instanceof ConsoleSource) {
+
+            if (optionalUser.isPresent()) {
+
+                user = optionalUser.get();
+
+            } else {
+
+                throw new CommandException(Text.of(TextColors.RED, "You must specify a user."));
+
+            }
+
+        } else {
+
+            throw new CommandException(Text.of(TextColors.RED, "You source type is not able to execute this command."));
 
         }
 
-        throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
+        Latch.getStorageHandler().deleteLocksForPlayer(user.getUniqueId());
+
+        user.getPlayer().ifPresent(p -> p.sendMessage(Text.of(TextColors.DARK_GREEN, "All of ", TextColors.GRAY,
+                user.getName() + "'s", TextColors.DARK_GREEN, " locks have been purged.")));
+
+        return CommandResult.success();
 
     }
 

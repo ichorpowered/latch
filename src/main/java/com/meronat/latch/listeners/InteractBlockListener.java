@@ -42,13 +42,8 @@ import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.filter.type.Include;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.InventoryArchetype;
-import org.spongepowered.api.item.inventory.InventoryArchetypes;
-import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
-import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -60,45 +55,47 @@ public class InteractBlockListener {
     @Listener
     public void onClickInventory(ClickInventoryEvent event, @First Player player) {
         //Make sure we have a transaction to validate
-        if( event.getTransactions().size() <= 0) {
+        if (event.getTransactions().size() <= 0) {
             return;
         }
-
-        boolean shiftClicking = event instanceof ClickInventoryEvent.Shift;
 
         SlotTransaction slotTransaction = null;
 
         //Get the transaction BEFORE the first one that is the player putting it in their inventory
         //TODO rework this once Sponge addresses SlotTransactions present in ClickInventoryEvents
         Iterator<SlotTransaction> itr = event.getTransactions().listIterator();
-        while(itr.hasNext()) {
+        while (itr.hasNext()) {
             SlotTransaction st = itr.next();
 
-            if( st.getSlot().parent() instanceof PlayerInventory) {
+            if (st.getSlot().parent() instanceof PlayerInventory) {
                 break;
             }
             slotTransaction = st;
         }
 
+        if (slotTransaction == null) {
+            return;
+        }
+
         //If the player is interacting with a TileEntityCarrier
-        if( slotTransaction.getSlot().parent() instanceof TileEntityCarrier ) {
+        if (slotTransaction.getSlot().parent() instanceof TileEntityCarrier ) {
             //If the final item is NONE (or amount is less) person is trying to withdraw (so we care about it)
             if (slotTransaction.getFinal().getType() == ItemTypes.NONE || slotTransaction.getFinal().getCount() < slotTransaction.getOriginal().getCount()) {
                 //Then check to see if there's a lock
                 Optional<Lock> lock = Latch.getLockManager().getLock(((TileEntityCarrier) slotTransaction.getSlot().parent()).getLocation());
 
                 //If there's a donation lock the player CANNOT access
-                if(lock.isPresent() && lock.get().getLockType() == LockType.DONATION && !lock.get().canAccess(player.getUniqueId())) {
+                if(!lock.isPresent() && lock.get().getLockType() == LockType.DONATION && !lock.get().canAccess(player.getUniqueId())) {
                     //Ideally cancel the event, but Sponge stacks up SlotTransactions that occur on the chest while a
                     //player has the window open (i.e. this even will show slot transactions that occur from other players
                     //between the main player's "clicks")
 
                     itr = event.getTransactions().iterator();
 
-                    while(itr.hasNext()) {
+                    while (itr.hasNext()) {
                         SlotTransaction st = itr.next();
 
-                        if( st.equals(slotTransaction)) {
+                        if (st.equals(slotTransaction)) {
                             break;
                         } else {
                             itr.remove();
@@ -107,6 +104,7 @@ public class InteractBlockListener {
 
                     event.setCancelled(true);
                 }
+
             }
 
         }
@@ -148,7 +146,7 @@ public class InteractBlockListener {
 
                 //If there's a lock (non-donation) that the player shouldn't be able to access
                 if(optionalLock.isPresent() && optionalLock.get().getLockType() != LockType.DONATION && !optionalLock.get().canAccess(player.getUniqueId()) ) {
-                    player.sendMessage(Text.of(TextColors.RED, "You can't access this lock."));
+                    player.sendMessage(Text.of(TextColors.RED, "You cannot access this lock."));
                     event.setCancelled(true);
                 }
             }

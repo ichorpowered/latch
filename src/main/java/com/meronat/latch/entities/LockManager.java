@@ -34,12 +34,16 @@ import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public class LockManager {
+
+    private Set<UUID> bypassing = new HashSet<>();
 
     private List<String> lockableBlocks = new ArrayList<>();
     private List<String> restrictedBlocks = new ArrayList<>();
@@ -169,4 +173,23 @@ public class LockManager {
     public void setProtectFromRedstone(boolean protectFromRedstone) {
         this.protectFromRedstone = protectFromRedstone;
     }
+
+    public boolean isBypassing(UUID uuid) {
+
+        return this.bypassing.contains(uuid);
+
+    }
+
+    public void setBypassing(UUID uuid) {
+
+        this.bypassing.add(uuid);
+
+    }
+
+    public void removeBypassing(UUID uuid) {
+
+        this.bypassing.remove(uuid);
+
+    }
+
 }

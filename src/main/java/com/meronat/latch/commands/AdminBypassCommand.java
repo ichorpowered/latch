@@ -26,7 +26,7 @@
 package com.meronat.latch.commands;
 
 import com.meronat.latch.Latch;
-import com.meronat.latch.interactions.AbstractLockInteraction;
+import com.meronat.latch.entities.LockManager;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -38,12 +38,12 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-public class PersistCommand implements CommandExecutor {
+public class AdminBypassCommand implements CommandExecutor {
 
     public CommandCallable getCommand() {
         return CommandSpec.builder()
-                .description(Text.of("Persist or clear a persisted latch command"))
-                .permission("latch.normal.persist")
+                .description(Text.of("Put yourself in or remove yourself from admin bypass mode."))
+                .permission("latch.admin.bypass")
                 .executor(this)
                 .build();
     }
@@ -51,29 +51,29 @@ public class PersistCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        if(src instanceof Player) {
+        if (!(src instanceof Player)) {
 
-            Player player = (Player) src;
-
-            if(!Latch.getLockManager().hasInteractionData(player.getUniqueId())) {
-                throw new CommandException(Text.of(TextColors.RED, "You must have run a latch command to persist/clear it."));
-            }
-
-            AbstractLockInteraction interaction = Latch.getLockManager().getInteractionData(player.getUniqueId());
-            interaction.setPersistence(!interaction.shouldPersist());
-
-            if(interaction.shouldPersist()) {
-                player.sendMessage(Text.of(TextColors.DARK_GREEN, "Your latch command will now persist."));
-            } else {
-                Latch.getLockManager().removeInteractionData(((Player) src).getUniqueId());
-                player.sendMessage(Text.of(TextColors.DARK_GREEN, "Your latch command has been cleared."));
-            }
-
-            return CommandResult.success();
+            throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
 
         }
 
-        throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
+        Player player = (Player) src;
+
+        LockManager lockManager = Latch.getLockManager();
+
+        if (lockManager.isBypassing(player.getUniqueId())) {
+
+            lockManager.removeBypassing(player.getUniqueId());
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You have disabled admin bypass."));
+
+        } else {
+
+            lockManager.setBypassing(player.getUniqueId());
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You have enabled admin bypass."));
+
+        }
+
+        return CommandResult.success();
 
     }
 

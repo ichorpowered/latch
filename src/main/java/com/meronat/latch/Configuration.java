@@ -167,6 +167,10 @@ class Configuration {
             configNode.getNode("auto_lock_on_placement").setValue(false);
         }
 
+        if (configNode.getNode("remove_bypass_on_logout").isVirtual()) {
+            configNode.getNode("remove_bypass_on_logout").setValue(true);
+        }
+
     }
 
     private void saveConfig() {

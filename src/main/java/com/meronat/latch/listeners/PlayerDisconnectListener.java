@@ -26,30 +26,18 @@
 package com.meronat.latch.listeners;
 
 import com.meronat.latch.Latch;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
-import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 
-public class SpawnEntityListener {
+public class PlayerDisconnectListener {
 
     @Listener
-    public void onSpawnLockItem(SpawnEntityEvent event, @Root BlockSpawnCause sc) {
-        //This is to prevent item drops from being generated when blocks break from things like Pistons
-        //Sponge still drops the item even if the blocksnapshot is invalidated/event is cancelled
+    public void onPlayerLeave(ClientConnectionEvent.Disconnect event, @Root Player player) {
 
-        //If the blocksnapshot causing the event is not lockable or has no location, no checks needed - return
-        if(!Latch.getLockManager().isLockableBlock(sc.getBlockSnapshot().getState().getType()) || !sc.getBlockSnapshot().getLocation().isPresent()) {
-            return;
-        }
+        Latch.getLockManager().removeBypassing(player.getUniqueId());
 
-        //Piston used to generate a CUSTOM spawn type, now it's DROPPED_ITEM
-        if( sc.getType() == SpawnTypes.DROPPED_ITEM ) {
-            if(Latch.getLockManager().getLock(sc.getBlockSnapshot().getLocation().get()).isPresent()) {
-                event.setCancelled(true);
-            }
-        }
     }
-}
 
+}

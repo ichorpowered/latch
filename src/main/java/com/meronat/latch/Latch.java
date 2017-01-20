@@ -34,6 +34,7 @@ import com.meronat.latch.entities.LockManager;
 import com.meronat.latch.listeners.ChangeBlockListener;
 import com.meronat.latch.listeners.InteractBlockListener;
 import com.meronat.latch.listeners.NotifyNeighborListener;
+import com.meronat.latch.listeners.PlayerDisconnectListener;
 import com.meronat.latch.listeners.SpawnEntityListener;
 import com.meronat.latch.storage.SqlHandler;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -58,8 +59,8 @@ import java.util.Map;
 @Plugin(
         id = "latch",
         name = "Latch",
-        version = "0.2.0",
-        description = "A locking plugin which optionally allows you to lockpick those locks.",
+        version = "0.3.0",
+        description = "An extensive locking plugin for your containers.",
         url = "http://ichorcommunity.com/",
         authors = {
                 "Nighteyes604",
@@ -128,6 +129,12 @@ public class Latch {
         eventManager.registerListeners(this, new InteractBlockListener());
         eventManager.registerListeners(this, new SpawnEntityListener());
         eventManager.registerListeners(this, new NotifyNeighborListener());
+
+        if(getConfig().getNode("remove_bypass_on_logout").getBoolean()) {
+
+            eventManager.registerListeners(this, new PlayerDisconnectListener());
+
+        }
 
     }
 

@@ -25,6 +25,7 @@
 
 package com.meronat.latch.entities;
 
+import com.meronat.latch.Latch;
 import com.meronat.latch.enums.LockType;
 import com.meronat.latch.utils.LatchUtils;
 import org.spongepowered.api.Sponge;
@@ -119,8 +120,12 @@ public class Lock {
         return lockedObjectName;
     }
 
-    public boolean isOwner(UUID uniqueId) {
-        return owner.equals(uniqueId);
+    public boolean isOwnerOrBypassing(UUID uniqueId) {
+        return this.owner.equals(uniqueId) || Latch.getLockManager().isBypassing(uniqueId);
+    }
+
+    public boolean isOwner(UUID uuid) {
+        return this.owner.equals(uuid);
     }
 
     public void setType(LockType type) {
@@ -158,7 +163,7 @@ public class Lock {
     }
 
     public boolean canAccess(UUID uniqueId) {
-        return ableToAccess.contains(uniqueId) || owner.equals(uniqueId) || type == LockType.PUBLIC;
+        return ableToAccess.contains(uniqueId) || owner.equals(uniqueId) || type == LockType.PUBLIC || Latch.getLockManager().isBypassing(uniqueId);
     }
 
     public String getPassword() {

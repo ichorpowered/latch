@@ -80,7 +80,7 @@ public class CreateLockInteraction implements AbstractLockInteraction {
         if(optionalOtherBlock.isPresent()) {
             //Check to see if another lock is present
             Optional<Lock> otherLock = Latch.getLockManager().getLock(optionalOtherBlock.get());
-            if( otherLock.isPresent() && !otherLock.get().isOwner(player.getUniqueId()) ) {
+            if( otherLock.isPresent() && !otherLock.get().isOwnerOrBypassing(player.getUniqueId()) ) {
                 //Shouldn't happen if we've configured this correctly - but just in case...
                 player.sendMessage(Text.of(TextColors.RED, "Another lock already present on the double block - delete locks and try again."));
                 return false;

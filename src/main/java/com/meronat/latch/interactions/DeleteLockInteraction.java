@@ -49,15 +49,17 @@ public class DeleteLockInteraction implements AbstractLockInteraction {
 
     @Override
     public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockState) {
-        Optional<Lock> lock = Latch.getLockManager().getLock(location);
+        Optional<Lock> optionalLock = Latch.getLockManager().getLock(location);
         //Check to see if another lock is present
-        if(!lock.isPresent()) {
+        if(!optionalLock.isPresent()) {
             player.sendMessage(Text.of(TextColors.RED, "There is no lock there."));
             return false;
         }
 
+        Lock lock = optionalLock.get();
+
         //Check to make sure they're the owner
-        if(!lock.get().isOwner(player.getUniqueId())) {
+        if(!lock.isOwnerOrBypassing(player.getUniqueId()) && !Latch.getLockManager().isBypassing(player.getUniqueId())) {
             player.sendMessage(Text.of(TextColors.RED, "You're not the owner of this lock."));
             return false;
         }
@@ -65,7 +67,7 @@ public class DeleteLockInteraction implements AbstractLockInteraction {
         Latch.getLockManager().deleteLock(location, true);
 
         player.sendMessage(Text.of(TextColors.DARK_GREEN, "You have deleted this ", TextColors.GRAY,
-                lock.get().getLockedObject(), TextColors.DARK_GREEN, " lock."));
+                lock.getLockedObject(), TextColors.DARK_GREEN, " lock."));
 
         return true;
     }

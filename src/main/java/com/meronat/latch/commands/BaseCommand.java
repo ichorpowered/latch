@@ -57,6 +57,8 @@ public class BaseCommand implements CommandExecutor {
             .child(new HelpCommand().getCommand(), "help")
             .child(new AddAccessorCommand().getCommand(), "add", "plus")
             .child(new RemoveAccessorCommand().getCommand(), "remove", "minus", "rem", "removeplayer")
+            .child(new AdminBypassCommand().getCommand(), "bypass", "adminbypass", "admin")
+            .child(new PurgeCommand().getCommand(), "purge", "destroyall")
             .executor(this)
             .build();
 
@@ -67,7 +69,7 @@ public class BaseCommand implements CommandExecutor {
         source.sendMessage(Text.of(TextColors.GRAY, "Created by ", StringUtils.join(Sponge.getPluginManager().getPlugin("latch").get().getAuthors(), ", ")));
         source.sendMessage(Text.builder("Click here for ")
                 .color(TextColors.GRAY)
-                .onClick(TextActions.runCommand("latch help"))
+                .onClick(TextActions.runCommand("/latch help"))
                 .onHover(TextActions.showText(Text.of("/latch help")))
                 .append(Text.builder("Latch")
                         .color(TextColors.DARK_GREEN)

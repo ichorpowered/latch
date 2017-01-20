@@ -3,10 +3,10 @@ plugins {
 }
 
 group 'com.meronat.latch'
-version '0.2.0'
+version '0.3.0'
 
 apply plugin: 'java'
-description = 'A locking plugin which optionally allows you to lockpick those locks.'
+description = 'An extensive locking plugin for your containers.'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8

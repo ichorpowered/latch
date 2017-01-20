@@ -25,29 +25,17 @@
 
 package com.meronat.latch.listeners;
 
-import com.flowpowered.noise.module.combiner.Power;
 import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
 import org.spongepowered.api.block.BlockSnapshot;
-import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.mutable.block.RedstonePoweredData;
-import org.spongepowered.api.data.property.block.IndirectlyPoweredProperty;
-import org.spongepowered.api.data.property.block.PoweredProperty;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.filter.cause.Last;
-import org.spongepowered.api.event.message.MessageChannelEvent;
-import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Optional;
 
 public class NotifyNeighborListener {
