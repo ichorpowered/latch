@@ -53,7 +53,11 @@ import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 public class ChangeBlockListener {
 
@@ -180,30 +184,28 @@ public class ChangeBlockListener {
                 event.setCancelled(true);
 
             }
-
         }
-
     }
 
     @Listener
     public void onBreakBlockByPlayer(ChangeBlockEvent.Break event, @Root Player player) {
+
+        //Track the names of the locks broken - only display message once per lock
+        HashSet<String> locksDeleted = new HashSet<String>();
+
         //Only allow the owner to break a lock
         for (Transaction<BlockSnapshot> bs : event.getTransactions()) {
             if (bs.isValid() && bs.getOriginal().getLocation().isPresent()) {
-
                 Location location = bs.getOriginal().getLocation().get();
-
                 LockManager lockManager = Latch.getLockManager();
 
                 Optional<Lock> optionalLock = lockManager.getLock(location);
 
                 //If the block is below a block we need to protect the below blocks of...
                 //Potentially Sponge issue - should be able to detect these blocks
-
                 Optional<Lock> aboveLock = lockManager.getLock(bs.getOriginal().getLocation().get().getBlockRelative(Direction.UP));
 
                 if (aboveLock.isPresent() && lockManager.isProtectBelowBlocks(location.getBlockRelative(Direction.UP).getBlockType()) && !aboveLock.get().isOwnerOrBypassing(player.getUniqueId())) {
-
                     player.sendMessage(Text.of(TextColors.RED, "You cannot destroy a block which is depended on by a lock that's not yours."));
                     bs.setValid(false);
                     continue;
@@ -211,7 +213,6 @@ public class ChangeBlockListener {
                 }
 
                 if (optionalLock.isPresent()) {
-
                     Lock lock = optionalLock.get();
 
                     //Check to make sure they're the owner
@@ -221,17 +222,16 @@ public class ChangeBlockListener {
                         return;
                     }
 
-                    player.sendMessage(Text.of(TextColors.DARK_GREEN, "You have destroyed this ", TextColors.GRAY,
-                            lock.getLockedObject(), TextColors.DARK_GREEN, " lock."));
+                    if(!locksDeleted.contains(lock.getName())) {
+                        player.sendMessage(Text.of(TextColors.DARK_GREEN, "You have destroyed this ", TextColors.GRAY,
+                                lock.getLockedObject(), TextColors.DARK_GREEN, " lock."));
+                        locksDeleted.add(lock.getName());
+                    }
 
                     lockManager.deleteLock(bs.getOriginal().getLocation().get(), false);
-
                 }
-
             }
-
         }
-
     }
 
     @Listener
