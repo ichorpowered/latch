@@ -128,12 +128,13 @@ public class Latch {
         eventManager.registerListeners(this, new ChangeBlockListener());
         eventManager.registerListeners(this, new InteractBlockListener());
         eventManager.registerListeners(this, new SpawnEntityListener());
-        eventManager.registerListeners(this, new NotifyNeighborListener());
+
+        if (getConfig().getNode("protect_from_redstone").getBoolean()) {
+            eventManager.registerListeners(this, new NotifyNeighborListener());
+        }
 
         if(getConfig().getNode("remove_bypass_on_logout").getBoolean()) {
-
             eventManager.registerListeners(this, new PlayerDisconnectListener());
-
         }
 
     }

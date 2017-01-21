@@ -85,7 +85,7 @@ public class InteractBlockListener {
                 Optional<Lock> lock = Latch.getLockManager().getLock(((TileEntityCarrier) slotTransaction.getSlot().parent()).getLocation());
 
                 //If there's a donation lock the player CANNOT access
-                if(!lock.isPresent() && lock.get().getLockType() == LockType.DONATION && !lock.get().canAccess(player.getUniqueId())) {
+                if(lock.isPresent() && lock.get().getLockType() == LockType.DONATION && !lock.get().canAccess(player.getUniqueId())) {
                     //Ideally cancel the event, but Sponge stacks up SlotTransactions that occur on the chest while a
                     //player has the window open (i.e. this even will show slot transactions that occur from other players
                     //between the main player's "clicks")

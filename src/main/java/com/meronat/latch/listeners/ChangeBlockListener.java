@@ -34,17 +34,22 @@ import com.meronat.latch.interactions.CreateLockInteraction;
 import com.meronat.latch.utils.LatchUtils;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.tileentity.Piston;
 import org.spongepowered.api.data.Transaction;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.world.ExplosionEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -153,6 +158,26 @@ public class ChangeBlockListener {
                     }
 
                 }
+
+            }
+
+        }
+
+    }
+
+    @Listener
+    public void onPreBlockChange(ChangeBlockEvent.Pre event, @First LocatableBlock block) {
+
+        if (block.getBlockState().getType().equals(BlockTypes.PISTON)) {
+
+            //noinspection OptionalGetWithoutIsPresent
+            Location<World> location = block.getLocation().getBlockRelative(block.get(Keys.DIRECTION).get());
+
+            LockManager lockManager = Latch.getLockManager();
+
+            if (lockManager.getLock(location).isPresent() || (lockManager.getLock(location.getBlockRelative(Direction.UP)).isPresent() && lockManager.isProtectBelowBlocks(location.getBlockRelative(Direction.UP).getBlockType()))) {
+
+                event.setCancelled(true);
 
             }
 

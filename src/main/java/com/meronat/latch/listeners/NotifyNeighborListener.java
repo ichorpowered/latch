@@ -66,17 +66,9 @@ public class NotifyNeighborListener {
     @Listener
     public void notifyNeighbors(NotifyNeighborBlockEvent event, @First BlockSnapshot cause) {
         cause.getLocation().ifPresent(worldLocation -> {
-            //If the cause is a Piston (to prevent it from breaking/modifying locks)
             //OR the cause is powered and our config blocks redstone we want to stop the notification
-            if (isPiston(cause.getState().getType())) {
-                event.getNeighbors().entrySet().removeIf(neighbor ->
-                    Latch.getLockManager()
-                        .getLock(worldLocation.getBlockRelative(neighbor.getKey())).isPresent()
-                );
-            } else if (Latch.getLockManager().getProtectFromRedstone()) {
                 event.getNeighbors().entrySet().removeIf(neighbor ->
                     protectLockFromRedstone(worldLocation.getBlockRelative(neighbor.getKey())));
-            }
         });
 
     }
