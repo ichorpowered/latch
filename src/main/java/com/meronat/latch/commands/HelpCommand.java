@@ -112,6 +112,12 @@ public class HelpCommand implements CommandExecutor {
         contents.add(LatchUtils.formatHelpText("/latch remove [user]", "Removes the specified user from one of your locks",
                 Text.of("Add -p to persist")));
 
+        contents.add(LatchUtils.formatHelpText("/latch purge", "Purge all of your or all of a player's locks",
+                Text.of("People with the proper permission can specify a user")));
+
+        contents.add(LatchUtils.formatHelpText("/latch bypass", "Allows admins to enter bypass mode and access other's locks.",
+                Text.of("Run again or log off to leave bypass mode.")));
+
         Sponge.getServiceManager().provide(PaginationService.class).get().builder()
                 .title(Text.of(TextColors.DARK_GREEN, " Latch Help "))
                 .linesPerPage(15)
