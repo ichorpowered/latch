@@ -46,6 +46,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ListCommand implements CommandExecutor {
     private final CommandFlags.Builder flagBuilder = GenericArguments.flags();
@@ -59,7 +60,7 @@ public class ListCommand implements CommandExecutor {
                         flagBuilder
                                 .valueFlag(GenericArguments.enumValue(Text.of("type"), LockType.class), "-type")
                                 .buildWith(GenericArguments.none())),
-                        GenericArguments.userOrSource(Text.of("owner")))
+                        GenericArguments.optionalWeak(GenericArguments.user(Text.of("owner"))))
                 .build();
     }
 
@@ -68,20 +69,26 @@ public class ListCommand implements CommandExecutor {
 
         List<Text> contents = new ArrayList<>();
 
-        User userToUse = args.<User>getOne("owner").get();
+        Optional<User> optionalUser = args.getOne("owner");
+
+        User user;
 
         //If the user doesn't have the permission to check someone else's lock, default to them
-        if (src instanceof User) {
-            if (!src.hasPermission("latch.admin.list")) {
-                userToUse = (User) src;
+        if (optionalUser.isPresent()) {
+            if (src.hasPermission("latch.admin.list")) {
+                user = optionalUser.get();
+            } else {
+                throw new CommandException(Text.of(TextColors.RED, "You do not have permission to specify a user to list."));
             }
-        } else if (!src.hasPermission("latch.admin.list")) {
-            throw new CommandException(Text.of(TextColors.RED, "You do not have permission to use this command."));
+        } else if (src instanceof User) {
+            user = (User) src;
+        } else {
+            throw new CommandException(Text.of(TextColors.RED, "Only users can use this command without specifying a player."));
         }
 
-        String displayName = src.getName().equalsIgnoreCase(userToUse.getName()) ? "Your" : userToUse.getName()+"'s";
+        String displayName = src.getName().equalsIgnoreCase(user.getName()) ? "Your" : user.getName()+"'s";
 
-        List<Lock> locks = Latch.getLockManager().getPlayersLocks(userToUse.getUniqueId());
+        List<Lock> locks = Latch.getLockManager().getPlayersLocks(user.getUniqueId());
 
         for(Lock lock : locks) {
             String location = lock.getFirstLocation().isPresent() ? LatchUtils.getLocationString(lock.getFirstLocation().get()) : "N/A";
@@ -93,7 +100,7 @@ public class ListCommand implements CommandExecutor {
         }
 
         Sponge.getServiceManager().provide(PaginationService.class).get().builder()
-                .title(Text.of(TextColors.DARK_GREEN, displayName + " Locks "))
+                .title(Text.of(TextColors.DARK_GREEN, displayName + " Locks"))
                 .header(Text.of(TextColors.GRAY, "There are ", TextColors.WHITE, locks.size(), TextColors.GRAY, " lock(s):"))
                 .linesPerPage(10)
                 .padding(Text.of(TextColors.GRAY, "="))

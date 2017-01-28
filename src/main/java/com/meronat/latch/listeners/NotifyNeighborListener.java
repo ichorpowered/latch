@@ -27,9 +27,12 @@ package com.meronat.latch.listeners;
 
 import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
+import com.meronat.latch.entities.LockManager;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -45,11 +48,6 @@ public class NotifyNeighborListener {
                 (location.getProperty(IndirectlyPoweredProperty.class).isPresent() && location.getProperty(IndirectlyPoweredProperty.class).get().getValue());
     }*/
 
-    private boolean protectLockFromRedstone(Location<World> location) {
-        Optional<Lock> lock = Latch.getLockManager().getLock(location);
-        return lock.isPresent() && lock.get().getProtectFromRedstone();
-    }
-
     /*This listener handles the below scenarios:
         -A piston moving the lock
         -Breaking the block below a lock dependent upon it
@@ -58,8 +56,32 @@ public class NotifyNeighborListener {
     //TODO Could this be improved? Is this querying too often? +Reevaluate once Sponge modifies redstone data
     @Listener
     public void notifyNeighbors(NotifyNeighborBlockEvent event, @First LocatableBlock cause) {
-        event.getNeighbors().entrySet().removeIf(neighbor ->
-                protectLockFromRedstone(cause.getLocation().getBlockRelative(neighbor.getKey())));
+        LockManager lockManager = Latch.getLockManager();
+        event.getNeighbors().entrySet().removeIf(neighbor -> {
+
+            Optional<Lock> optionalLock = lockManager.getLock(cause.getLocation().getBlockRelative(neighbor.getKey()));
+
+            if (optionalLock.isPresent()) {
+
+                Lock lock = optionalLock.get();
+
+                if (!lock.getProtectFromRedstone()) {
+                    return false;
+                }
+
+                Optional<Player> optionalPlayer = event.getCause().first(Player.class);
+
+                if (!optionalPlayer.isPresent()) {
+                    return true;
+                } else {
+                    return lock.canAccess(optionalPlayer.get().getUniqueId());
+                }
+
+            }
+
+            return false;
+
+        });
     }
 
 }

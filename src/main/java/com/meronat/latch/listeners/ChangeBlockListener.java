@@ -231,9 +231,9 @@ public class ChangeBlockListener {
     public void onBlockBrokenByExplosion(ExplosionEvent.Post event) {
         if(Latch.getConfig().getNode("protect_from_explosives").getBoolean(true)) {
             //If we're supposed to protect from explosions, invalidate the transaction
+            LockManager lockManager = Latch.getLockManager();
             for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
                 if (transaction.isValid() && transaction.getOriginal().getLocation().isPresent()) {
-                    LockManager lockManager = Latch.getLockManager();
                     Location<World> location = transaction.getOriginal().getLocation().get();
                     if (lockManager.getLock(location).isPresent()) {
                         transaction.setValid(false);

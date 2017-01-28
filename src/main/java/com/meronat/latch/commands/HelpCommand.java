@@ -76,7 +76,7 @@ public class HelpCommand implements CommandExecutor {
                 "--remove=[player] remove the player from the lock access list", Text.NEW_LINE,
                 "--owner=[player] give the lock to another player");
 
-        if (Latch.getConfig().getNode("protect_from_redstone").getBoolean(true)) {
+        if (Latch.getConfig().getNode("protect_from_redstone").getBoolean(false)) {
 
             changeHelp = Text.of("--name=[name] to rename the lock", Text.NEW_LINE,
                     "--type=[PRIVATE, PASSWORD_ALWAYS, PASSWORD_ONCE] to change the lock type", Text.NEW_LINE,
@@ -84,7 +84,7 @@ public class HelpCommand implements CommandExecutor {
                     "--add=[player] add the player to the lock access list", Text.NEW_LINE,
                     "--remove=[player] remove the player from the lock access list", Text.NEW_LINE,
                     "--owner=[player] give the lock to another player", Text.NEW_LINE,
-                    "--redstone[true/false] enable or disable redstone protection");
+                    "--redstone=[true/false] enable or disable redstone protection");
 
         }
 
@@ -119,7 +119,7 @@ public class HelpCommand implements CommandExecutor {
                 Text.of("Run again or log off to leave bypass mode.")));
 
         Sponge.getServiceManager().provide(PaginationService.class).get().builder()
-                .title(Text.of(TextColors.DARK_GREEN, " Latch Help "))
+                .title(Text.of(TextColors.DARK_GREEN, "Latch Help"))
                 .linesPerPage(15)
                 .padding(Text.of(TextColors.GRAY, "="))
                 .contents(contents)
