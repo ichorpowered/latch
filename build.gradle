@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.meronat.latch'
-version '0.3.0'
+version '0.3.1'
 
 apply plugin: 'java'
 description = 'An extensive locking plugin for your containers.'

@@ -58,7 +58,7 @@ import java.util.Map;
 @Plugin(
         id = "latch",
         name = "Latch",
-        version = "0.3.0",
+        version = "0.3.1",
         description = "An extensive locking plugin for your containers.",
         url = "http://ichorcommunity.com/",
         authors = {
