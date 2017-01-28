@@ -27,12 +27,10 @@ package com.meronat.latch.listeners;
 
 import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
-import org.spongepowered.api.block.BlockSnapshot;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -59,12 +57,9 @@ public class NotifyNeighborListener {
     */
     //TODO Could this be improved? Is this querying too often? +Reevaluate once Sponge modifies redstone data
     @Listener
-    public void notifyNeighbors(NotifyNeighborBlockEvent event, @First BlockSnapshot cause) {
-        cause.getLocation().ifPresent(worldLocation -> {
-            //OR the cause is powered and our config blocks redstone we want to stop the notification
-                event.getNeighbors().entrySet().removeIf(neighbor ->
-                    protectLockFromRedstone(worldLocation.getBlockRelative(neighbor.getKey())));
-        });
+    public void notifyNeighbors(NotifyNeighborBlockEvent event, @First LocatableBlock cause) {
+        event.getNeighbors().entrySet().removeIf(neighbor ->
+                protectLockFromRedstone(cause.getLocation().getBlockRelative(neighbor.getKey())));
     }
 
 }
