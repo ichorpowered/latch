@@ -58,7 +58,6 @@ public class NotifyNeighborListener {
     public void notifyNeighbors(NotifyNeighborBlockEvent event, @First LocatableBlock cause) {
         LockManager lockManager = Latch.getLockManager();
         event.getNeighbors().entrySet().removeIf(neighbor -> {
-
             Optional<Lock> optionalLock = lockManager.getLock(cause.getLocation().getBlockRelative(neighbor.getKey()));
 
             if (optionalLock.isPresent()) {
@@ -74,13 +73,11 @@ public class NotifyNeighborListener {
                 if (!optionalPlayer.isPresent()) {
                     return true;
                 } else {
-                    return lock.canAccess(optionalPlayer.get().getUniqueId());
+                    return !lock.canAccess(optionalPlayer.get().getUniqueId());
                 }
 
             }
-
             return false;
-
         });
     }
 
