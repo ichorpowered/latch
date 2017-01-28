@@ -58,24 +58,8 @@ public class InteractBlockListener {
         if (event.getTransactions().size() <= 0) {
             return;
         }
-
-        SlotTransaction slotTransaction = null;
-
-        //Get the transaction BEFORE the first one that is the player putting it in their inventory
-        //TODO rework this once Sponge addresses SlotTransactions present in ClickInventoryEvents
-        Iterator<SlotTransaction> itr = event.getTransactions().listIterator();
-        while (itr.hasNext()) {
-            SlotTransaction st = itr.next();
-
-            if (st.getSlot().parent() instanceof PlayerInventory) {
-                break;
-            }
-            slotTransaction = st;
-        }
-
-        if (slotTransaction == null) {
-            return;
-        }
+        //Get the first transaction of this event
+        SlotTransaction slotTransaction = event.getTransactions().get(0);
 
         //If the player is interacting with a TileEntityCarrier
         if (slotTransaction.getSlot().parent() instanceof TileEntityCarrier ) {
@@ -86,27 +70,9 @@ public class InteractBlockListener {
 
                 //If there's a donation lock the player CANNOT access
                 if(lock.isPresent() && lock.get().getLockType() == LockType.DONATION && !lock.get().canAccess(player.getUniqueId())) {
-                    //Ideally cancel the event, but Sponge stacks up SlotTransactions that occur on the chest while a
-                    //player has the window open (i.e. this even will show slot transactions that occur from other players
-                    //between the main player's "clicks")
-
-                    itr = event.getTransactions().iterator();
-
-                    while (itr.hasNext()) {
-                        SlotTransaction st = itr.next();
-
-                        if (st.equals(slotTransaction)) {
-                            break;
-                        } else {
-                            itr.remove();
-                        }
-                    }
-
                     event.setCancelled(true);
                 }
-
             }
-
         }
     }
 
