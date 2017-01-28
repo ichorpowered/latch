@@ -47,11 +47,6 @@ public class NotifyNeighborListener {
                 (location.getProperty(IndirectlyPoweredProperty.class).isPresent() && location.getProperty(IndirectlyPoweredProperty.class).get().getValue());
     }*/
 
-    private boolean isPiston(BlockType type) {
-        return type == BlockTypes.PISTON || type == BlockTypes.PISTON_EXTENSION ||
-            type == BlockTypes.PISTON_HEAD || type == BlockTypes.STICKY_PISTON;
-    }
-
     private boolean protectLockFromRedstone(Location<World> location) {
         Optional<Lock> lock = Latch.getLockManager().getLock(location);
         return lock.isPresent() && lock.get().getProtectFromRedstone();
@@ -70,9 +65,6 @@ public class NotifyNeighborListener {
                 event.getNeighbors().entrySet().removeIf(neighbor ->
                     protectLockFromRedstone(worldLocation.getBlockRelative(neighbor.getKey())));
         });
-
     }
-
-
 
 }

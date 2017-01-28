@@ -34,6 +34,7 @@ import com.meronat.latch.interactions.CreateLockInteraction;
 import com.meronat.latch.utils.LatchUtils;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
@@ -167,25 +168,22 @@ public class ChangeBlockListener {
 
     @Listener
     public void onPreBlockChange(ChangeBlockEvent.Pre event, @First LocatableBlock block) {
+        BlockType type = block.getBlockState().getType();
 
-        if (block.getBlockState().getType().equals(BlockTypes.PISTON)) {
-
+        if (type.equals(BlockTypes.PISTON) || type.equals(BlockTypes.STICKY_PISTON) || type.equals(BlockTypes.PISTON_EXTENSION) || type.equals(BlockTypes.PISTON_HEAD)) {
             //noinspection OptionalGetWithoutIsPresent
             Location<World> location = block.getLocation().getBlockRelative(block.get(Keys.DIRECTION).get());
 
             LockManager lockManager = Latch.getLockManager();
 
             if (lockManager.getLock(location).isPresent() || (lockManager.getLock(location.getBlockRelative(Direction.UP)).isPresent() && lockManager.isProtectBelowBlocks(location.getBlockRelative(Direction.UP).getBlockType()))) {
-
                 event.setCancelled(true);
-
             }
         }
     }
 
     @Listener
     public void onBreakBlockByPlayer(ChangeBlockEvent.Break event, @Root Player player) {
-
         //Track the names of the locks broken - only display message once per lock
         HashSet<String> locksDeleted = new HashSet<String>();
 
@@ -199,13 +197,12 @@ public class ChangeBlockListener {
 
                 //If the block is below a block we need to protect the below blocks of...
                 //Potentially Sponge issue - should be able to detect these blocks
-                Optional<Lock> aboveLock = lockManager.getLock(bs.getOriginal().getLocation().get().getBlockRelative(Direction.UP));
+                Optional<Lock> aboveLock = lockManager.getLock(location.getBlockRelative(Direction.UP));
 
                 if (aboveLock.isPresent() && lockManager.isProtectBelowBlocks(location.getBlockRelative(Direction.UP).getBlockType()) && !aboveLock.get().isOwnerOrBypassing(player.getUniqueId())) {
                     player.sendMessage(Text.of(TextColors.RED, "You cannot destroy a block which is depended on by a lock that's not yours."));
                     bs.setValid(false);
                     continue;
-
                 }
 
                 if (optionalLock.isPresent()) {
@@ -236,8 +233,13 @@ public class ChangeBlockListener {
             //If we're supposed to protect from explosions, invalidate the transaction
             for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
                 if (transaction.isValid() && transaction.getOriginal().getLocation().isPresent()) {
-
-                    if (Latch.getLockManager().getLock(transaction.getOriginal().getLocation().get()).isPresent()) {
+                    LockManager lockManager = Latch.getLockManager();
+                    Location<World> location = transaction.getOriginal().getLocation().get();
+                    if (lockManager.getLock(location).isPresent()) {
+                        transaction.setValid(false);
+                    }
+                    Optional<Lock> aboveLock = lockManager.getLock(location.getBlockRelative(Direction.UP));
+                    if (aboveLock.isPresent() && lockManager.isProtectBelowBlocks(location.getBlockRelative(Direction.UP).getBlockType())) {
                         transaction.setValid(false);
                     }
                 }

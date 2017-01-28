@@ -50,7 +50,7 @@ public class LockManager {
     private List<String> protectBelowBlocks = new ArrayList<>();
     private HashMap<String, Integer> lockLimits = new HashMap<>();
 
-    private boolean protectFromRedstone = true;
+    private boolean protectFromRedstone = false;
 
     private HashMap<UUID, AbstractLockInteraction> interactionData = new HashMap<>();
 
@@ -77,15 +77,15 @@ public class LockManager {
     }
 
     public boolean hasInteractionData(UUID uniqueId) {
-        return interactionData.containsKey(uniqueId);
+        return this.interactionData.containsKey(uniqueId);
     }
 
     public AbstractLockInteraction getInteractionData(UUID uniqueId) {
-        return interactionData.get(uniqueId);
+        return this.interactionData.get(uniqueId);
     }
 
     public void setInteractionData(UUID uniqueId, AbstractLockInteraction lockInteraction) {
-        interactionData.put(uniqueId, lockInteraction);
+        this.interactionData.put(uniqueId, lockInteraction);
     }
 
     public void setLockableBlocks(List<String> lockableBlocks) {
@@ -101,17 +101,17 @@ public class LockManager {
     }
 
     public boolean isRestrictedBlock(BlockType type) {
-        return restrictedBlocks.contains(type.getId());
+        return this.restrictedBlocks.contains(type.getId());
     }
 
     public boolean isLockableBlock(BlockType block) {
-        return lockableBlocks.contains(block.getId());
+        return this.lockableBlocks.contains(block.getId());
     }
 
-    public boolean isProtectBelowBlocks(BlockType block) { return protectBelowBlocks.contains(block.getId()); }
+    public boolean isProtectBelowBlocks(BlockType block) { return this.protectBelowBlocks.contains(block.getId()); }
 
     public void removeInteractionData(UUID uniqueId) {
-        interactionData.remove(uniqueId);
+        this.interactionData.remove(uniqueId);
     }
 
     public void addLockAccess(Lock thisLock, UUID uniqueId) {
@@ -163,11 +163,11 @@ public class LockManager {
     }
 
     public boolean isPlayerAtLockLimit(UUID player, LockType type) {
-        return Latch.getStorageHandler().isPlayerAtLockLimit(player, type, lockLimits);
+        return Latch.getStorageHandler().isPlayerAtLockLimit(player, type, this.lockLimits);
     }
 
     public boolean getProtectFromRedstone() {
-        return protectFromRedstone;
+        return this.protectFromRedstone;
     }
 
     public void setProtectFromRedstone(boolean protectFromRedstone) {

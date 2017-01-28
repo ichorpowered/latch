@@ -35,7 +35,6 @@ import com.meronat.latch.listeners.ChangeBlockListener;
 import com.meronat.latch.listeners.InteractBlockListener;
 import com.meronat.latch.listeners.NotifyNeighborListener;
 import com.meronat.latch.listeners.PlayerDisconnectListener;
-import com.meronat.latch.listeners.SpawnEntityListener;
 import com.meronat.latch.storage.SqlHandler;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -127,13 +126,10 @@ public class Latch {
 
         eventManager.registerListeners(this, new ChangeBlockListener());
         eventManager.registerListeners(this, new InteractBlockListener());
-        eventManager.registerListeners(this, new SpawnEntityListener());
-
-        if (getConfig().getNode("protect_from_redstone").getBoolean()) {
+        if (getConfig().getNode("protect_from_redstone").getBoolean(false)); {
             eventManager.registerListeners(this, new NotifyNeighborListener());
         }
-
-        if(getConfig().getNode("remove_bypass_on_logout").getBoolean()) {
+        if (getConfig().getNode("remove_bypass_on_logout").getBoolean()) {
             eventManager.registerListeners(this, new PlayerDisconnectListener());
         }
 
