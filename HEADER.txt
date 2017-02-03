@@ -1,4 +1,4 @@
-The MIT License
+This file is part of Latch, licensed under the MIT License.
 
 Copyright (c) 2016-2017 IchorPowered <https://github.com/IchorPowered>
 Copyright (c) Contributors

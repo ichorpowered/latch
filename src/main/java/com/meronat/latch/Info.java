@@ -23,53 +23,16 @@
  * THE SOFTWARE.
  */
 
-package com.meronat.latch.enums;
+package com.meronat.latch;
 
-public enum LockType {
+public final class Info {
 
-    /*
-     * Accessible by everyone
-     */
-    PUBLIC("Public"),
+    public static final String ID = "@id@";
+    public static final String NAME = "@name@";
+    public static final String VERSION = "@version@";
+    public static final String DESCRIPTION = "@description@";
+    public static final String URL = "@url@";
 
-    /*
-     * Accessible by everyone in the guild
-     */
-    //TODO implement Guild lock (integration with Guilds)
-    //GUILD("Guild"),
-
-    /*
-     * Requires a password every time to use
-     */
-    PASSWORD_ALWAYS("Password Always"),
-
-    /*
-     * Requires a password the first time a player accesses it
-     */
-    PASSWORD_ONCE("Password Once"),
-
-    /*
-     * Owned/controlled by one person, access able to be shared
-     */
-    PRIVATE("Private"),
-
-    /*
-     * Allows all players to deposit items, only the owner to withdraw
-     */
-    DONATION("Donation");
-
-    private final String humanReadable;
-
-    LockType(String human) {
-
-        this.humanReadable = human;
-
-    }
-
-    public String getHumanReadable() {
-
-        return this.humanReadable;
-
-    }
+    private Info() {}
 
 }

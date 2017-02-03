@@ -1,7 +1,7 @@
 /*
- * This file is part of Latch, licensed under the MIT License (MIT).
+ * This file is part of Latch, licensed under the MIT License.
  *
- * Copyright (c) IchorPowered <https://github.com/IchorPowered>
+ * Copyright (c) 2016-2017 IchorPowered <https://github.com/IchorPowered>
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -42,12 +42,10 @@ import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.filter.type.Include;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import java.util.Iterator;
 import java.util.Optional;
 
 public class InteractBlockListener {

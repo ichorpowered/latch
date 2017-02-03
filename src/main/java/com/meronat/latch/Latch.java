@@ -1,7 +1,7 @@
 /*
- * This file is part of Latch, licensed under the MIT License (MIT).
+ * This file is part of Latch, licensed under the MIT License.
  *
- * Copyright (c) IchorPowered <https://github.com/IchorPowered>
+ * Copyright (c) 2016-2017 IchorPowered <https://github.com/IchorPowered>
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -56,11 +56,11 @@ import java.util.List;
 import java.util.Map;
 
 @Plugin(
-        id = "latch",
-        name = "Latch",
-        version = "0.3.1",
-        description = "An extensive locking plugin for your containers.",
-        url = "http://ichorcommunity.com/",
+        id = Info.ID,
+        name = Info.NAME,
+        version = Info.VERSION,
+        description = Info.DESCRIPTION,
+        url = Info.URL,
         authors = {
                 "Nighteyes604",
                 "Meronat"
@@ -92,11 +92,6 @@ public class Latch {
 
     @Listener
     public void onGameInit(GameInitializationEvent event) {
-
-        // TODO Configure if redstone can interact with lock
-        // TODO Add admin bypass, PurgeALL command
-        // TODO Lock visualize command
-
         config = new Configuration(configManager);
         storageHandler = new SqlHandler();
 
@@ -113,7 +108,6 @@ public class Latch {
                     p -> p.getUserSubjects().getDefaults().getSubjectData()
                             .setPermission(p.getDefaults().getActiveContexts(), "latch.normal", Tristate.TRUE));
         }
-
     }
 
     public static Logger getLogger() {
@@ -121,7 +115,6 @@ public class Latch {
     }
 
     private void registerListeners() {
-
         EventManager eventManager = Sponge.getEventManager();
 
         eventManager.registerListeners(this, new ChangeBlockListener());
@@ -132,7 +125,6 @@ public class Latch {
         if (getConfig().getNode("remove_bypass_on_logout").getBoolean()) {
             eventManager.registerListeners(this, new PlayerDisconnectListener());
         }
-
     }
 
     private void loadConfigurationData() {

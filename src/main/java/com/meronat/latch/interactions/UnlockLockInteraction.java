@@ -1,7 +1,7 @@
 /*
- * This file is part of Latch, licensed under the MIT License (MIT).
+ * This file is part of Latch, licensed under the MIT License.
  *
- * Copyright (c) IchorPowered <https://github.com/IchorPowered>
+ * Copyright (c) 2016-2017 IchorPowered <https://github.com/IchorPowered>
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy

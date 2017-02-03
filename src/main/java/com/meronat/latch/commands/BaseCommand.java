@@ -1,7 +1,7 @@
 /*
- * This file is part of Latch, licensed under the MIT License (MIT).
+ * This file is part of Latch, licensed under the MIT License.
  *
- * Copyright (c) IchorPowered <https://github.com/IchorPowered>
+ * Copyright (c) 2016-2017 IchorPowered <https://github.com/IchorPowered>
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,6 +25,7 @@
 
 package com.meronat.latch.commands;
 
+import com.meronat.latch.Info;
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -64,8 +65,7 @@ public class BaseCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(@Nonnull CommandSource source, CommandContext args) throws CommandException {
-
-        source.sendMessage(Text.of(TextColors.DARK_GREEN, "Latch", " v", Sponge.getPluginManager().getPlugin("latch").get().getVersion().get()));
+        source.sendMessage(Text.of(TextColors.DARK_GREEN, "Latch", " v", Info.VERSION));
         source.sendMessage(Text.of(TextColors.GRAY, "Created by ", StringUtils.join(Sponge.getPluginManager().getPlugin("latch").get().getAuthors(), ", ")));
         source.sendMessage(Text.builder("Click here for ")
                 .color(TextColors.GRAY)
@@ -85,9 +85,7 @@ public class BaseCommand implements CommandExecutor {
     }
 
     public CommandSpec getCommand() {
-
         return this.baseCommand;
-
     }
 
 }

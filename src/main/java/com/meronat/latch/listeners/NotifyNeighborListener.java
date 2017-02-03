@@ -1,7 +1,7 @@
 /*
- * This file is part of Latch, licensed under the MIT License (MIT).
+ * This file is part of Latch, licensed under the MIT License.
  *
- * Copyright (c) IchorPowered <https://github.com/IchorPowered>
+ * Copyright (c) 2016-2017 IchorPowered <https://github.com/IchorPowered>
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,10 +32,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.world.LocatableBlock;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
