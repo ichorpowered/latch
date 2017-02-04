@@ -25,11 +25,7 @@
 
 package com.meronat.latch.commands;
 
-import com.meronat.latch.Latch;
-import com.meronat.latch.entities.Lock;
 import com.meronat.latch.enums.LockType;
-import com.meronat.latch.utils.LatchUtils;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -39,23 +35,17 @@ import org.spongepowered.api.command.args.CommandFlags;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-public class ListCommand implements CommandExecutor {
+public class LimitsCommand implements CommandExecutor {
 
     private final CommandFlags.Builder flagBuilder = GenericArguments.flags();
 
     public CommandCallable getCommand() {
         return CommandSpec.builder()
-                .description(Text.of("List all of a player's locks"))
-                .permission("latch.normal.list")
+                .description(Text.of("List all of a player's limits"))
+                .permission("latch.normal.limits")
                 .executor(this)
                 .arguments(GenericArguments.optionalWeak(
                         flagBuilder
@@ -68,45 +58,7 @@ public class ListCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        List<Text> contents = new ArrayList<>();
-
-        Optional<User> optionalUser = args.getOne("owner");
-
-        User user;
-
-        //If the user doesn't have the permission to check someone else's lock, default to them
-        if (optionalUser.isPresent()) {
-            if (src.hasPermission("latch.admin.list")) {
-                user = optionalUser.get();
-            } else {
-                throw new CommandException(Text.of(TextColors.RED, "You do not have permission to specify a user to list."));
-            }
-        } else if (src instanceof User) {
-            user = (User) src;
-        } else {
-            throw new CommandException(Text.of(TextColors.RED, "Only users can use this command without specifying a player."));
-        }
-
-        String displayName = src.getName().equalsIgnoreCase(user.getName()) ? "Your" : user.getName()+"'s";
-
-        List<Lock> locks = Latch.getLockManager().getPlayersLocks(user.getUniqueId());
-
-        for(Lock lock : locks) {
-            String location = lock.getFirstLocation().isPresent() ? LatchUtils.getLocationString(lock.getFirstLocation().get()) : "N/A";
-            contents.add(Text.of("  ",lock.getName(),
-                    TextColors.GRAY,", type: ",
-                    TextColors.WHITE,lock.getLockType(),
-                    TextColors.GRAY,", location: ",
-                    TextColors.WHITE, location));
-        }
-
-        Sponge.getServiceManager().provide(PaginationService.class).get().builder()
-                .title(Text.of(TextColors.DARK_GREEN, displayName + " Locks"))
-                .header(Text.of(TextColors.GRAY, "There are ", TextColors.WHITE, locks.size(), TextColors.GRAY, " lock(s):"))
-                .linesPerPage(10)
-                .padding(Text.of(TextColors.GRAY, "="))
-                .contents(contents)
-                .sendTo(src);
+        src.sendMessage(Text.of(TextColors.RED, "This command is not yet implemented."));
 
         return CommandResult.success();
     }

@@ -61,10 +61,10 @@ public class ChangeBlockListener {
     @Listener
     public void validateBlockPlacement(ChangeBlockEvent.Place event) {
         //Did a player cause this... if so use them for owner checks
-        Optional<Player> player = event.getCause().last(Player.class);
+        Optional<Player> optionalPlayer = event.getCause().last(Player.class);
 
         //Get a player's lock interaction (if present)
-        Optional<LockInteraction> lockInteraction = player.map(p -> Latch.getLockManager().getInteractionData(p.getUniqueId()));
+        Optional<LockInteraction> lockInteraction = optionalPlayer.map(p -> Latch.getLockManager().getInteractionData(p.getUniqueId()));
 
         //Variable to see if a lock is created -- this way we don't duplicate messages if a lock gets expanded (like placing a door)
         boolean interactionSuccessful = false;
@@ -76,10 +76,10 @@ public class ChangeBlockListener {
                 if( Latch.getLockManager().isRestrictedBlock(bs.getFinal().getState().getType())) {
                     for(Lock lock : LatchUtils.getAdjacentLocks(bs.getFinal().getLocation().get())) {
                         //If there is a player and they aren't the owner, OR there's no player, invalidate
-                        if( (!player.isPresent() || (player.isPresent() && !lock.isOwnerOrBypassing(player.get().getUniqueId()))) ) {
+                        if( (!optionalPlayer.isPresent() || (optionalPlayer.isPresent() && !lock.isOwnerOrBypassing(optionalPlayer.get().getUniqueId()))) ) {
                             bs.setValid(false);
                             event.setCancelled(true);
-                            player.ifPresent(p -> p.sendMessage(Text.of(TextColors.RED, "You can't place that type of block near a lock you don't own.")));
+                            optionalPlayer.ifPresent(p -> p.sendMessage(Text.of(TextColors.RED, "You can't place that type of block near a lock you don't own.")));
                         }
                     }
                 }
@@ -94,17 +94,17 @@ public class ChangeBlockListener {
                         otherBlockLock = Latch.getLockManager().getLock(optionalOtherBlock.get());
                     }
                     if(otherBlockLock.isPresent()) {
-                        if(player.isPresent() && otherBlockLock.get().isOwnerOrBypassing(player.get().getUniqueId())) {
+                        if(optionalPlayer.isPresent() && otherBlockLock.get().isOwnerOrBypassing(optionalPlayer.get().getUniqueId())) {
                             Latch.getLockManager().addLockLocation(otherBlockLock.get(), bs.getFinal().getLocation().get());
                             if (!interactionSuccessful) {
-                                player.get().sendMessage(ChatTypes.ACTION_BAR, Text.of(TextColors.DARK_GREEN,
+                                optionalPlayer.get().sendMessage(ChatTypes.ACTION_BAR, Text.of(TextColors.DARK_GREEN,
                                         "You have expanded your " + otherBlockLock.get().getName() + " lock."));
                             }
                             continue; //break to allow expanding locks while having a command persisted
                         } else {
                             bs.setValid(false);
                             event.setCancelled(true);
-                            player.ifPresent(p -> p.sendMessage(Text.of(TextColors.RED, "You can't place that type of block near a lock you don't own.")));
+                            optionalPlayer.ifPresent(p -> p.sendMessage(Text.of(TextColors.RED, "You can't place that type of block near a lock you don't own.")));
                             continue;
                         }
                     }
@@ -115,7 +115,10 @@ public class ChangeBlockListener {
                     return;
                 }
 
-                if (player.isPresent()) {
+                if (optionalPlayer.isPresent()) {
+
+                    Player player = optionalPlayer.get();
+
                     //If the player has interaction data
                     if (lockInteraction.isPresent()) {
                         //Check all of the blocks and apply the interaction
@@ -123,7 +126,7 @@ public class ChangeBlockListener {
 
                         if (bs.isValid() && bs.getFinal().getLocation().isPresent() && isSolidBlock(bs.getFinal().getState())) {
 
-                            boolean result = lockInteraction.get().handleInteraction(player.get(), bs.getFinal().getLocation().get(), bs.getFinal());
+                            boolean result = lockInteraction.get().handleInteraction(player, bs.getFinal().getLocation().get(), bs.getFinal());
                             bs.setValid(result);
 
                             //Set interactionSuccessful to true so we don't send expanded messages (for doors)
@@ -134,7 +137,7 @@ public class ChangeBlockListener {
                         }
 
                         if (!lockInteraction.get().shouldPersist()) {
-                            Latch.getLockManager().removeInteractionData(player.get().getUniqueId());
+                            Latch.getLockManager().removeInteractionData(player.getUniqueId());
                         }
                     } else if (Latch.getConfig().getNode("auto_lock_on_placement").getBoolean()) {
 
@@ -142,10 +145,15 @@ public class ChangeBlockListener {
                             return;
                         }
 
+                        if (Latch.getLockManager().isPlayerAtLockLimit(player.getUniqueId(), LockType.PRIVATE)) {
+                            player.sendMessage(ChatTypes.ACTION_BAR, Text.of(TextColors.RED, "You are at the lock limit so the container was not locked."));
+                            return;
+                        }
+
                         if (bs.isValid() && bs.getFinal().getLocation().isPresent() && isSolidBlock(bs.getFinal().getState())) {
 
-                            boolean result = new CreateLockInteraction(player.get().getUniqueId(), LockType.PRIVATE, "")
-                                    .handleInteraction(player.get(), bs.getFinal().getLocation().get(), bs.getFinal());
+                            boolean result = new CreateLockInteraction(player.getUniqueId(), LockType.PRIVATE, "")
+                                    .handleInteraction(player, bs.getFinal().getLocation().get(), bs.getFinal());
 
                             bs.setValid(result);
 

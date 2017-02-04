@@ -38,6 +38,7 @@ import com.meronat.latch.commands.CreatePublicLockCommand;
 import com.meronat.latch.commands.DisplayLockCommand;
 import com.meronat.latch.commands.HelpCommand;
 import com.meronat.latch.commands.InfoCommand;
+import com.meronat.latch.commands.LimitsCommand;
 import com.meronat.latch.commands.ListCommand;
 import com.meronat.latch.commands.PersistCommand;
 import com.meronat.latch.commands.PurgeCommand;
@@ -138,6 +139,7 @@ public class Latch {
                 .child(new AdminBypassCommand().getCommand(), "bypass", "adminbypass", "admin")
                 .child(new PurgeCommand().getCommand(), "purge", "destroyall")
                 .child(new InfoCommand().getCommand(), "version", "authors")
+                .child(new LimitsCommand().getCommand(), "limits", "max")
                 .executor(new HelpCommand())
                 .build(), "latch", "lock");
 
@@ -149,10 +151,6 @@ public class Latch {
                     p -> p.getUserSubjects().getDefaults().getSubjectData()
                             .setPermission(p.getDefaults().getActiveContexts(), "latch.normal", Tristate.TRUE));
         }
-    }
-
-    public static Logger getLogger() {
-        return logger;
     }
 
     private void registerListeners() {
@@ -207,6 +205,10 @@ public class Latch {
         lockManager.setProtectBelowBlocks(protectBelowBlocks);
         lockManager.setLockLimits(lockLimits);
         lockManager.setProtectFromRedstone(getConfig().getNode("protect_from_redstone").getBoolean(false));
+    }
+
+    public static Logger getLogger() {
+        return logger;
     }
 
     public static SqlHandler getStorageHandler() {
