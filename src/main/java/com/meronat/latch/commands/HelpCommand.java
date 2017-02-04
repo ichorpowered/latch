@@ -33,7 +33,6 @@ import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.service.pagination.PaginationService;
@@ -59,9 +58,10 @@ public class HelpCommand implements CommandExecutor {
 
         List<Text> contents = new ArrayList<>();
 
-        contents.add(LatchUtils.formatHelpText("/latch version", "Shows information about the Latch plugin", Text.of("Can also use the alias /latch authors")));
+        contents.add(LatchUtils.formatHelpText("/latch version", "Shows information about the Latch plugin",
+                Text.of("Can also use the alias /latch authors")));
 
-        contents.add(LatchUtils.formatHelpText("/latch private","Create a private lock",
+        contents.add(LatchUtils.formatHelpText("/latch private", "Create a private lock",
                 Text.of("Add -p to persist")));
 
         contents.add(LatchUtils.formatHelpText("/latch password [password]", "Create a password lock with the specified password",

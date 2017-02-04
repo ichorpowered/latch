@@ -37,6 +37,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
@@ -58,19 +59,23 @@ public class PurgeCommand implements CommandExecutor {
         Optional<User> optionalUser = args.getOne("target");
 
         User user;
+        final boolean self;
 
         if (src instanceof User) {
             if (optionalUser.isPresent()) {
                 if (src.hasPermission("latch.admin.purge")) {
+                    self = false;
                     user = optionalUser.get();
                 } else {
                     throw new CommandException(Text.of(TextColors.RED, "You do not have permission to specify a player to purge."));
                 }
             } else {
                 user = (User) src;
+                self = true;
             }
         } else if (src instanceof ConsoleSource) {
             if (optionalUser.isPresent()) {
+                self = false;
                 user = optionalUser.get();
             } else {
                 throw new CommandException(Text.of(TextColors.RED, "You must specify a user."));
@@ -79,13 +84,40 @@ public class PurgeCommand implements CommandExecutor {
             throw new CommandException(Text.of(TextColors.RED, "You source type is not able to execute this command."));
         }
 
-        Latch.getStorageHandler().deleteLocksForPlayer(user.getUniqueId());
+        Text yes = Text.of(TextColors.GREEN, TextActions.executeCallback(x -> yes(user, src, self)), "YES   ");
 
-        user.getPlayer().ifPresent(p -> p.sendMessage(Text.of(TextColors.DARK_GREEN, "All of ", TextColors.GRAY,
-                user.getName() + "'s", TextColors.DARK_GREEN, " locks have been purged.")));
+        Text no = Text.of(TextColors.RED, TextActions.executeCallback(x -> no(user, src, self)), " NO");
+
+        if (self) {
+            src.sendMessage(Text.of(TextColors.DARK_RED, "Are you sure you want to delete all of your locks?").concat(yes).concat(no));
+        } else {
+            src.sendMessage(Text.of(TextColors.DARK_RED, "Are you sure you want to delete all of ", TextColors.GRAY,
+                    user.getName() +"'s", TextColors.DARK_RED, " locks?").concat(yes).concat(no));
+        }
 
         return CommandResult.success();
 
+    }
+
+    private void yes(User user, CommandSource src, boolean self) {
+        Latch.getStorageHandler().deleteLocksForPlayer(user.getUniqueId());
+
+        if (self) {
+            src.sendMessage(Text.of(TextColors.DARK_GREEN, "All of your locks have been deleted."));
+        } else {
+            src.sendMessage(Text.of(TextColors.DARK_GREEN, "All of ", TextColors.GRAY,
+                    user.getName() + "'s", TextColors.DARK_GREEN, " locks have been purged."));
+            user.getPlayer().ifPresent(p -> p.sendMessage(Text.of(TextColors.RED, "All of your locks have been deleted by a staff member.")));
+        }
+    }
+
+    private void no(User user, CommandSource src, boolean self) {
+        if (self) {
+            src.sendMessage(Text.of(TextColors.DARK_GREEN, "You have cancelled the deletion of all of your locks."));
+        } else {
+            src.sendMessage(Text.of(TextColors.DARK_GREEN, "You have cancelled the deletion of ", TextColors.GRAY,
+                    user.getName() + "'s", TextColors.DARK_GREEN, " locks."));
+        }
     }
 
 }
