@@ -137,7 +137,7 @@ public class Latch {
                 .child(new RemoveAccessorCommand().getCommand(), "remove", "minus", "rem", "removeplayer")
                 .child(new AdminBypassCommand().getCommand(), "bypass", "adminbypass", "admin")
                 .child(new PurgeCommand().getCommand(), "purge", "destroyall")
-                .child(new InfoCommand().getCommand(), "info", "version")
+                .child(new InfoCommand().getCommand(), "version", "authors")
                 .executor(new HelpCommand())
                 .build(), "latch", "lock");
 

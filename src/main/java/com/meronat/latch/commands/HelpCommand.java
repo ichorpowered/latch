@@ -59,6 +59,8 @@ public class HelpCommand implements CommandExecutor {
 
         List<Text> contents = new ArrayList<>();
 
+        contents.add(LatchUtils.formatHelpText("/latch version", "Shows information about the Latch plugin", Text.of("Can also use the alias /latch authors")));
+
         contents.add(LatchUtils.formatHelpText("/latch private","Create a private lock",
                 Text.of("Add -p to persist")));
 
