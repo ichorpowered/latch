@@ -28,10 +28,12 @@ package com.meronat.latch.commands;
 import com.meronat.latch.Info;
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
@@ -40,33 +42,20 @@ import org.spongepowered.api.text.format.TextColors;
 
 import javax.annotation.Nonnull;
 
-public class BaseCommand implements CommandExecutor {
+public class InfoCommand implements CommandExecutor {
 
-    private final CommandSpec baseCommand = CommandSpec.builder()
-            .description(Text.of("The base Latch command."))
-            .permission("latch.normal")
-            .child(new CreatePrivateLockCommand().getCommand(), "private")
-            .child(new CreateDonationLockCommand().getCommand(), "donation")
-            .child(new CreatePublicLockCommand().getCommand(), "public")
-            .child(new CreatePasswordLockCommand().getCommand(), "password")
-            .child(new PersistCommand().getCommand(), "persist", "clear", "unpersist", "stop", "cancel")
-            .child(new RemoveLockCommand().getCommand(), "delete", "removelock")
-            .child(new ChangeLockCommand().getCommand(), "change")
-            .child(new DisplayLockCommand().getCommand(), "info", "display")
-            .child(new UnlockCommand().getCommand(), "open", "unlock")
-            .child(new ListCommand().getCommand(), "list", "displayall")
-            .child(new HelpCommand().getCommand(), "help")
-            .child(new AddAccessorCommand().getCommand(), "add", "plus")
-            .child(new RemoveAccessorCommand().getCommand(), "remove", "minus", "rem", "removeplayer")
-            .child(new AdminBypassCommand().getCommand(), "bypass", "adminbypass", "admin")
-            .child(new PurgeCommand().getCommand(), "purge", "destroyall")
-            .executor(this)
-            .build();
+    public CommandCallable getCommand() {
+        return CommandSpec.builder()
+                .description(Text.of("Latch info command"))
+                .permission("latch.normal.info")
+                .executor(this)
+                .build();
+    }
 
     @Override
     public CommandResult execute(@Nonnull CommandSource source, CommandContext args) throws CommandException {
-        source.sendMessage(Text.of(TextColors.DARK_GREEN, "Latch", " v", Info.VERSION));
-        source.sendMessage(Text.of(TextColors.GRAY, "Created by ", StringUtils.join(Sponge.getPluginManager().getPlugin("latch").get().getAuthors(), ", ")));
+        source.sendMessage(Text.of(TextColors.DARK_GREEN, Info.NAME, " v", Info.VERSION));
+        source.sendMessage(Text.of(TextColors.GRAY, "Created by ", StringUtils.join(Sponge.getPluginManager().getPlugin(Info.ID).get().getAuthors(), ", ")));
         source.sendMessage(Text.builder("Click here for ")
                 .color(TextColors.GRAY)
                 .onClick(TextActions.runCommand("/latch help"))
@@ -82,10 +71,6 @@ public class BaseCommand implements CommandExecutor {
                                 .build()).build()).build());
 
         return CommandResult.success();
-    }
-
-    public CommandSpec getCommand() {
-        return this.baseCommand;
     }
 
 }

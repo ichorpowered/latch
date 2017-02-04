@@ -28,7 +28,21 @@ package com.meronat.latch;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.meronat.latch.bstats.Metrics;
-import com.meronat.latch.commands.BaseCommand;
+import com.meronat.latch.commands.AddAccessorCommand;
+import com.meronat.latch.commands.AdminBypassCommand;
+import com.meronat.latch.commands.InfoCommand;
+import com.meronat.latch.commands.ChangeLockCommand;
+import com.meronat.latch.commands.CreateDonationLockCommand;
+import com.meronat.latch.commands.CreatePasswordLockCommand;
+import com.meronat.latch.commands.CreatePrivateLockCommand;
+import com.meronat.latch.commands.CreatePublicLockCommand;
+import com.meronat.latch.commands.DisplayLockCommand;
+import com.meronat.latch.commands.HelpCommand;
+import com.meronat.latch.commands.ListCommand;
+import com.meronat.latch.commands.PersistCommand;
+import com.meronat.latch.commands.PurgeCommand;
+import com.meronat.latch.commands.RemoveAccessorCommand;
+import com.meronat.latch.commands.RemoveLockCommand;
 import com.meronat.latch.commands.UnlockCommand;
 import com.meronat.latch.entities.LockManager;
 import com.meronat.latch.listeners.ChangeBlockListener;
@@ -41,6 +55,7 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.Listener;
@@ -48,6 +63,7 @@ import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Tristate;
 
 import java.nio.file.Path;
@@ -103,7 +119,28 @@ public class Latch {
 
         registerListeners();
 
-        Sponge.getCommandManager().register(this, new BaseCommand().getCommand(), "latch", "lock");
+        Sponge.getCommandManager().register(this, CommandSpec.builder()
+                .description(Text.of("The base Latch command."))
+                .permission("latch.normal")
+                .child(new CreatePrivateLockCommand().getCommand(), "private")
+                .child(new CreateDonationLockCommand().getCommand(), "donation")
+                .child(new CreatePublicLockCommand().getCommand(), "public")
+                .child(new CreatePasswordLockCommand().getCommand(), "password")
+                .child(new PersistCommand().getCommand(), "persist", "clear", "unpersist", "stop", "cancel")
+                .child(new RemoveLockCommand().getCommand(), "delete", "removelock")
+                .child(new ChangeLockCommand().getCommand(), "change")
+                .child(new DisplayLockCommand().getCommand(), "info", "display")
+                .child(new UnlockCommand().getCommand(), "open", "unlock")
+                .child(new ListCommand().getCommand(), "list", "displayall")
+                .child(new HelpCommand().getCommand(), "help")
+                .child(new AddAccessorCommand().getCommand(), "add", "plus")
+                .child(new RemoveAccessorCommand().getCommand(), "remove", "minus", "rem", "removeplayer")
+                .child(new AdminBypassCommand().getCommand(), "bypass", "adminbypass", "admin")
+                .child(new PurgeCommand().getCommand(), "purge", "destroyall")
+                .child(new InfoCommand().getCommand(), "info", "version")
+                .executor(new HelpCommand())
+                .build(), "latch", "lock");
+
         Sponge.getCommandManager().register(this, new UnlockCommand().getCommand(), "unlock", "unlatch");
 
         // Register base permission node.

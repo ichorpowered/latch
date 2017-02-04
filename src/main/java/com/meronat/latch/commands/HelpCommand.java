@@ -51,7 +51,6 @@ public class HelpCommand implements CommandExecutor {
                 .description(Text.of("Latch help command"))
                 .permission("latch.normal.help")
                 .executor(this)
-                .arguments(GenericArguments.none())
                 .build();
     }
 
