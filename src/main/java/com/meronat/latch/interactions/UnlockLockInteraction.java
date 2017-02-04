@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
-public class UnlockLockInteraction implements AbstractLockInteraction {
+public class UnlockLockInteraction implements LockInteraction {
 
     private final UUID player;
 
@@ -68,7 +68,7 @@ public class UnlockLockInteraction implements AbstractLockInteraction {
 
         //Check the password
         if(Latch.getLockManager().isPasswordCompatibleLock(lock.get())) {
-            if( !LatchUtils.hashPassword(password, lock.get().getSalt()).equals(lock.get().getPassword())) {
+            if( !LatchUtils.hashPassword(this.password, lock.get().getSalt()).equals(lock.get().getPassword())) {
                 player.sendMessage(Text.of(TextColors.RED, "The password you tried is incorrect."));
                 return false;
             }
@@ -87,7 +87,7 @@ public class UnlockLockInteraction implements AbstractLockInteraction {
                     otherBlockLock = Optional.of(Latch.getLockManager().getLock(optionalOtherBlock.get()).get());
                 }
                 if(otherBlockLock.isPresent()) {
-                    if(!otherBlockLock.get().getPassword().equalsIgnoreCase(password)) {
+                    if(!otherBlockLock.get().getPassword().equalsIgnoreCase(this.password)) {
                         player.sendMessage(Text.of(TextColors.RED, "The adjacent lock does not have the same password."));
                     } else {
                         locks.add(otherBlockLock.get());
@@ -110,7 +110,7 @@ public class UnlockLockInteraction implements AbstractLockInteraction {
 
     @Override
     public boolean shouldPersist() {
-        return persisting;
+        return this.persisting;
     }
 
     @Override

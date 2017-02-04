@@ -82,9 +82,7 @@ public class ChangeLockCommand implements CommandExecutor {
             }
 
             if (args.hasAny("redstone") && !Latch.getLockManager().getProtectFromRedstone()) {
-
                 throw new CommandException(Text.of(TextColors.RED, "Protection from redstone is disabled for all locks."));
-
             }
 
             ChangeLockInteraction changeLock = new ChangeLockInteraction(player.getUniqueId());
@@ -126,13 +124,9 @@ public class ChangeLockCommand implements CommandExecutor {
             Latch.getLockManager().setInteractionData(player.getUniqueId(), changeLock);
 
             if (args.hasAny("p")) {
-
                 player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will change all locks you click until you type \"/latch persist\"."));
-
             } else {
-
                 player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will change the next lock you click."));
-
             }
 
             return CommandResult.success();

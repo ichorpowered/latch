@@ -37,7 +37,7 @@ import org.spongepowered.api.world.World;
 import java.util.Optional;
 import java.util.UUID;
 
-public class DeleteLockInteraction implements AbstractLockInteraction {
+public class DeleteLockInteraction implements LockInteraction {
 
     private final UUID player;
 
@@ -74,7 +74,7 @@ public class DeleteLockInteraction implements AbstractLockInteraction {
 
     @Override
     public boolean shouldPersist() {
-        return persisting;
+        return this.persisting;
     }
 
     @Override

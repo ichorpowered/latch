@@ -29,8 +29,8 @@ import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
 import com.meronat.latch.entities.LockManager;
 import com.meronat.latch.enums.LockType;
-import com.meronat.latch.interactions.AbstractLockInteraction;
 import com.meronat.latch.interactions.CreateLockInteraction;
+import com.meronat.latch.interactions.LockInteraction;
 import com.meronat.latch.utils.LatchUtils;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -64,7 +64,7 @@ public class ChangeBlockListener {
         Optional<Player> player = event.getCause().last(Player.class);
 
         //Get a player's lock interaction (if present)
-        Optional<AbstractLockInteraction> lockInteraction = player.map(p -> Latch.getLockManager().getInteractionData(p.getUniqueId()));
+        Optional<LockInteraction> lockInteraction = player.map(p -> Latch.getLockManager().getInteractionData(p.getUniqueId()));
 
         //Variable to see if a lock is created -- this way we don't duplicate messages if a lock gets expanded (like placing a door)
         boolean interactionSuccessful = false;

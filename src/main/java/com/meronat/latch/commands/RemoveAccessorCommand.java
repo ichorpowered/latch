@@ -86,13 +86,9 @@ public class RemoveAccessorCommand implements CommandExecutor {
         Latch.getLockManager().setInteractionData(player.getUniqueId(), removePlayers);
 
         if (args.hasAny("p")) {
-
             player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will remove them on all locks you click until you type \"latch persist\"."));
-
         } else {
-
             player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will remove them on the next lock of yours you click."));
-
         }
 
         return CommandResult.success();

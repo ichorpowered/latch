@@ -45,16 +45,16 @@ public class LockCreateEvent extends AbstractEvent implements Cancellable  {
     }
 
     public Player getPlayer() {
-        return creator;
+        return this.creator;
     }
 
     public Lock getLock() {
-        return lock;
+        return this.lock;
     }
 
     @Override
     public boolean isCancelled() {
-        return cancelled;
+        return this.cancelled;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class LockCreateEvent extends AbstractEvent implements Cancellable  {
 
     @Override
     public Cause getCause() {
-        return cause;
+        return this.cause;
     }
 
 }

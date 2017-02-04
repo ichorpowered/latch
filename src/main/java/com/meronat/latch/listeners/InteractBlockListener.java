@@ -28,7 +28,7 @@ package com.meronat.latch.listeners;
 import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
 import com.meronat.latch.enums.LockType;
-import com.meronat.latch.interactions.AbstractLockInteraction;
+import com.meronat.latch.interactions.LockInteraction;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
@@ -94,7 +94,7 @@ public class InteractBlockListener {
 
         //If they have an interaction, handle the interaction
         if(Latch.getLockManager().hasInteractionData(player.getUniqueId())) {
-            AbstractLockInteraction lockInteraction = Latch.getLockManager().getInteractionData(player.getUniqueId());
+            LockInteraction lockInteraction = Latch.getLockManager().getInteractionData(player.getUniqueId());
 
             boolean result = lockInteraction.handleInteraction(player, event.getTargetBlock().getLocation().get(), event.getTargetBlock());
 

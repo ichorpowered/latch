@@ -43,7 +43,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 
-public class CreateLockInteraction implements AbstractLockInteraction {
+public class CreateLockInteraction implements LockInteraction {
 
     private final UUID player;
     private final LockType type;
@@ -88,21 +88,21 @@ public class CreateLockInteraction implements AbstractLockInteraction {
             lockLocations.add(optionalOtherBlock.get());
         }
 
-        if(Latch.getLockManager().isPlayerAtLockLimit(player.getUniqueId(), type)) {
+        if(Latch.getLockManager().isPlayerAtLockLimit(player.getUniqueId(), this.type)) {
             player.sendMessage(Text.of(TextColors.RED, "You have reached the limit for locks."));
             return false;
         }
 
-        Lock lock = new Lock(player.getUniqueId(), type, lockLocations, LatchUtils.getBlockNameFromType(blockState.getState().getType()), Latch.getLockManager().getProtectFromRedstone());
+        Lock lock = new Lock(player.getUniqueId(), this.type, lockLocations, LatchUtils.getBlockNameFromType(blockState.getState().getType()), Latch.getLockManager().getProtectFromRedstone());
 
-        if (type.equals(LockType.PASSWORD_ALWAYS) || type.equals(LockType.PASSWORD_ONCE)) {
+        if (this.type.equals(LockType.PASSWORD_ALWAYS) || this.type.equals(LockType.PASSWORD_ONCE)) {
 
             //Fire the lock create event and create the lock if it's not cancelled (by other plugins)
             byte[] salt = LatchUtils.generateSalt();
 
             lock.setSalt(salt);
 
-            lock.changePassword(LatchUtils.hashPassword(password, salt));
+            lock.changePassword(LatchUtils.hashPassword(this.password, salt));
 
         }
 
@@ -126,7 +126,7 @@ public class CreateLockInteraction implements AbstractLockInteraction {
 
     @Override
     public boolean shouldPersist() {
-        return persisting;
+        return this.persisting;
     }
 
     @Override

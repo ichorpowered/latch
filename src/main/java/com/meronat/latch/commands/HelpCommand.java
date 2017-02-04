@@ -77,7 +77,6 @@ public class HelpCommand implements CommandExecutor {
                 "--owner=[player] give the lock to another player");
 
         if (Latch.getConfig().getNode("protect_from_redstone").getBoolean(false)) {
-
             changeHelp = Text.of("--name=[name] to rename the lock", Text.NEW_LINE,
                     "--type=[PRIVATE, PASSWORD_ALWAYS, PASSWORD_ONCE] to change the lock type", Text.NEW_LINE,
                     "--password=[password] change the password of the lock (resets access list)", Text.NEW_LINE,
@@ -85,7 +84,6 @@ public class HelpCommand implements CommandExecutor {
                     "--remove=[player] remove the player from the lock access list", Text.NEW_LINE,
                     "--owner=[player] give the lock to another player", Text.NEW_LINE,
                     "--redstone=[true/false] enable or disable redstone protection");
-
         }
 
         contents.add(LatchUtils.formatHelpText("/latch change", "Change the attributes of one of your locks (hover for flags)",

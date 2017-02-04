@@ -33,12 +33,6 @@ public enum LockType {
     PUBLIC("Public"),
 
     /*
-     * Accessible by everyone in the guild
-     */
-    //TODO implement Guild lock (integration with Guilds)
-    //GUILD("Guild"),
-
-    /*
      * Requires a password every time to use
      */
     PASSWORD_ALWAYS("Password Always"),
@@ -61,15 +55,12 @@ public enum LockType {
     private final String humanReadable;
 
     LockType(String human) {
-
         this.humanReadable = human;
-
     }
 
-    public String getHumanReadable() {
-
+    @Override
+    public String toString() {
         return this.humanReadable;
-
     }
 
 }

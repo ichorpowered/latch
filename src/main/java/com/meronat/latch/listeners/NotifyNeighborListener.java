@@ -58,7 +58,6 @@ public class NotifyNeighborListener {
             Optional<Lock> optionalLock = lockManager.getLock(cause.getLocation().getBlockRelative(neighbor.getKey()));
 
             if (optionalLock.isPresent()) {
-
                 Lock lock = optionalLock.get();
 
                 if (!lock.getProtectFromRedstone()) {
@@ -67,12 +66,8 @@ public class NotifyNeighborListener {
 
                 Optional<Player> optionalPlayer = event.getCause().first(Player.class);
 
-                if (!optionalPlayer.isPresent()) {
-                    return true;
-                } else {
-                    return !lock.canAccess(optionalPlayer.get().getUniqueId());
-                }
-
+                //noinspection OptionalIsPresent
+                return !optionalPlayer.isPresent() || !lock.canAccess(optionalPlayer.get().getUniqueId());
             }
             return false;
         });

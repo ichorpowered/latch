@@ -98,20 +98,15 @@ public class LatchUtils {
         return Optional.empty();
     }
 
-    // TODO Increase security of passwords
-
     public static byte[] generateSalt() {
-
         byte[] salt = new byte[8];
 
         new SecureRandom().nextBytes(salt);
 
         return salt;
-
     }
 
     public static String hashPassword(String password, byte[] salt) {
-
         PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 1000, 256);
 
         try {

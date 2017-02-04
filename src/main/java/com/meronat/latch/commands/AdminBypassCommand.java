@@ -62,15 +62,11 @@ public class AdminBypassCommand implements CommandExecutor {
         LockManager lockManager = Latch.getLockManager();
 
         if (lockManager.isBypassing(player.getUniqueId())) {
-
             lockManager.removeBypassing(player.getUniqueId());
             player.sendMessage(Text.of(TextColors.DARK_GREEN, "You have disabled admin bypass."));
-
         } else {
-
             lockManager.setBypassing(player.getUniqueId());
             player.sendMessage(Text.of(TextColors.DARK_GREEN, "You have enabled admin bypass."));
-
         }
 
         return CommandResult.success();

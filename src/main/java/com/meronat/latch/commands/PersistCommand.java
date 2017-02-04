@@ -26,7 +26,7 @@
 package com.meronat.latch.commands;
 
 import com.meronat.latch.Latch;
-import com.meronat.latch.interactions.AbstractLockInteraction;
+import com.meronat.latch.interactions.LockInteraction;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -59,7 +59,7 @@ public class PersistCommand implements CommandExecutor {
                 throw new CommandException(Text.of(TextColors.RED, "You must have run a latch command to persist/clear it."));
             }
 
-            AbstractLockInteraction interaction = Latch.getLockManager().getInteractionData(player.getUniqueId());
+            LockInteraction interaction = Latch.getLockManager().getInteractionData(player.getUniqueId());
             interaction.setPersistence(!interaction.shouldPersist());
 
             if(interaction.shouldPersist()) {

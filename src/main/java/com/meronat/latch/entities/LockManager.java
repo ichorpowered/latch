@@ -27,7 +27,7 @@ package com.meronat.latch.entities;
 
 import com.meronat.latch.Latch;
 import com.meronat.latch.enums.LockType;
-import com.meronat.latch.interactions.AbstractLockInteraction;
+import com.meronat.latch.interactions.LockInteraction;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -52,7 +52,7 @@ public class LockManager {
 
     private boolean protectFromRedstone = false;
 
-    private HashMap<UUID, AbstractLockInteraction> interactionData = new HashMap<>();
+    private HashMap<UUID, LockInteraction> interactionData = new HashMap<>();
 
     public Optional<Lock> getLock(Location location) {
         return Latch.getStorageHandler().getLockByLocation(location);
@@ -80,11 +80,11 @@ public class LockManager {
         return this.interactionData.containsKey(uniqueId);
     }
 
-    public AbstractLockInteraction getInteractionData(UUID uniqueId) {
+    public LockInteraction getInteractionData(UUID uniqueId) {
         return this.interactionData.get(uniqueId);
     }
 
-    public void setInteractionData(UUID uniqueId, AbstractLockInteraction lockInteraction) {
+    public void setInteractionData(UUID uniqueId, LockInteraction lockInteraction) {
         this.interactionData.put(uniqueId, lockInteraction);
     }
 

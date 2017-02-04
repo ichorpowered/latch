@@ -46,6 +46,7 @@ import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.util.Tristate;
 
@@ -73,12 +74,15 @@ public class Latch {
 
     private static final LockManager lockManager = new LockManager();
 
+    private static PluginContainer plugin;
+
     private static SqlHandler storageHandler;
 
     @Inject
-    public Latch(Logger logger, @DefaultConfig(sharedRoot = false) Path configPath) {
+    public Latch(Logger logger, @DefaultConfig(sharedRoot = false) Path configPath, PluginContainer pluginContainer) {
         Latch.logger = logger;
         Latch.configPath = configPath;
+        Latch.plugin = pluginContainer;
     }
 
     @Inject
@@ -177,11 +181,15 @@ public class Latch {
     }
 
     public static CommentedConfigurationNode getConfig() {
-        return config.getConfigurationNode();
+        return config.getRootNode();
     }
 
     public static Path getConfigPatch() {
         return configPath;
+    }
+
+    public static PluginContainer getPluginContainer() {
+        return plugin;
     }
 
 }

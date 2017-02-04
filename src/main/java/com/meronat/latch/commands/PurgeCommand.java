@@ -60,41 +60,23 @@ public class PurgeCommand implements CommandExecutor {
         User user;
 
         if (src instanceof User) {
-
             if (optionalUser.isPresent()) {
-
                 if (src.hasPermission("latch.admin.purge")) {
-
                     user = optionalUser.get();
-
                 } else {
-
                     throw new CommandException(Text.of(TextColors.RED, "You do not have permission to specify a player to purge."));
-
                 }
-
             } else {
-
                 user = (User) src;
-
             }
-
         } else if (src instanceof ConsoleSource) {
-
             if (optionalUser.isPresent()) {
-
                 user = optionalUser.get();
-
             } else {
-
                 throw new CommandException(Text.of(TextColors.RED, "You must specify a user."));
-
             }
-
         } else {
-
             throw new CommandException(Text.of(TextColors.RED, "You source type is not able to execute this command."));
-
         }
 
         Latch.getStorageHandler().deleteLocksForPlayer(user.getUniqueId());

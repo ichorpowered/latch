@@ -37,7 +37,7 @@ import org.spongepowered.api.world.World;
 import java.util.Optional;
 import java.util.UUID;
 
-public class DisplayLockInteraction implements AbstractLockInteraction {
+public class DisplayLockInteraction implements LockInteraction {
 
     private final UUID player;
 
@@ -59,7 +59,7 @@ public class DisplayLockInteraction implements AbstractLockInteraction {
 
         Lock lock = optionalLock.get();
 
-        player.sendMessage(Text.of(TextColors.DARK_GREEN, lock.getLockType().getHumanReadable() + " " +
+        player.sendMessage(Text.of(TextColors.DARK_GREEN, lock.getLockType().toString() + " " +
                 lock.getLockedObject().substring(0, 1).toUpperCase() + lock.getLockedObject().substring(1) + ": ", TextColors.GRAY, lock.getName()));
         player.sendMessage(Text.of(TextColors.DARK_GREEN, "Owner: ", TextColors.GRAY, lock.getOwnerName()));
         player.sendMessage(Text.of(TextColors.DARK_GREEN, "Accessors: ", TextColors.GRAY, String.join(", ", lock.getAbleToAccessNames())));
@@ -75,7 +75,7 @@ public class DisplayLockInteraction implements AbstractLockInteraction {
 
     @Override
     public boolean shouldPersist() {
-        return persisting;
+        return this.persisting;
     }
 
     @Override

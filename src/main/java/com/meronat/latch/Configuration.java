@@ -40,16 +40,16 @@ import java.util.Map;
 
 class Configuration {
 
-    private CommentedConfigurationNode configNode;
+    private CommentedConfigurationNode rootNode;
     private final ConfigurationLoader<CommentedConfigurationNode> configManager;
 
     public Configuration(ConfigurationLoader<CommentedConfigurationNode> configManager) {
         this.configManager = configManager;
         try {
-            this.configNode = configManager.load();
+            this.rootNode = configManager.load();
         } catch (IOException e) {
             Latch.getLogger().error("Unable to load configuration, starting with a default one.");
-            this.configNode = configManager.createEmptyNode();
+            this.rootNode = configManager.createEmptyNode();
         }
 
         loadDefaults();
@@ -59,12 +59,12 @@ class Configuration {
     private void loadDefaults() {
 
         //Should we add latch.normal to default permissions?
-        if(configNode.getNode("add_default_permissions").isVirtual()) {
-            configNode.getNode("add_default_permissions").setValue(false);
+        if(this.rootNode.getNode("add_default_permissions").isVirtual()) {
+            this.rootNode.getNode("add_default_permissions").setValue(false);
         }
 
         //Blocks we're able to lock
-        if(configNode.getNode("lockable_blocks").isVirtual()) {
+        if(this.rootNode.getNode("lockable_blocks").isVirtual()) {
             List<String> lockableBlocks = new ArrayList<>();
 
             lockableBlocks.add(BlockTypes.CHEST.getId());
@@ -113,23 +113,23 @@ class Configuration {
             lockableBlocks.add(BlockTypes.JUNGLE_DOOR.getId());
             lockableBlocks.add(BlockTypes.SPRUCE_DOOR.getId());
 
-            configNode.getNode("lockable_blocks").setValue(lockableBlocks);
+            this.rootNode.getNode("lockable_blocks").setValue(lockableBlocks);
         }
 
         //Should we protect locks from explosions?
-        if(configNode.getNode("protect_from_explosives").isVirtual()) {
-            configNode.getNode("protect_from_explosives").setValue(true);
+        if(this.rootNode.getNode("protect_from_explosives").isVirtual()) {
+            this.rootNode.getNode("protect_from_explosives").setValue(true);
         }
 
         //Blocks we should prevent being placed next to locks the player doesn't own
-        if(configNode.getNode("prevent_adjacent_to_locks").isVirtual()) {
+        if(this.rootNode.getNode("prevent_adjacent_to_locks").isVirtual()) {
             List<String> preventAdjacent = new ArrayList<>();
             preventAdjacent.add(BlockTypes.HOPPER.getId());
-            configNode.getNode("prevent_adjacent_to_locks").setValue(preventAdjacent);
+            this.rootNode.getNode("prevent_adjacent_to_locks").setValue(preventAdjacent);
         }
 
         //Blocks that rely on a block under them to stay intact
-        if(configNode.getNode("protect_below_block").isVirtual()) {
+        if(this.rootNode.getNode("protect_below_block").isVirtual()) {
             List<String> protectBelowBlock = new ArrayList<>();
             protectBelowBlock.add(BlockTypes.ACACIA_DOOR.getId());
             protectBelowBlock.add(BlockTypes.BIRCH_DOOR.getId());
@@ -138,11 +138,11 @@ class Configuration {
             protectBelowBlock.add(BlockTypes.JUNGLE_DOOR.getId());
             protectBelowBlock.add(BlockTypes.SPRUCE_DOOR.getId());
 
-            configNode.getNode("protect_below_block").setValue(protectBelowBlock);
+            this.rootNode.getNode("protect_below_block").setValue(protectBelowBlock);
         }
 
         //Lock limit per enum
-        if(configNode.getNode("lock_limit").isVirtual()) {
+        if(this.rootNode.getNode("lock_limit").isVirtual()) {
             HashMap<String, Integer> limits = new HashMap<>();
             limits.put("total", 30);
 
@@ -151,37 +151,37 @@ class Configuration {
             }
 
             try {
-                configNode.getNode("lock_limit").setValue(new TypeToken<Map<String, Integer>>() {}, limits);
+                this.rootNode.getNode("lock_limit").setValue(new TypeToken<Map<String, Integer>>() {}, limits);
             } catch (ObjectMappingException e) {
-                configNode.getNode("lock_limit").setValue(limits);
+                this.rootNode.getNode("lock_limit").setValue(limits);
                 e.printStackTrace();
             }
         }
 
         //Do we allow redstone protection?
-        if(configNode.getNode("protect_from_redstone").isVirtual()) {
-            configNode.getNode("protect_from_redstone").setValue(false);
+        if(this.rootNode.getNode("protect_from_redstone").isVirtual()) {
+            this.rootNode.getNode("protect_from_redstone").setValue(false);
         }
 
-        if (configNode.getNode("auto_lock_on_placement").isVirtual()) {
-            configNode.getNode("auto_lock_on_placement").setValue(false);
+        if (this.rootNode.getNode("auto_lock_on_placement").isVirtual()) {
+            this.rootNode.getNode("auto_lock_on_placement").setValue(false);
         }
 
-        if (configNode.getNode("remove_bypass_on_logout").isVirtual()) {
-            configNode.getNode("remove_bypass_on_logout").setValue(true);
+        if (this.rootNode.getNode("remove_bypass_on_logout").isVirtual()) {
+            this.rootNode.getNode("remove_bypass_on_logout").setValue(true);
         }
 
     }
 
     private void saveConfig() {
         try {
-            configManager.save(configNode);
+            this.configManager.save(this.rootNode);
         } catch (IOException e) {
             Latch.getLogger().error("Issues saving configuration.");
         }
     }
 
-    public CommentedConfigurationNode getConfigurationNode() {
-        return configNode;
+    public CommentedConfigurationNode getRootNode() {
+        return this.rootNode;
     }
 }

@@ -69,13 +69,9 @@ public class DisplayLockCommand implements CommandExecutor {
             Latch.getLockManager().setInteractionData(player.getUniqueId(), displayLock);
 
             if (args.hasAny("p")) {
-
                 player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will display information of all locks you click until you type \"/latch persist\"."));
-
             } else {
-
                 player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will display information of the next lock you click."));
-
             }
 
             return CommandResult.success();

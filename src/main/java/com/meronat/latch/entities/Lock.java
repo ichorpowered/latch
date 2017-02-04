@@ -93,7 +93,7 @@ public class Lock {
     }
 
     protected HashSet<Location<World>> getLocations() {
-        return location;
+        return this.location;
     }
 
     public void setOwner(UUID uuid) {
@@ -117,7 +117,7 @@ public class Lock {
     }
 
     public String getLockedObject() {
-        return lockedObjectName;
+        return this.lockedObjectName;
     }
 
     public boolean isOwnerOrBypassing(UUID uniqueId) {
@@ -137,15 +137,15 @@ public class Lock {
     }
 
     protected void addAccess(UUID uuid) {
-        ableToAccess.add(uuid);
+        this.ableToAccess.add(uuid);
     }
 
     protected void removeAccess(UUID uuid) {
-        ableToAccess.remove(uuid);
+        this.ableToAccess.remove(uuid);
     }
 
     protected HashSet<UUID> getAbleToAccess() {
-        return ableToAccess;
+        return this.ableToAccess;
     }
 
     public List<String> getAbleToAccessNames() {
@@ -154,7 +154,7 @@ public class Lock {
         Optional<UserStorageService> userStorageService = Sponge.getGame().getServiceManager().provide(UserStorageService.class);
 
         if(userStorageService.isPresent()) {
-            for(UUID uuid : ableToAccess) {
+            for(UUID uuid : this.ableToAccess) {
                 userStorageService.get().get(uuid).ifPresent(u -> names.add(u.getName()));
             }
         }
@@ -163,7 +163,7 @@ public class Lock {
     }
 
     public boolean canAccess(UUID uniqueId) {
-        return ableToAccess.contains(uniqueId) || owner.equals(uniqueId) || type == LockType.PUBLIC || Latch.getLockManager().isBypassing(uniqueId);
+        return this.ableToAccess.contains(uniqueId) || this.owner.equals(uniqueId) || this.type == LockType.PUBLIC || Latch.getLockManager().isBypassing(uniqueId);
     }
 
     public String getPassword() {
@@ -174,7 +174,7 @@ public class Lock {
         Optional<UserStorageService> userStorageService = Sponge.getGame().getServiceManager().provide(UserStorageService.class);
 
         if(userStorageService.isPresent()) {
-            Optional<User> user = userStorageService.get().get(owner);
+            Optional<User> user = userStorageService.get().get(this.owner);
             return user.get().getName();
         }
         return "(owner name not found)";

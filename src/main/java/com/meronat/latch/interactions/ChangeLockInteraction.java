@@ -40,7 +40,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
-public class ChangeLockInteraction implements AbstractLockInteraction {
+public class ChangeLockInteraction implements LockInteraction {
 
     private final UUID player;
 
@@ -115,42 +115,42 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
         UUID originalOwner = lock.getOwner();
         String originalName = lock.getName();
 
-        if(type != null) {
+        if(this.type != null) {
             lock.setType(type);
         }
-        if(password != null) {
+        if(this.password != null) {
             lock.setSalt(LatchUtils.generateSalt());
-            lock.changePassword(LatchUtils.hashPassword(password, lock.getSalt()));
+            lock.changePassword(LatchUtils.hashPassword(this.password, lock.getSalt()));
 
             //If changing password, need to clear out ability to access
             Latch.getLockManager().removeAllLockAccess(lock);
         }
-        if(lockName != null) {
-            lock.setName(lockName);
+        if(this.lockName != null) {
+            lock.setName(this.lockName);
         }
-        if(newOwner != null) {
+        if(this.newOwner != null) {
             //If assigning to a new owner - need to validate the name
-            if(!Latch.getLockManager().isUniqueName(newOwner, lock.getName())) {
-                lock.setName(LatchUtils.getRandomLockName(newOwner, lock.getLockedObject()));
+            if(!Latch.getLockManager().isUniqueName(this.newOwner, lock.getName())) {
+                lock.setName(LatchUtils.getRandomLockName(this.newOwner, lock.getLockedObject()));
             }
-            lock.setOwner(newOwner);
+            lock.setOwner(this.newOwner);
         }
-        if(membersToAdd != null) {
-            for(UUID u : membersToAdd) {
+        if(this.membersToAdd != null) {
+            for(UUID u : this.membersToAdd) {
                 Latch.getLockManager().addLockAccess(lock, u);
             }
         }
-        if(membersToRemove != null) {
-            for(UUID u : membersToRemove) {
+        if(this.membersToRemove != null) {
+            for(UUID u : this.membersToRemove) {
                 Latch.getLockManager().removeLockAccess(lock, u);
             }
         }
-        if(protectFromRedstone != null) {
-            lock.setProtectFromRedstone(protectFromRedstone);
+        if(this.protectFromRedstone != null) {
+            lock.setProtectFromRedstone(this.protectFromRedstone);
         }
 
         //Update the base lock elements
-        if(lockName != null || type != null || password != null || newOwner != null || protectFromRedstone != null) {
+        if(this.lockName != null || this.type != null || this.password != null || this.newOwner != null || this.protectFromRedstone != null) {
             Latch.getLockManager().updateLockAttributes(originalOwner, originalName, lock);
         }
 
@@ -162,7 +162,7 @@ public class ChangeLockInteraction implements AbstractLockInteraction {
 
     @Override
     public boolean shouldPersist() {
-        return persisting;
+        return this.persisting;
     }
 
     @Override

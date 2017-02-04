@@ -1,0 +1,16 @@
+language: java
+jdk:
+  - oraclejdk8
+git:
+  depth: 3
+env:
+  matrix:
+    - GRADLE_OPTS="-Xms1g -Xmx3g"
+before_install:
+  - chmod +x gradlew
+install: true
+script: "./gradlew build --refresh-dependencies"
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer

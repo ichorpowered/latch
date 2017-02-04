@@ -56,10 +56,10 @@ public class SqlHandler {
     }
 
     private Connection getConnection() throws SQLException {
-        if (sql == null) {
-            sql = Sponge.getServiceManager().provide(SqlService.class).get();
+        if (this.sql == null) {
+            this.sql = Sponge.getServiceManager().provide(SqlService.class).get();
         }
-        return sql.getDataSource("jdbc:h2:" + Latch.getConfigPatch().getParent().toAbsolutePath().toString() + File.separator + "latch").getConnection();
+        return this.sql.getDataSource("jdbc:h2:" + Latch.getConfigPatch().getParent().toAbsolutePath().toString() + File.separator + "latch").getConnection();
     }
 
     private void createTables() {
@@ -208,9 +208,7 @@ public class SqlHandler {
             ps.setObject(1, owner);
             ps.setString(2, name);
 
-            try (
-                    ResultSet rs = ps.executeQuery();
-            ) {
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     id = Optional.of(rs.getInt("ID"));
                 }
@@ -234,9 +232,7 @@ public class SqlHandler {
             ps.setInt(3, location.getBlockY());
             ps.setInt(4, location.getBlockZ());
 
-            try (
-                    ResultSet rs = ps.executeQuery();
-            ) {
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     id = Optional.of(rs.getInt("LOCK_ID"));
                 }
@@ -286,9 +282,7 @@ public class SqlHandler {
 
             psLock.executeUpdate();
 
-            try (
-                    ResultSet rsLock = psLock.getGeneratedKeys();
-            ) {
+            try (ResultSet rsLock = psLock.getGeneratedKeys()) {
                 if (rsLock.next()) {
                     //If the lock was successfully created, proceed with inserting remaining information
                     //Insert the lock locations
@@ -325,14 +319,10 @@ public class SqlHandler {
         boolean fullyDelete = deleteEntireLock; //do we fully delete the lock (from all tables)
 
         if (lockKey.isPresent()) {
-            try (
-                    Connection connection = getConnection();
-            ) {
+            try (Connection connection = getConnection()) {
                 //If not forced to delete the entire lock(all locations), only do it if it's the last location
                 if (!fullyDelete) {
-                    try (
-                            PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) FROM LOCK_LOCATIONS WHERE LOCK_ID = ?");
-                    ) {
+                    try (PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) FROM LOCK_LOCATIONS WHERE LOCK_ID = ?")) {
                         ps.setLong(1, lockKey.get());
 
                         try (
@@ -383,7 +373,6 @@ public class SqlHandler {
     }
 
     public void deleteLocksForPlayer(UUID player) {
-
         try (
             Connection connection = getConnection();
             PreparedStatement ps = connection.prepareStatement("SELECT ID FROM LOCK WHERE OWNER_UUID = ?");
@@ -391,18 +380,13 @@ public class SqlHandler {
 
             ps.setString(1, player.toString());
 
-            try (
-                    ResultSet rs = ps.executeQuery();
-            ) {
-
+            try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-
                     try (
                         PreparedStatement psLocations = connection.prepareStatement("DELETE FROM LOCK_LOCATIONS WHERE LOCK_ID = ?");
                         PreparedStatement psAccessors = connection.prepareStatement("DELETE FROM LOCK_PLAYERS WHERE LOCK_ID = ?");
                         PreparedStatement psLocks = connection.prepareStatement("DELETE FROM LOCK WHERE ID = ?");
                     ) {
-
                         String lockId = rs.getString(1);
 
                         psLocations.setString(1, lockId);
@@ -412,17 +396,12 @@ public class SqlHandler {
                         psLocations.execute();
                         psAccessors.execute();
                         psLocks.execute();
-
                     }
-
                 }
-
             }
 
         } catch (SQLException e) {
-
             getLogger().error("Error deleting locks for player: " + player.toString());
-
         }
 
     }
@@ -435,9 +414,7 @@ public class SqlHandler {
             ps.setObject(1, playerUUID);
             ps.setString(2, lockName);
 
-            try (
-                    ResultSet rs = ps.executeQuery();
-            ) {
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getLong("COUNT(*)") == 0;
                 }
@@ -458,9 +435,7 @@ public class SqlHandler {
         ) {
             ps.setString(1, lockedObjectName + "%");
 
-            try (
-                    ResultSet rs = ps.executeQuery();
-            ) {
+            try (ResultSet rs = ps.executeQuery()) {
                 HashSet<String> usedNames = new HashSet<>();
 
                 while (rs.next()) {
@@ -611,15 +586,14 @@ public class SqlHandler {
             ps.setString(1, type.toString());
             ps.setString(2, player.toString());
 
-            try (
-                    ResultSet rs = ps.executeQuery();
-            ) {
+            try (ResultSet rs = ps.executeQuery()) {
                 //If total limit set and query says we're above that.. or if type limit is set and query says we're above that
                 return rs.next() && ( //if !rs.next(), no locks detected
                         (limits.containsKey("total") && rs.getInt("TOTAL") >= limits.get("total")) || (
                                 limits.containsKey(type.toString().toLowerCase())
                                         && rs.getInt("TYPE_TOTAL") >= limits.get(type.toString().toLowerCase())));
             }
+
         } catch (SQLException e) {
             getLogger().error("Error isPlayerAtLockLimit: " + player + ", " + type);
             e.printStackTrace();
