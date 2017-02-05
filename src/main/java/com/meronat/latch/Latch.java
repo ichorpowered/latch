@@ -63,6 +63,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Tristate;
@@ -72,6 +73,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Plugin(
         id = Info.ID,
@@ -151,6 +153,22 @@ public class Latch {
                     p -> p.getUserSubjects().getDefaults().getSubjectData()
                             .setPermission(p.getDefaults().getActiveContexts(), "latch.normal", Tristate.TRUE));
         }
+    }
+
+    private void registerTasks() {
+
+        if (getConfig().getNode("clean_old_locks").getBoolean(false)) {
+            Task.builder()
+                    .name("clean-old-locks")
+                    .interval(getConfig().getNode("clean_old_locks_interval").getInt(40), TimeUnit.DAYS)
+                    .execute(() -> {
+
+
+
+                    })
+                    .submit(getPluginContainer());
+        }
+
     }
 
     private void registerListeners() {

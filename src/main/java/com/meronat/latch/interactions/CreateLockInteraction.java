@@ -39,6 +39,7 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
@@ -93,7 +94,7 @@ public class CreateLockInteraction implements LockInteraction {
             return false;
         }
 
-        Lock lock = new Lock(player.getUniqueId(), this.type, lockLocations, LatchUtils.getBlockNameFromType(blockState.getState().getType()), Latch.getLockManager().getProtectFromRedstone());
+        Lock lock = new Lock(player.getUniqueId(), this.type, lockLocations, LatchUtils.getBlockNameFromType(blockState.getState().getType()), Latch.getLockManager().getProtectFromRedstone(), LocalDateTime.now());
 
         if (this.type.equals(LockType.PASSWORD_ALWAYS) || this.type.equals(LockType.PASSWORD_ONCE)) {
 

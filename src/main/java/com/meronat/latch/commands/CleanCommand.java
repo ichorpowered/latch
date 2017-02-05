@@ -23,24 +23,7 @@
  * THE SOFTWARE.
  */
 
-package com.meronat.latch.listeners;
+package com.meronat.latch.commands;
 
-import com.meronat.latch.Latch;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
-
-import java.time.LocalDateTime;
-
-public class PlayerDisconnectListener {
-
-    @Listener
-    public void onPlayerDisconnect(ClientConnectionEvent.Disconnect event, @Root Player player) {
-        Latch.getLockManager().removeBypassing(player.getUniqueId());
-        Sponge.getScheduler().createAsyncExecutor(Latch.getPluginContainer())
-                .execute(() -> Latch.getStorageHandler().updateLastAccessed(player.getUniqueId(), LocalDateTime.now()));
-    }
-
+public class CleanCommand {
 }
