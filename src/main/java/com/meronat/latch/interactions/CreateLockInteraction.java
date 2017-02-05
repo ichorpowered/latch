@@ -116,7 +116,7 @@ public class CreateLockInteraction implements LockInteraction {
         }
 
         //Notify the player
-        player.sendMessage(Text.of(TextColors.DARK_GREEN, "You have created a ", TextColors.GRAY, lockCreateEvent.getLock().getLockType(),
+        player.sendMessage(Text.of(TextColors.DARK_GREEN, "You have created a ", TextColors.GRAY, lockCreateEvent.getLock().getLockType().getHumanReadable().toLowerCase(),
                 TextColors.DARK_GREEN, " lock called: ", TextColors.GRAY, lockCreateEvent.getLock().getName()));
         Latch.getLockManager().createLock(lockCreateEvent.getLock());
 

@@ -89,7 +89,7 @@ public class PurgeCommand implements CommandExecutor {
         Text no = Text.of(TextColors.RED, TextActions.executeCallback(x -> no(user, src, self)), " NO");
 
         if (self) {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "Are you sure you want to delete all of your locks?").concat(yes).concat(no));
+            src.sendMessage(Text.of(TextColors.DARK_RED, "Are you sure you want to delete all of your locks? ").concat(yes).concat(no));
         } else {
             src.sendMessage(Text.of(TextColors.DARK_RED, "Are you sure you want to delete all of ", TextColors.GRAY,
                     user.getName() +"'s", TextColors.DARK_RED, " locks?").concat(yes).concat(no));

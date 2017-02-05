@@ -146,7 +146,7 @@ public class ChangeBlockListener {
                         }
 
                         if (Latch.getLockManager().isPlayerAtLockLimit(player.getUniqueId(), LockType.PRIVATE)) {
-                            player.sendMessage(ChatTypes.ACTION_BAR, Text.of(TextColors.RED, "You are at the lock limit so the container was not locked."));
+                            player.sendMessage(ChatTypes.ACTION_BAR, Text.of(TextColors.RED, "You are at the lock limit."));
                             return;
                         }
 

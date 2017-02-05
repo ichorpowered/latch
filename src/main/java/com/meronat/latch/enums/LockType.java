@@ -58,8 +58,7 @@ public enum LockType {
         this.humanReadable = human;
     }
 
-    @Override
-    public String toString() {
+    public String getHumanReadable() {
         return this.humanReadable;
     }
 
