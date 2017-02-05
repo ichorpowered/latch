@@ -160,10 +160,10 @@ public class Latch {
         if (getConfig().getNode("clean_old_locks").getBoolean(false)) {
             Task.builder()
                     .name("clean-old-locks")
-                    .interval(getConfig().getNode("clean_old_locks_interval").getInt(40), TimeUnit.DAYS)
+                    .interval(getConfig().getNode("clean_old_locks_interval").getInt(2), TimeUnit.HOURS)
                     .execute(() -> {
 
-
+                        // TODO SQL Statement which deletes these old locks
 
                     })
                     .submit(getPluginContainer());

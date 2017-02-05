@@ -171,6 +171,14 @@ class Configuration {
             this.rootNode.getNode("remove_bypass_on_logout").setValue(true);
         }
 
+        if (this.rootNode.getNode("clean_old_locks").isVirtual()) {
+            this.rootNode.getNode("clean_old_locks").setValue(false);
+        }
+
+        if (this.rootNode.getNode("clean_old_locks_interval").isVirtual()) {
+            this.rootNode.getNode("clean_old_locks_interval").setValue(2);
+        }
+
     }
 
     private void saveConfig() {
