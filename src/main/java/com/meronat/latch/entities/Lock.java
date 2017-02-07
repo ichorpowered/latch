@@ -173,7 +173,7 @@ public class Lock {
     }
 
     public String getPassword() {
-        return password;
+        return this.password;
     }
 
     public String getOwnerName() {
@@ -209,7 +209,7 @@ public class Lock {
     }
 
     public boolean getProtectFromRedstone() {
-        return protectFromRedstone;
+        return this.protectFromRedstone;
     }
 
     public LocalDateTime getLastAccessed() {
@@ -218,5 +218,6 @@ public class Lock {
 
     public void updateLastAccessed() {
         this.lastAccessed = LocalDateTime.now();
+        Sponge.getScheduler().createAsyncExecutor(Latch.getPluginContainer()).execute(() -> Latch.getLockManager().updateLockAttributes(this.owner, this.name, this));
     }
 }

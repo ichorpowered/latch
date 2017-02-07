@@ -25,5 +25,72 @@
 
 package com.meronat.latch.commands;
 
-public class CleanCommand {
+import com.meronat.latch.Latch;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandCallable;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextColors;
+
+import java.util.Optional;
+
+public class CleanCommand implements CommandExecutor {
+
+    public CommandCallable getCommand() {
+        return CommandSpec.builder()
+                .description(Text.of("Purges all locks not accessed in more than a certain amount of days"))
+                .permission("latch.admin.clean")
+                .executor(this)
+                .arguments(GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.integer(Text.of("days")))))
+                .build();
+    }
+
+    @Override
+    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+
+        if (!(src instanceof Player)) {
+            throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
+        }
+
+        Optional<Integer> optionalDays = args.getOne("days");
+
+        if (!optionalDays.isPresent()) {
+            throw new CommandException(Text.of(TextColors.RED, "You must specify a certain amount of days."));
+        }
+
+        int days = optionalDays.get();
+
+        if (days <= 0) {
+            throw new CommandException(Text.of(TextColors.RED, "Please specify an amount of days larger than 0."));
+        }
+
+        Text yes = Text.of(TextColors.GREEN, TextActions.executeCallback(x -> yes(src, days)), "    YES   ");
+
+        Text no = Text.of(TextColors.RED, TextActions.executeCallback(x -> no(src)), " NO");
+
+        src.sendMessage(Text.of(TextColors.DARK_RED, "Are you sure you want to delete all locks not accessed in " + days + " days.").concat(yes).concat(no));
+
+        return CommandResult.success();
+
+    }
+
+    private void yes(CommandSource src, int days) {
+        Sponge.getScheduler().createAsyncExecutor(Latch.getPluginContainer()).execute(() -> {
+            src.sendMessage(Text.of(TextColors.YELLOW, Latch.getStorageHandler().clearLocksOlderThan(days), TextColors.DARK_GREEN,
+                    " locks have been deleted that were not accessed in the past ", TextColors.YELLOW, days,
+                    TextColors.DARK_GREEN, " days."));
+        });
+    }
+
+    private void no(CommandSource src) {
+        src.sendMessage(Text.of(TextColors.DARK_GREEN, "You have cancelled the deletion of old locks."));
+    }
 }

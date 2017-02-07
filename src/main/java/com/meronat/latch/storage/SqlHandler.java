@@ -625,7 +625,7 @@ public class SqlHandler {
         return true;
     }
 
-    public void updateLastAccessed(UUID player, LocalDateTime now) {
+    /*public void updateLastAccessed(UUID player, LocalDateTime now) {
         try (PreparedStatement ps = getConnection().prepareStatement("UPDATE LOCK SET ACCESSED = ? WHERE OWNER_UUID = ?")) {
             ps.setTimestamp(1, Timestamp.valueOf(now));
             ps.setString(2, player.toString());
@@ -633,6 +633,48 @@ public class SqlHandler {
             getLogger().error("Error updateLastAccessed: " + player);
             e.printStackTrace();
         }
+    }*/
+
+    public int clearLocksOlderThan(int days) {
+
+        int amountDeleted = 0;
+
+        try (
+                Connection connection = getConnection();
+                PreparedStatement ps = connection.prepareStatement("SELECT ID FROM LOCK WHERE ACCESSED < ?");
+        ) {
+            ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now().minusDays(days)));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    amountDeleted++;
+                    try (
+                            PreparedStatement psLocations = connection.prepareStatement("DELETE FROM LOCK_LOCATIONS WHERE LOCK_ID = ?");
+                            PreparedStatement psAccessors = connection.prepareStatement("DELETE FROM LOCK_PLAYERS WHERE LOCK_ID = ?");
+                            PreparedStatement psLocks = connection.prepareStatement("DELETE FROM LOCK WHERE ID = ?");
+                    ) {
+                        String lockId = rs.getString(1);
+
+                        psLocations.setString(1, lockId);
+                        psAccessors.setString(1, lockId);
+                        psLocks.setString(1, lockId);
+
+                        psLocations.execute();
+                        psAccessors.execute();
+                        psLocks.execute();
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+
+            getLogger().error("Error clearLocksOlderThan: " + days);
+            e.printStackTrace();
+
+        }
+
+        return amountDeleted;
+
     }
 
 }

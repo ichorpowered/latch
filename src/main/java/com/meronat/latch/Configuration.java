@@ -179,6 +179,10 @@ class Configuration {
             this.rootNode.getNode("clean_old_locks_interval").setValue(2);
         }
 
+        if (this.rootNode.getNode("clean_locks_older_than").isVirtual()) {
+            this.rootNode.getNode("clean_locks_older_than").setValue(40);
+        }
+
     }
 
     private void saveConfig() {

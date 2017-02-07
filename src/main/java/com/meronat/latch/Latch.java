@@ -31,6 +31,7 @@ import com.meronat.latch.bstats.Metrics;
 import com.meronat.latch.commands.AddAccessorCommand;
 import com.meronat.latch.commands.AdminBypassCommand;
 import com.meronat.latch.commands.ChangeLockCommand;
+import com.meronat.latch.commands.CleanCommand;
 import com.meronat.latch.commands.CreateDonationLockCommand;
 import com.meronat.latch.commands.CreatePasswordLockCommand;
 import com.meronat.latch.commands.CreatePrivateLockCommand;
@@ -61,6 +62,7 @@ import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
@@ -135,13 +137,14 @@ public class Latch {
                 .child(new DisplayLockCommand().getCommand(), "info", "display")
                 .child(new UnlockCommand().getCommand(), "open", "unlock")
                 .child(new ListCommand().getCommand(), "list", "displayall")
-                .child(new HelpCommand().getCommand(), "help")
+                .child(new HelpCommand().getCommand(), "help", "?")
                 .child(new AddAccessorCommand().getCommand(), "add", "plus")
                 .child(new RemoveAccessorCommand().getCommand(), "remove", "minus", "rem", "removeplayer")
                 .child(new AdminBypassCommand().getCommand(), "bypass", "adminbypass", "admin")
                 .child(new PurgeCommand().getCommand(), "purge", "destroyall")
                 .child(new InfoCommand().getCommand(), "version", "authors")
                 .child(new LimitsCommand().getCommand(), "limits", "max")
+                .child(new CleanCommand().getCommand(), "clean", "misterclean")
                 .executor(new HelpCommand())
                 .build(), "latch", "lock");
 
@@ -155,16 +158,21 @@ public class Latch {
         }
     }
 
+    @Listener
+    public void onGamePostInitialization(GamePostInitializationEvent event) {
+        registerTasks();
+    }
+
     private void registerTasks() {
 
         if (getConfig().getNode("clean_old_locks").getBoolean(false)) {
             Task.builder()
                     .name("clean-old-locks")
-                    .interval(getConfig().getNode("clean_old_locks_interval").getInt(2), TimeUnit.HOURS)
+                    .async()
+                    .interval(getConfig().getNode("clean_old_locks_interval").getInt(4), TimeUnit.HOURS)
                     .execute(() -> {
-
-                        // TODO SQL Statement which deletes these old locks
-
+                        int daysOld = getConfig().getNode("clean_locks_older_than").getInt(40);
+                        getLogger().info("Successfully deleted " + storageHandler.clearLocksOlderThan(getConfig().getNode("clean_locks_older_than").getInt(daysOld)) + " locks older than " + daysOld + " days old.");
                     })
                     .submit(getPluginContainer());
         }
