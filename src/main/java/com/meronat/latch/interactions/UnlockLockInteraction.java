@@ -54,30 +54,32 @@ public class UnlockLockInteraction implements LockInteraction {
 
     @Override
     public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockState) {
-        Optional<Lock> lock = Latch.getLockManager().getLock(location);
+        Optional<Lock> optionalLock = Latch.getLockManager().getLock(location);
         //Check to see if another lock is present
-        if(!lock.isPresent()) {
+        if(!optionalLock.isPresent()) {
             player.sendMessage(Text.of("There is no lock there."));
             return false;
         }
 
+        Lock lock = optionalLock.get();
+
         //If they're the owner or on the list of players within the lock, allow
-        if(lock.get().canAccess(player.getUniqueId())) {
+        if(lock.canAccess(player.getUniqueId())) {
             return true;
         }
 
         //Check the password
-        if(Latch.getLockManager().isPasswordCompatibleLock(lock.get())) {
-            if( !LatchUtils.hashPassword(this.password, lock.get().getSalt()).equals(lock.get().getPassword())) {
+        if(Latch.getLockManager().isPasswordCompatibleLock(lock)) {
+            if( !LatchUtils.hashPassword(this.password, lock.getSalt()).equals(lock.getPassword())) {
                 player.sendMessage(Text.of(TextColors.RED, "The password you tried is incorrect."));
                 return false;
             }
 
             //If the password is correct we're returning true - but if it's a PASSWORD_ONCE need to add them to allowed members
-            if(lock.get().getLockType() == LockType.PASSWORD_ONCE) {
+            if(lock.getLockType() == LockType.PASSWORD_ONCE) {
                 //Check for other locks
                 ArrayList<Lock> locks = new ArrayList<>();
-                locks.add(lock.get());
+                locks.add(lock);
 
                 Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(blockState);
                 Optional<Lock> otherBlockLock = Optional.empty();
@@ -97,6 +99,7 @@ public class UnlockLockInteraction implements LockInteraction {
                 //Modify the attributes of the lock
                 for(Lock thisLock : locks) {
                     Latch.getLockManager().addLockAccess(thisLock, player.getUniqueId());
+                    lock.updateLastAccessed();
                 }
                 player.sendMessage(Text.of(TextColors.DARK_GREEN, "Unlocking the password lock for future access."));
             }

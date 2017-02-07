@@ -27,17 +27,28 @@ package com.meronat.latch.interactions;
 
 import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.data.manipulator.mutable.DisplayNameData;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.service.pagination.PaginationService;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class DisplayLockInteraction implements LockInteraction {
+
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d yyyy H:mm");
 
     private final UUID player;
 
@@ -59,13 +70,37 @@ public class DisplayLockInteraction implements LockInteraction {
 
         Lock lock = optionalLock.get();
 
-        player.sendMessage(Text.of(TextColors.DARK_GREEN, lock.getLockType().toString() + " " +
-                lock.getLockedObject().substring(0, 1).toUpperCase() + lock.getLockedObject().substring(1) + ": ", TextColors.GRAY, lock.getName()));
-        player.sendMessage(Text.of(TextColors.DARK_GREEN, "Owner: ", TextColors.GRAY, lock.getOwnerName()));
-        player.sendMessage(Text.of(TextColors.DARK_GREEN, "Accessors: ", TextColors.GRAY, String.join(", ", lock.getAbleToAccessNames())));
+        List<Text> contents = new ArrayList<>();
 
+        contents.add(Text.of(TextColors.GOLD, "Owner: ", TextColors.GRAY, lock.getOwnerName()));
+        contents.add(Text.of(TextColors.GOLD, "Latch Type: ", TextColors.GRAY, lock.getLockType().getHumanReadable()));
+        contents.add(Text.of(TextColors.GOLD, "Last Accessed: ", TextColors.GRAY, formatter.format(lock.getLastAccessed())));
+        contents.add(Text.of(TextColors.GOLD, "Block/Entity Type: ", TextColors.GRAY, lock.getLockedObject().substring(0, 1).toUpperCase() + lock.getLockedObject().substring(1)));
         if (Latch.getConfig().getNode("protect_from_redstone").getBoolean(false)) {
-            player.sendMessage(Text.of(TextColors.DARK_GREEN, "Protect from Redstone: ", TextColors.GRAY, lock.getProtectFromRedstone()));
+            contents.add(Text.of(TextColors.GOLD, "Redstone Protection: ", TextColors.GRAY, lock.getProtectFromRedstone()));
+        }
+        contents.add(Text.of(TextColors.GOLD, "Location: ", TextColors.GRAY, location.getExtent().getName().substring(0, 1).toUpperCase()
+                + location.getExtent().getName().substring(1) + " - X: " + location.getBlockX() + " Y: " + location.getBlockY() + " Z: " + location.getBlockZ()));
+        contents.add(Text.of(TextColors.GOLD, "Accessors: ", TextColors.GRAY, String.join(", ", lock.getAbleToAccessNames())));
+
+        Optional<PaginationService> optionalPaginationService = Sponge.getServiceManager().provide(PaginationService.class);
+
+        if (optionalPaginationService.isPresent()) {
+
+            optionalPaginationService.get().builder()
+                    .title(Text.of(TextColors.DARK_GREEN, lock.getName()))
+                    .linesPerPage(10)
+                    .padding(Text.of(TextColors.DARK_GREEN, "="))
+                    .contents(contents)
+                    .sendTo(player);
+
+        } else {
+
+            player.sendMessage(Text.of(Text.of(TextColors.GOLD, "Latch Name: ", lock.getName())));
+            for (Text t : contents) {
+                player.sendMessage(t);
+            }
+
         }
 
         //Return false to cancel interactions when using this command

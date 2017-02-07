@@ -28,6 +28,7 @@ package com.meronat.latch.listeners;
 import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
 import com.meronat.latch.enums.LockType;
+import com.meronat.latch.interactions.CreateLockInteraction;
 import com.meronat.latch.interactions.LockInteraction;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTypes;
@@ -96,9 +97,9 @@ public class InteractBlockListener {
         if(Latch.getLockManager().hasInteractionData(player.getUniqueId())) {
             LockInteraction lockInteraction = Latch.getLockManager().getInteractionData(player.getUniqueId());
 
-            boolean result = lockInteraction.handleInteraction(player, event.getTargetBlock().getLocation().get(), event.getTargetBlock());
+            lockInteraction.handleInteraction(player, event.getTargetBlock().getLocation().get(), event.getTargetBlock());
 
-            event.setCancelled(!result);
+            event.setCancelled(true);
 
             if(!lockInteraction.shouldPersist()) {
                 Latch.getLockManager().removeInteractionData(player.getUniqueId());
