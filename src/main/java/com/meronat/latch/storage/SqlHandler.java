@@ -665,12 +665,9 @@ public class SqlHandler {
                     }
                 }
             }
-
         } catch (SQLException e) {
-
             getLogger().error("Error clearLocksOlderThan: " + days);
             e.printStackTrace();
-
         }
 
         return amountDeleted;
