@@ -34,6 +34,7 @@ import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -58,11 +59,13 @@ public class Lock {
     private HashSet<UUID> ableToAccess;
     private boolean protectFromRedstone;
 
-    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password, boolean protectFromRedstone) {
-        this(owner, LatchUtils.getRandomLockName(owner, lockedObjectName), type, location, lockedObjectName, salt, password, new HashSet<>(), protectFromRedstone);
+    private LocalDateTime lastAccessed;
+
+    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password, boolean protectFromRedstone, LocalDateTime lastAccessed) {
+        this(owner, LatchUtils.getRandomLockName(owner, lockedObjectName), type, location, lockedObjectName, salt, password, new HashSet<>(), protectFromRedstone, lastAccessed);
     }
 
-    public Lock(UUID owner, String lockName, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password, HashSet<UUID> players, boolean protectFromRedstone) {
+    public Lock(UUID owner, String lockName, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password, HashSet<UUID> players, boolean protectFromRedstone, LocalDateTime lastAccessed) {
 
         this.owner = owner;
         this.type = type;
@@ -78,9 +81,11 @@ public class Lock {
         ableToAccess = players;
 
         this.protectFromRedstone = protectFromRedstone;
+
+        this.lastAccessed = lastAccessed;
     }
 
-    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, boolean protectFromRedstone) {
+    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, boolean protectFromRedstone, LocalDateTime lastAccessed) {
 
         this.owner = owner;
         this.name = LatchUtils.getRandomLockName(owner, lockedObjectName);
@@ -89,6 +94,7 @@ public class Lock {
         this.location = location;
         this.protectFromRedstone = protectFromRedstone;
         this.ableToAccess = new HashSet<>();
+        this.lastAccessed = lastAccessed;
 
     }
 
@@ -167,7 +173,7 @@ public class Lock {
     }
 
     public String getPassword() {
-        return password;
+        return this.password;
     }
 
     public String getOwnerName() {
@@ -203,6 +209,15 @@ public class Lock {
     }
 
     public boolean getProtectFromRedstone() {
-        return protectFromRedstone;
+        return this.protectFromRedstone;
+    }
+
+    public LocalDateTime getLastAccessed() {
+        return this.lastAccessed;
+    }
+
+    public void updateLastAccessed() {
+        this.lastAccessed = LocalDateTime.now();
+        Sponge.getScheduler().createAsyncExecutor(Latch.getPluginContainer()).execute(() -> Latch.getLockManager().updateLockAttributes(this.owner, this.name, this));
     }
 }

@@ -35,9 +35,12 @@ import org.spongepowered.api.world.World;
 
 import java.io.File;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,6 +75,7 @@ public class SqlHandler {
                 "PASSWORD varchar(256) NOT NULL, " +
                 "SALT varchar(64) NOT NULL, " +
                 "REDSTONE_PROTECT BOOLEAN NOT NULL, " +
+                "ACCESSED DATETIME NOT NULL," +
                 "PRIMARY KEY(ID), CONSTRAINT UQ_OWNER_NAME UNIQUE (OWNER_UUID, LOCK_NAME) )";
 
         String createLocationTable = "CREATE TABLE IF NOT EXISTS LOCK_LOCATIONS (" +
@@ -101,6 +105,20 @@ public class SqlHandler {
             getLogger().error("Error running SQL createTables:");
             e.printStackTrace();
         }
+
+        try (
+                Connection connection = getConnection();
+                PreparedStatement add = connection.prepareStatement("ALTER TABLE LOCK ADD COLUMN ACCESSED DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP");
+        ) {
+            DatabaseMetaData metaData = connection.getMetaData();
+            if (!metaData.getColumns(null, null, "LOCK", "ACCESSED").next()) {
+                add.execute();
+            }
+        } catch (SQLException e) {
+            getLogger().error("There was a problem adding the ACCESSED column. Please report this to the developers:");
+            e.printStackTrace();
+        }
+
     }
 
     public Optional<Lock> getLockByLocation(Location location) {
@@ -109,7 +127,7 @@ public class SqlHandler {
         try (
                 Connection connection = getConnection();
                 PreparedStatement ps = connection.prepareStatement(
-                        "SELECT ID, OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD, REDSTONE_PROTECT FROM LOCK_LOCATIONS JOIN LOCK ON (LOCK_LOCATIONS.LOCK_ID = LOCK.ID) "
+                        "SELECT ID, OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD, REDSTONE_PROTECT, ACCESSED FROM LOCK_LOCATIONS JOIN LOCK ON (LOCK_LOCATIONS.LOCK_ID = LOCK.ID) "
                                 + "WHERE LOCK_LOCATIONS.WORLD_UUID = ? AND LOCK_LOCATIONS.X = ? AND LOCK_LOCATIONS.Y = ? AND LOCK_LOCATIONS.Z = ?")
         ) {
             ps.setObject(1, location.getExtent().getUniqueId());
@@ -131,7 +149,8 @@ public class SqlHandler {
                             tempLock.getBytes("SALT"),
                             tempLock.getString("PASSWORD"),
                             getAbleToAccessByID(tempLock.getInt("ID")),
-                            tempLock.getBoolean("REDSTONE_PROTECT")));
+                            tempLock.getBoolean("REDSTONE_PROTECT"),
+                            tempLock.getTimestamp("ACCESSED").toLocalDateTime()));
                 }
             }
 
@@ -267,7 +286,7 @@ public class SqlHandler {
         try (
                 Connection connection = getConnection();
                 PreparedStatement psLock = connection.prepareStatement(
-                        "INSERT INTO LOCK(OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD, REDSTONE_PROTECT) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        "INSERT INTO LOCK(OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD, REDSTONE_PROTECT, ACCESSED) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                         PreparedStatement.RETURN_GENERATED_KEYS);
                 PreparedStatement psLocations = connection.prepareStatement("INSERT INTO LOCK_LOCATIONS(LOCK_ID, WORLD_UUID, X, Y, Z) VALUES (?, ?, ?, ?, ?)");
                 PreparedStatement psPlayers = connection.prepareStatement("INSERT INTO LOCK_PLAYERS(LOCK_ID, PLAYER_UUID) VALUES (?, ?)");
@@ -279,6 +298,7 @@ public class SqlHandler {
             psLock.setBytes(5, lock.getSalt());
             psLock.setString(6, lock.getPassword());
             psLock.setBoolean(7, lock.getProtectFromRedstone());
+            psLock.setTimestamp(8, Timestamp.valueOf(lock.getLastAccessed()));
 
             psLock.executeUpdate();
 
@@ -503,7 +523,7 @@ public class SqlHandler {
         try (
                 Connection connection = getConnection();
                 PreparedStatement ps = connection.prepareStatement(
-                        "UPDATE LOCK SET OWNER_UUID = ?, LOCK_NAME = ?, LOCK_TYPE = ?, PASSWORD = ?, SALT = ?, REDSTONE_PROTECT = ? WHERE OWNER_UUID = ? AND LOCK_NAME = ?");
+                        "UPDATE LOCK SET OWNER_UUID = ?, LOCK_NAME = ?, LOCK_TYPE = ?, PASSWORD = ?, SALT = ?, REDSTONE_PROTECT = ?, ACCESSED = ? WHERE OWNER_UUID = ? AND LOCK_NAME = ?");
         ) {
             ps.setString(1, thisLock.getOwner().toString());
             ps.setString(2, thisLock.getName());
@@ -511,8 +531,9 @@ public class SqlHandler {
             ps.setString(4, thisLock.getPassword());
             ps.setBytes(5, thisLock.getSalt());
             ps.setBoolean(6, thisLock.getProtectFromRedstone());
-            ps.setString(7, originalOwner.toString());
-            ps.setString(8, originalName);
+            ps.setTimestamp(7, Timestamp.valueOf(thisLock.getLastAccessed()));
+            ps.setString(8, originalOwner.toString());
+            ps.setString(9, originalName);
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -544,7 +565,7 @@ public class SqlHandler {
         try (
                 Connection connection = getConnection();
                 PreparedStatement ps = connection.prepareStatement(
-                        "SELECT ID, OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD, REDSTONE_PROTECT FROM LOCK WHERE OWNER_UUID = ?");
+                        "SELECT ID, OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD, REDSTONE_PROTECT, ACCESSED FROM LOCK WHERE OWNER_UUID = ?");
         ) {
             ps.setString(1, uniqueId.toString());
 
@@ -561,7 +582,8 @@ public class SqlHandler {
                             rs.getBytes("SALT"),
                             rs.getString("PASSWORD"),
                             getAbleToAccessByID(rs.getInt("ID")),
-                            rs.getBoolean("REDSTONE_PROTECT")));
+                            rs.getBoolean("REDSTONE_PROTECT"),
+                            rs.getTimestamp("ACCESSED").toLocalDateTime()));
                 }
             }
         } catch (SQLException e) {
@@ -602,4 +624,54 @@ public class SqlHandler {
         //Sql exception, prevent placement
         return true;
     }
+
+    /*public void updateLastAccessed(UUID player, LocalDateTime now) {
+        try (PreparedStatement ps = getConnection().prepareStatement("UPDATE LOCK SET ACCESSED = ? WHERE OWNER_UUID = ?")) {
+            ps.setTimestamp(1, Timestamp.valueOf(now));
+            ps.setString(2, player.toString());
+        } catch (SQLException e) {
+            getLogger().error("Error updateLastAccessed: " + player);
+            e.printStackTrace();
+        }
+    }*/
+
+    public int clearLocksOlderThan(int days) {
+
+        int amountDeleted = 0;
+
+        try (
+                Connection connection = getConnection();
+                PreparedStatement ps = connection.prepareStatement("SELECT ID FROM LOCK WHERE ACCESSED < ?");
+        ) {
+            ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now().minusDays(days)));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    amountDeleted++;
+                    try (
+                            PreparedStatement psLocations = connection.prepareStatement("DELETE FROM LOCK_LOCATIONS WHERE LOCK_ID = ?");
+                            PreparedStatement psAccessors = connection.prepareStatement("DELETE FROM LOCK_PLAYERS WHERE LOCK_ID = ?");
+                            PreparedStatement psLocks = connection.prepareStatement("DELETE FROM LOCK WHERE ID = ?");
+                    ) {
+                        String lockId = rs.getString(1);
+
+                        psLocations.setString(1, lockId);
+                        psAccessors.setString(1, lockId);
+                        psLocks.setString(1, lockId);
+
+                        psLocations.execute();
+                        psAccessors.execute();
+                        psLocks.execute();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            getLogger().error("Error clearLocksOlderThan: " + days);
+            e.printStackTrace();
+        }
+
+        return amountDeleted;
+
+    }
+
 }

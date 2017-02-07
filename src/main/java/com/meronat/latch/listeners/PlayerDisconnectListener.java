@@ -26,7 +26,6 @@
 package com.meronat.latch.listeners;
 
 import com.meronat.latch.Latch;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.filter.cause.Root;
@@ -36,8 +35,7 @@ public class PlayerDisconnectListener {
 
     @Listener
     public void onPlayerDisconnect(ClientConnectionEvent.Disconnect event, @Root Player player) {
-        Sponge.getScheduler().createAsyncExecutor(Latch.getPluginContainer())
-                .execute(() -> Latch.getLockManager().removeBypassing(player.getUniqueId()));
+        Latch.getLockManager().removeBypassing(player.getUniqueId());
     }
 
 }
