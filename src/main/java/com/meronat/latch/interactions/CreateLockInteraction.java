@@ -49,6 +49,7 @@ public class CreateLockInteraction implements LockInteraction {
     private final UUID player;
     private final LockType type;
     private final String password;
+    private String name;
 
     private boolean persisting = false;
 
@@ -56,6 +57,13 @@ public class CreateLockInteraction implements LockInteraction {
         this.player = player;
         this.type = type;
         this.password = password;
+    }
+
+    public CreateLockInteraction(UUID player, LockType type, String password, String name) {
+        this.player = player;
+        this.type = type;
+        this.password = password;
+        this.name = name;
     }
 
     @Override
@@ -94,7 +102,13 @@ public class CreateLockInteraction implements LockInteraction {
             return false;
         }
 
-        Lock lock = new Lock(player.getUniqueId(), this.type, lockLocations, LatchUtils.getBlockNameFromType(blockState.getState().getType()), Latch.getLockManager().getProtectFromRedstone(), LocalDateTime.now());
+        final Lock lock;
+
+        if (name != null) {
+            lock = new Lock(player.getUniqueId(), this.type, lockLocations, LatchUtils.getBlockNameFromType(blockState.getState().getType()), Latch.getLockManager().getProtectFromRedstone(), LocalDateTime.now(), name);
+        } else {
+            lock = new Lock(player.getUniqueId(), this.type, lockLocations, LatchUtils.getBlockNameFromType(blockState.getState().getType()), Latch.getLockManager().getProtectFromRedstone(), LocalDateTime.now());
+        }
 
         if (this.type.equals(LockType.PASSWORD_ALWAYS) || this.type.equals(LockType.PASSWORD_ONCE)) {
 

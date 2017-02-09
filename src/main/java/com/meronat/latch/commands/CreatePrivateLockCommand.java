@@ -41,22 +41,9 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import java.util.Optional;
+
 public class CreatePrivateLockCommand implements CommandExecutor {
-
-    private final CommandFlags.Builder flagBuilder = GenericArguments.flags();
-
-    public CommandCallable getCommand() {
-        return CommandSpec.builder()
-                .description(Text.of("Create a password lock"))
-                .extendedDescription(Text.of(" on the next block placed/clicked."))
-                .permission("latch.normal.create.private")
-                .executor(this)
-                .arguments(GenericArguments.optionalWeak(
-                        flagBuilder
-                                .permissionFlag("latch.normal.persist", "persist", "p")
-                                .buildWith(GenericArguments.none())))
-                .build();
-    }
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
@@ -65,7 +52,17 @@ public class CreatePrivateLockCommand implements CommandExecutor {
 
             Player player = (Player) src;
 
-            CreateLockInteraction privateLock = new CreateLockInteraction(player.getUniqueId(), LockType.PRIVATE, "");
+            Optional<String> optionalName = args.getOne("name");
+
+            final CreateLockInteraction privateLock;
+
+            //noinspection OptionalIsPresent
+            if (optionalName.isPresent()) {
+                privateLock = new CreateLockInteraction(player.getUniqueId(), LockType.PRIVATE, "", optionalName.get());
+            } else {
+                privateLock = new CreateLockInteraction(player.getUniqueId(), LockType.PRIVATE, "");
+            }
+
             privateLock.setPersistence(args.hasAny("p"));
 
             Latch.getLockManager().setInteractionData(player.getUniqueId(), privateLock);

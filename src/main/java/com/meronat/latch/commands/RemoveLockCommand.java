@@ -42,20 +42,6 @@ import org.spongepowered.api.text.format.TextColors;
 
 public class RemoveLockCommand implements CommandExecutor {
 
-    private final CommandFlags.Builder flagBuilder = GenericArguments.flags();
-
-    public CommandCallable getCommand() {
-        return CommandSpec.builder()
-                .description(Text.of("Remove the next lock clicked"))
-                .permission("latch.normal.remove")
-                .executor(this)
-                .arguments(GenericArguments.optionalWeak(
-                        flagBuilder
-                                .permissionFlag("latch.normal.persist", "persist", "p")
-                                .buildWith(GenericArguments.none())))
-                .build();
-    }
-
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 

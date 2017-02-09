@@ -44,15 +44,6 @@ import java.util.Optional;
 
 public class CleanCommand implements CommandExecutor {
 
-    public CommandCallable getCommand() {
-        return CommandSpec.builder()
-                .description(Text.of("Purges all locks not accessed in more than a certain amount of days"))
-                .permission("latch.admin.clean")
-                .executor(this)
-                .arguments(GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.integer(Text.of("days")))))
-                .build();
-    }
-
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 

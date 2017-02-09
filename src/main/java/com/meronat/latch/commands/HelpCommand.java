@@ -45,14 +45,6 @@ import java.util.List;
 
 public class HelpCommand implements CommandExecutor {
 
-    public CommandCallable getCommand() {
-        return CommandSpec.builder()
-                .description(Text.of("Latch help command"))
-                .permission("latch.normal.help")
-                .executor(this)
-                .build();
-    }
-
     @Override
     public CommandResult execute(@Nonnull CommandSource src, CommandContext args) throws CommandException {
 
@@ -114,8 +106,11 @@ public class HelpCommand implements CommandExecutor {
         contents.add(LatchUtils.formatHelpText("/latch purge", "Purge all of your or all of a player's locks",
                 Text.of("People with the proper permission can specify a user")));
 
-        contents.add(LatchUtils.formatHelpText("/latch bypass", "Allows admins to enter bypass mode and access other's locks.",
-                Text.of("Run again or log off to leave bypass mode.")));
+        contents.add(LatchUtils.formatHelpText("/latch bypass", "Allows admins to enter bypass mode and access other's locks",
+                Text.of("Run again or log off to leave bypass mode")));
+
+        contents.add(LatchUtils.formatHelpText("/latch clean [days]", "Deletes all locks older than the specified amount of days",
+                Text.of("Be careful as it is not possible to undo this command")));
 
         Sponge.getServiceManager().provide(PaginationService.class).get().builder()
                 .title(Text.of(TextColors.DARK_GREEN, "Latch Help"))

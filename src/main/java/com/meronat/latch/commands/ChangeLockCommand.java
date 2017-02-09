@@ -49,27 +49,6 @@ import java.util.UUID;
 
 public class ChangeLockCommand implements CommandExecutor {
 
-    private final CommandFlags.Builder flagBuilder = GenericArguments.flags();
-
-    public CommandCallable getCommand() {
-        return CommandSpec.builder()
-                .description(Text.of("Change the attributes of a lock"))
-                .permission("latch.normal.change")
-                .executor(this)
-                .arguments(GenericArguments.optionalWeak(
-                        flagBuilder
-                                .valueFlag(GenericArguments.string(Text.of("name")), "-name")
-                                .valueFlag(GenericArguments.enumValue(Text.of("type"), LockType.class), "-type")
-                                .valueFlag(GenericArguments.user(Text.of("owner")), "-owner")
-                                .valueFlag(GenericArguments.string(Text.of("password")), "-password")
-                                .valueFlag(GenericArguments.user(Text.of("add")), "-add")
-                                .valueFlag(GenericArguments.user(Text.of("remove")), "-remove")
-                                .valueFlag(GenericArguments.bool(Text.of("redstone")), "-redstone")
-                                .permissionFlag("latch.normal.persist", "persist", "p")
-                                .buildWith(GenericArguments.none())))
-                .build();
-    }
-
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 

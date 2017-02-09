@@ -41,15 +41,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import javax.annotation.Nonnull;
 
-public class InfoCommand implements CommandExecutor {
-
-    public CommandCallable getCommand() {
-        return CommandSpec.builder()
-                .description(Text.of("Latch info command"))
-                .permission("latch.normal.info")
-                .executor(this)
-                .build();
-    }
+public class LatchInfoCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(@Nonnull CommandSource src, CommandContext args) throws CommandException {

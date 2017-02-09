@@ -40,21 +40,6 @@ import org.spongepowered.api.text.format.TextColors;
 
 public class LimitsCommand implements CommandExecutor {
 
-    private final CommandFlags.Builder flagBuilder = GenericArguments.flags();
-
-    public CommandCallable getCommand() {
-        return CommandSpec.builder()
-                .description(Text.of("List all of a player's limits"))
-                .permission("latch.normal.limits")
-                .executor(this)
-                .arguments(GenericArguments.optionalWeak(
-                        flagBuilder
-                                .valueFlag(GenericArguments.enumValue(Text.of("type"), LockType.class), "-type")
-                                .buildWith(GenericArguments.none())),
-                        GenericArguments.optionalWeak(GenericArguments.user(Text.of("owner"))))
-                .build();
-    }
-
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 

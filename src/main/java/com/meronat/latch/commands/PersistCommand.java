@@ -40,14 +40,6 @@ import org.spongepowered.api.text.format.TextColors;
 
 public class PersistCommand implements CommandExecutor {
 
-    public CommandCallable getCommand() {
-        return CommandSpec.builder()
-                .description(Text.of("Persist or clear a persisted latch command"))
-                .permission("latch.normal.persist")
-                .executor(this)
-                .build();
-    }
-
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 

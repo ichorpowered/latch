@@ -43,21 +43,6 @@ import org.spongepowered.api.text.format.TextColors;
 
 public class CreateDonationLockCommand implements CommandExecutor {
 
-    private final CommandFlags.Builder flagBuilder = GenericArguments.flags();
-
-    public CommandCallable getCommand() {
-        return CommandSpec.builder()
-                .description(Text.of("Create a donation lock"))
-                .extendedDescription(Text.of(" on the next block placed/clicked."))
-                .permission("latch.normal.create.donation")
-                .executor(this)
-                .arguments(GenericArguments.optionalWeak(
-                        flagBuilder
-                                .permissionFlag("latch.normal.persist", "persist", "p")
-                                .buildWith(GenericArguments.none())))
-                .build();
-    }
-
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 

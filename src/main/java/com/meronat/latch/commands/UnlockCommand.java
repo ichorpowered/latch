@@ -44,21 +44,6 @@ import java.util.Optional;
 
 public class UnlockCommand implements CommandExecutor {
 
-    private final CommandFlags.Builder flagBuilder = GenericArguments.flags();
-
-    public CommandCallable getCommand() {
-        return CommandSpec.builder()
-                .description(Text.of("Unlock a password lock"))
-                .permission("latch.normal.unlock")
-                .executor(this)
-                .arguments(GenericArguments.optionalWeak(
-                        flagBuilder
-                                .permissionFlag("latch.normal.persist", "persist", "p")
-                                .buildWith(GenericArguments.none())),
-                        GenericArguments.optionalWeak(GenericArguments.string(Text.of("password"))))
-                .build();
-    }
-
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 

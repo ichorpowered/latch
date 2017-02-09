@@ -44,15 +44,6 @@ import java.util.Optional;
 
 public class PurgeCommand implements CommandExecutor {
 
-    public CommandCallable getCommand() {
-        return CommandSpec.builder()
-                .description(Text.of("Purge all locks of yourself or a player"))
-                .permission("latch.normal.purge")
-                .arguments(GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.user(Text.of("target")))))
-                .executor(this)
-                .build();
-    }
-
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 

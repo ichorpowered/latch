@@ -50,21 +50,6 @@ import java.util.Optional;
 
 public class ListCommand implements CommandExecutor {
 
-    private final CommandFlags.Builder flagBuilder = GenericArguments.flags();
-
-    public CommandCallable getCommand() {
-        return CommandSpec.builder()
-                .description(Text.of("List all of a player's locks"))
-                .permission("latch.normal.list")
-                .executor(this)
-                .arguments(GenericArguments.optionalWeak(
-                        flagBuilder
-                                .valueFlag(GenericArguments.enumValue(Text.of("type"), LockType.class), "-type")
-                                .buildWith(GenericArguments.none())),
-                        GenericArguments.optionalWeak(GenericArguments.user(Text.of("owner"))))
-                .build();
-    }
-
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 

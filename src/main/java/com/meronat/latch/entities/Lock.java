@@ -98,6 +98,19 @@ public class Lock {
 
     }
 
+    // TODO This is super messy. Let's switch to a builder pattern once we add the flag table.
+
+    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, boolean protectFromRedstone, LocalDateTime lastAccessed, String name) {
+        this.owner = owner;
+        this.name = name;
+        this.type = type;
+        this.lockedObjectName = lockedObjectName;
+        this.location = location;
+        this.protectFromRedstone = protectFromRedstone;
+        this.ableToAccess = new HashSet<>();
+        this.lastAccessed = lastAccessed;
+    }
+
     protected HashSet<Location<World>> getLocations() {
         return this.location;
     }
