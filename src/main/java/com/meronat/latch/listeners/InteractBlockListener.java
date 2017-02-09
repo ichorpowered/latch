@@ -28,7 +28,6 @@ package com.meronat.latch.listeners;
 import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
 import com.meronat.latch.enums.LockType;
-import com.meronat.latch.interactions.CreateLockInteraction;
 import com.meronat.latch.interactions.LockInteraction;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTypes;
@@ -82,7 +81,7 @@ public class InteractBlockListener {
         if(event instanceof InteractBlockEvent.Secondary && player.get(Keys.IS_SNEAKING).orElse(false)) {
             if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent() && player.getItemInHand(HandTypes.MAIN_HAND).get().getItem().getBlock().isPresent()) {
                 if(event.getTargetBlock().getLocation().isPresent() && event.getTargetBlock().getLocation().get().getBlockRelative(event.getTargetSide()).getBlockType() == BlockTypes.AIR) {
-                    //If they're sneaking and have an item(block) in their hand, and are clicking to replace air... let the blockplace handle it
+                    //If they're sneaking and have an item(block) in their hand, and are clicking to replace air... let the block place handle it
                     return;
                 }
             }

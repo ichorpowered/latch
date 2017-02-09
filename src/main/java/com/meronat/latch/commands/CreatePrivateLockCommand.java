@@ -28,15 +28,11 @@ package com.meronat.latch.commands;
 import com.meronat.latch.Latch;
 import com.meronat.latch.enums.LockType;
 import com.meronat.latch.interactions.CreateLockInteraction;
-import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.CommandFlags;
-import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -48,36 +44,34 @@ public class CreatePrivateLockCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        if(src instanceof Player) {
-
-            Player player = (Player) src;
-
-            Optional<String> optionalName = args.getOne("name");
-
-            final CreateLockInteraction privateLock;
-
-            //noinspection OptionalIsPresent
-            if (optionalName.isPresent()) {
-                privateLock = new CreateLockInteraction(player.getUniqueId(), LockType.PRIVATE, "", optionalName.get());
-            } else {
-                privateLock = new CreateLockInteraction(player.getUniqueId(), LockType.PRIVATE, "");
-            }
-
-            privateLock.setPersistence(args.hasAny("p"));
-
-            Latch.getLockManager().setInteractionData(player.getUniqueId(), privateLock);
-
-            if (args.hasAny("p")) {
-                player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will lock all latchable blocks you click or place until you type \"latch persist\"."));
-            } else {
-                player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will lock the next latchable block you click or place."));
-            }
-
-            return CommandResult.success();
-
+        if (!(src instanceof Player)) {
+            throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
 
-        throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
+        Player player = (Player) src;
+
+        Optional<String> optionalName = args.getOne("name");
+
+        final CreateLockInteraction privateLock;
+
+        //noinspection OptionalIsPresent
+        if (optionalName.isPresent()) {
+            privateLock = new CreateLockInteraction(player.getUniqueId(), LockType.PRIVATE, "", optionalName.get());
+        } else {
+            privateLock = new CreateLockInteraction(player.getUniqueId(), LockType.PRIVATE, "");
+        }
+
+        privateLock.setPersistence(args.hasAny("p"));
+
+        Latch.getLockManager().setInteractionData(player.getUniqueId(), privateLock);
+
+        if (args.hasAny("p")) {
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will lock all latchable blocks you click or place until you type \"latch persist\"."));
+        } else {
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will lock the next latchable block you click or place."));
+        }
+
+        return CommandResult.success();
 
     }
 

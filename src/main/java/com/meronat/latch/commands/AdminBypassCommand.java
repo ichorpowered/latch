@@ -27,13 +27,11 @@ package com.meronat.latch.commands;
 
 import com.meronat.latch.Latch;
 import com.meronat.latch.entities.LockManager;
-import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -44,9 +42,7 @@ public class AdminBypassCommand implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
         if (!(src instanceof Player)) {
-
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
-
         }
 
         Player player = (Player) src;

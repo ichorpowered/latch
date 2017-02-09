@@ -464,7 +464,7 @@ public class SqlHandler {
 
                 for (int i = 0; i <= usedNames.size(); i++) {
                     if (!usedNames.contains(lockedObjectName + i)) {
-                        //Modify lockecObjectName - limit it to the 25character max of names
+                        //Modify lockedObjectName - limit it to the 25character max of names
                         return lockedObjectName.substring(0, Math.min(25 - String.valueOf(i).length(), lockedObjectName.length())) + i;
                     }
                 }

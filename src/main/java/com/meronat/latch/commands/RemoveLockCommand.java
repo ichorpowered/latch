@@ -27,15 +27,11 @@ package com.meronat.latch.commands;
 
 import com.meronat.latch.Latch;
 import com.meronat.latch.interactions.DeleteLockInteraction;
-import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.CommandFlags;
-import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -45,26 +41,25 @@ public class RemoveLockCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        if(src instanceof Player) {
-
-            Player player = (Player) src;
-
-            DeleteLockInteraction deleteLock = new DeleteLockInteraction(player.getUniqueId());
-
-            deleteLock.setPersistence(args.hasAny("p"));
-
-            Latch.getLockManager().setInteractionData(player.getUniqueId(), deleteLock);
-
-            if (args.hasAny("p")) {
-                player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will remove all locks you click until you type /latch persist."));
-            } else {
-                player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will remove the next lock you click."));
-            }
-
-            return CommandResult.success();
+        if (!(src instanceof Player)) {
+            throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
 
-        throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
+        Player player = (Player) src;
+
+        DeleteLockInteraction deleteLock = new DeleteLockInteraction(player.getUniqueId());
+
+        deleteLock.setPersistence(args.hasAny("p"));
+
+        Latch.getLockManager().setInteractionData(player.getUniqueId(), deleteLock);
+
+        if (args.hasAny("p")) {
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will remove all locks you click until you type /latch persist."));
+        } else {
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will remove the next lock you click."));
+        }
+
+        return CommandResult.success();
 
     }
 

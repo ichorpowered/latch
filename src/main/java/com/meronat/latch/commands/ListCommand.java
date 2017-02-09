@@ -27,18 +27,13 @@ package com.meronat.latch.commands;
 
 import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
-import com.meronat.latch.enums.LockType;
 import com.meronat.latch.utils.LatchUtils;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.CommandFlags;
-import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
@@ -85,13 +80,22 @@ public class ListCommand implements CommandExecutor {
                     TextColors.WHITE, location));
         }
 
-        Sponge.getServiceManager().provide(PaginationService.class).get().builder()
-                .title(Text.of(TextColors.DARK_GREEN, displayName + " Locks"))
-                .header(Text.of(TextColors.GRAY, "There are ", TextColors.WHITE, locks.size(), TextColors.GRAY, " lock(s):"))
-                .linesPerPage(10)
-                .padding(Text.of(TextColors.GRAY, "="))
-                .contents(contents)
-                .sendTo(src);
+        Optional<PaginationService> optionalPaginationService = Sponge.getServiceManager().provide(PaginationService.class);
+
+        if (optionalPaginationService.isPresent()) {
+            optionalPaginationService.get().builder()
+                    .title(Text.of(TextColors.DARK_GREEN, displayName + " Locks"))
+                    .header(Text.of(TextColors.GRAY, "There are ", TextColors.WHITE, locks.size(), TextColors.GRAY, " lock(s):"))
+                    .linesPerPage(10)
+                    .padding(Text.of(TextColors.GRAY, "="))
+                    .contents(contents)
+                    .sendTo(src);
+        } else {
+            src.sendMessage(Text.of(TextColors.RED, "Pagination service not found, printing out list:"));
+            for (Text t : contents) {
+                src.sendMessage(t);
+            }
+        }
 
         return CommandResult.success();
     }

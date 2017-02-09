@@ -27,13 +27,11 @@ package com.meronat.latch.commands;
 
 import com.meronat.latch.Latch;
 import com.meronat.latch.interactions.LockInteraction;
-import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -43,29 +41,27 @@ public class PersistCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        if(src instanceof Player) {
-
-            Player player = (Player) src;
-
-            if(!Latch.getLockManager().hasInteractionData(player.getUniqueId())) {
-                throw new CommandException(Text.of(TextColors.RED, "You must have run a latch command to persist/clear it."));
-            }
-
-            LockInteraction interaction = Latch.getLockManager().getInteractionData(player.getUniqueId());
-            interaction.setPersistence(!interaction.shouldPersist());
-
-            if(interaction.shouldPersist()) {
-                player.sendMessage(Text.of(TextColors.DARK_GREEN, "Your latch command will now persist."));
-            } else {
-                Latch.getLockManager().removeInteractionData(((Player) src).getUniqueId());
-                player.sendMessage(Text.of(TextColors.DARK_GREEN, "Your latch command has been cleared."));
-            }
-
-            return CommandResult.success();
-
+        if (!(src instanceof Player)) {
+            throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
 
-        throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
+        Player player = (Player) src;
+
+        if(!Latch.getLockManager().hasInteractionData(player.getUniqueId())) {
+            throw new CommandException(Text.of(TextColors.RED, "You must have run a latch command to persist/clear it."));
+        }
+
+        LockInteraction interaction = Latch.getLockManager().getInteractionData(player.getUniqueId());
+        interaction.setPersistence(!interaction.shouldPersist());
+
+        if(interaction.shouldPersist()) {
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "Your latch command will now persist."));
+        } else {
+            Latch.getLockManager().removeInteractionData(player.getUniqueId());
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "Your latch command has been cleared."));
+        }
+
+        return CommandResult.success();
 
     }
 

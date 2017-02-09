@@ -78,7 +78,7 @@ public class Lock {
 
         this.name = lockName;
 
-        ableToAccess = players;
+        this.ableToAccess = players;
 
         this.protectFromRedstone = protectFromRedstone;
 

@@ -27,15 +27,11 @@ package com.meronat.latch.commands;
 
 import com.meronat.latch.Latch;
 import com.meronat.latch.interactions.UnlockLockInteraction;
-import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.CommandFlags;
-import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -47,32 +43,31 @@ public class UnlockCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        if(src instanceof Player) {
-
-            Optional<String> password = args.getOne("password");
-
-            Player player = (Player) src;
-
-            if(!password.isPresent())  {
-                throw new CommandException(Text.of(TextColors.RED, "You must specify a password to unlock locks."));
-            }
-
-            UnlockLockInteraction unlockLock = new UnlockLockInteraction(((Player) src).getUniqueId(), password.get());
-
-            unlockLock.setPersistence(args.hasAny("p"));
-
-            Latch.getLockManager().setInteractionData(player.getUniqueId(), unlockLock);
-
-            if (args.hasAny("p")) {
-                player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will unlock all locks you click until you type \"latch persist\"."));
-            } else {
-                player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will unlock the next lock you click."));
-            }
-
-            return CommandResult.success();
+        if (!(src instanceof Player)) {
+            throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
 
-        throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
+        Optional<String> password = args.getOne("password");
+
+        Player player = (Player) src;
+
+        if(!password.isPresent())  {
+            throw new CommandException(Text.of(TextColors.RED, "You must specify a password to unlock locks."));
+        }
+
+        UnlockLockInteraction unlockLock = new UnlockLockInteraction(player.getUniqueId(), password.get());
+
+        unlockLock.setPersistence(args.hasAny("p"));
+
+        Latch.getLockManager().setInteractionData(player.getUniqueId(), unlockLock);
+
+        if (args.hasAny("p")) {
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will unlock all locks you click until you type \"latch persist\"."));
+        } else {
+            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will unlock the next lock you click."));
+        }
+
+        return CommandResult.success();
 
     }
 

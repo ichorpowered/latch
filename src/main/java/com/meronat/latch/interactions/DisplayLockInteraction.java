@@ -29,13 +29,10 @@ import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
-import org.spongepowered.api.data.manipulator.mutable.DisplayNameData;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.pagination.PaginationService;
-import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -44,7 +41,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class DisplayLockInteraction implements LockInteraction {
 

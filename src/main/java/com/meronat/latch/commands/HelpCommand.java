@@ -28,13 +28,11 @@ package com.meronat.latch.commands;
 import com.meronat.latch.Latch;
 import com.meronat.latch.utils.LatchUtils;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -42,6 +40,7 @@ import org.spongepowered.api.text.format.TextColors;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class HelpCommand implements CommandExecutor {
 
@@ -112,12 +111,21 @@ public class HelpCommand implements CommandExecutor {
         contents.add(LatchUtils.formatHelpText("/latch clean [days]", "Deletes all locks older than the specified amount of days",
                 Text.of("Be careful as it is not possible to undo this command")));
 
-        Sponge.getServiceManager().provide(PaginationService.class).get().builder()
-                .title(Text.of(TextColors.DARK_GREEN, "Latch Help"))
-                .linesPerPage(15)
-                .padding(Text.of(TextColors.GRAY, "="))
-                .contents(contents)
-                .sendTo(src);
+        Optional<PaginationService> optionalPaginationService = Sponge.getServiceManager().provide(PaginationService.class);
+
+        if (optionalPaginationService.isPresent()) {
+            optionalPaginationService.get().builder()
+                    .title(Text.of(TextColors.DARK_GREEN, "Latch Help"))
+                    .linesPerPage(15)
+                    .padding(Text.of(TextColors.GRAY, "="))
+                    .contents(contents)
+                    .sendTo(src);
+        } else {
+            src.sendMessage(Text.of(TextColors.RED, "Pagination service not found, printing out help:"));
+            for (Text t : contents) {
+                src.sendMessage(t);
+            }
+        }
 
         return CommandResult.success();
 
