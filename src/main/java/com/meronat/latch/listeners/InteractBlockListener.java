@@ -45,6 +45,7 @@ import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.filter.type.Include;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
@@ -88,13 +89,13 @@ public class InteractBlockListener {
 
     @Listener
     public void onCloseInventory(InteractInventoryEvent.Close event, @Root Player player) {
-        stopThem.remove(player.getUniqueId());
+        this.stopThem.remove(player.getUniqueId());
     }
 
 
     @Listener
     public void onSpawnExp(SpawnEntityEvent event, @First Player player) {
-        if(stopThem.contains(player.getUniqueId())) {
+        if(this.stopThem.contains(player.getUniqueId())) {
             for(Entity e : event.getEntities()) {
                 if(e.getType() == EntityTypes.EXPERIENCE_ORB) {
                     event.setCancelled(true);
@@ -102,6 +103,11 @@ public class InteractBlockListener {
                 }
             }
         }
+    }
+
+    @Listener
+    public void onLeave(ClientConnectionEvent.Disconnect event, @Root Player player) {
+        this.stopThem.remove(player.getUniqueId());
     }
 
     @Listener
@@ -141,7 +147,12 @@ public class InteractBlockListener {
                         player.sendMessage(Text.of(TextColors.RED, "You cannot access this lock."));
                         event.setCancelled(true);
                     } else {
-                        if(lock.getLockType() == LockType.DONATION && !lock.canAccess(player.getUniqueId())) { stopThem.add(player.getUniqueId()); }
+                        if ((event.getTargetBlock().getState().getType().equals(BlockTypes.FURNACE)
+                                || event.getTargetBlock().getState().getType().equals(BlockTypes.LIT_FURNACE))
+                                && lock.getLockType() == LockType.DONATION
+                                && !lock.canAccess(player.getUniqueId())) {
+                            this.stopThem.add(player.getUniqueId());
+                        }
                         lock.updateLastAccessed();
                     }
                 });
