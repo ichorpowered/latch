@@ -59,7 +59,11 @@ public class CreatePrivateLockCommand implements CommandExecutor {
             if (!Latch.getLockManager().isUniqueName(player.getUniqueId(), optionalName.get())) {
                 throw new CommandException(Text.of(TextColors.RED, "You already have a lock with this name."));
             }
-            privateLock = new CreateLockInteraction(player.getUniqueId(), LockType.PRIVATE, "", optionalName.get());
+            if(optionalName.get().length() <= 25) {
+                privateLock = new CreateLockInteraction(player.getUniqueId(), LockType.PRIVATE, "", optionalName.get());
+            } else {
+                throw new CommandException(Text.of(TextColors.RED, "Lock names must be less than 25 characters long."));
+            }
         } else {
             privateLock = new CreateLockInteraction(player.getUniqueId(), LockType.PRIVATE, "");
         }
