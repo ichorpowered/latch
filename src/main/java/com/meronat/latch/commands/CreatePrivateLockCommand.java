@@ -56,6 +56,9 @@ public class CreatePrivateLockCommand implements CommandExecutor {
 
         //noinspection OptionalIsPresent
         if (optionalName.isPresent()) {
+            if (!Latch.getLockManager().isUniqueName(player.getUniqueId(), optionalName.get())) {
+                throw new CommandException(Text.of(TextColors.RED, "You already have a lock with this name."));
+            }
             privateLock = new CreateLockInteraction(player.getUniqueId(), LockType.PRIVATE, "", optionalName.get());
         } else {
             privateLock = new CreateLockInteraction(player.getUniqueId(), LockType.PRIVATE, "");

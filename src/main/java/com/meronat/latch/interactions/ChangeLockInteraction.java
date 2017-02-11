@@ -101,6 +101,14 @@ public class ChangeLockInteraction implements LockInteraction {
             return false;
         }
 
+        if(this.lockName != null) {
+            if (!Latch.getLockManager().isUniqueName(this.player, this.lockName)) {
+                player.sendMessage(Text.of(TextColors.RED, "This lock name is already taken."));
+                return false;
+            }
+            lock.setName(this.lockName);
+        }
+
         //Check to make sure, if they're assigning a new owner, the new owner is not at their limit
         if(newOwner != null || type != null) {
             if (Latch.getLockManager().isPlayerAtLockLimit(newOwner == null ? lock.getOwner() : newOwner, type == null ? lock.getLockType() : type)) {
@@ -121,9 +129,6 @@ public class ChangeLockInteraction implements LockInteraction {
 
             //If changing password, need to clear out ability to access
             Latch.getLockManager().removeAllLockAccess(lock);
-        }
-        if(this.lockName != null) {
-            lock.setName(this.lockName);
         }
         if(this.newOwner != null) {
             //If assigning to a new owner - need to validate the name
