@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.spongepowered:spongeapi:5.1.0-SNAPSHOT'
+    compile 'org.spongepowered:spongeapi:' + project.spongeVersion
 }
 
 license {
