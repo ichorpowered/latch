@@ -176,7 +176,7 @@ class Configuration {
         }
 
         if (this.rootNode.getNode("clean_old_locks_interval").isVirtual()) {
-            this.rootNode.getNode("clean_old_locks_interval").setValue(2);
+            this.rootNode.getNode("clean_old_locks_interval").setValue(4);
         }
 
         if (this.rootNode.getNode("clean_locks_older_than").isVirtual()) {
@@ -189,7 +189,7 @@ class Configuration {
         try {
             this.configManager.save(this.rootNode);
         } catch (IOException e) {
-            Latch.getLogger().error("Issues saving configuration.");
+            Latch.getLogger().error("There were issues saving the configuration.");
         }
     }
 

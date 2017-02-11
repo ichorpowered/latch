@@ -128,7 +128,7 @@ public class Latch {
                     .interval(getConfig().getNode("clean_old_locks_interval").getInt(4), TimeUnit.HOURS)
                     .execute(() -> {
                         int daysOld = getConfig().getNode("clean_locks_older_than").getInt(40);
-                        getLogger().info("Successfully deleted " + storageHandler.clearLocksOlderThan(getConfig().getNode("clean_locks_older_than").getInt(daysOld)) + " locks older than " + daysOld + " days old.");
+                        getLogger().info("Successfully deleted " + storageHandler.clearLocksOlderThan(daysOld) + " locks older than " + daysOld + " days old.");
                     })
                     .submit(getPluginContainer());
         }

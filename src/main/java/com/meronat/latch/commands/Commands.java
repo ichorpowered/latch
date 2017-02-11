@@ -228,10 +228,10 @@ public final class Commands {
         commandManager.register(plugin, CommandSpec.builder()
                 .description(Text.of("The base Latch command."))
                 .permission("latch.normal")
-                .child(privateLockCommand, "private")
-                .child(donationLockCommand, "donation")
-                .child(publicLockCommand, "public")
-                .child(passwordLockCommand, "password")
+                .child(privateLockCommand, "private", "priv")
+                .child(donationLockCommand, "donation", "donate")
+                .child(publicLockCommand, "public", "public")
+                .child(passwordLockCommand, "password", "pass")
                 .child(persistCommand, "persist", "clear", "unpersist", "stop", "cancel")
                 .child(removeLockCommand, "delete", "removelock")
                 .child(changeLockCommand, "change")
@@ -250,14 +250,14 @@ public final class Commands {
                 .build(), "latch", "lock");
 
         commandManager.register(plugin, unlockCommand, "unlock", "unlatch", "lunlock", "lopen");
-        commandManager.register(plugin, privateLockCommand, "lprivate");
+        commandManager.register(plugin, privateLockCommand, "lprivate", "lpriv");
         commandManager.register(plugin, donationLockCommand, "ldonate", "ldonation");
-        commandManager.register(plugin, passwordLockCommand, "lpassword");
-        commandManager.register(plugin, publicLockCommand, "lpublic");
+        commandManager.register(plugin, passwordLockCommand, "lpassword", "lpass");
+        commandManager.register(plugin, publicLockCommand, "lpublic", "lpub");
         commandManager.register(plugin, displayLockCommand, "linfo", "ldisplay");
         commandManager.register(plugin, listCommand, "llist");
         commandManager.register(plugin, removeLockCommand, "ldelete");
-        commandManager.register(plugin, persistCommand, "lpersist");
+        commandManager.register(plugin, persistCommand, "lpersist", "lclear");
         commandManager.register(plugin, changeLockCommand, "lmodify", "lchange");
         commandManager.register(plugin, purgeCommand, "lpurge");
         commandManager.register(plugin, limitsCommand, "llimits");
@@ -266,7 +266,7 @@ public final class Commands {
         commandManager.register(plugin, addAccessorCommand, "ladd");
         commandManager.register(plugin, removeAccessorCommand, "lremove");
         commandManager.register(plugin, helpCommand, "lhelp");
-        commandManager.register(plugin, latchInfoCommand, "llatch");
+        commandManager.register(plugin, latchInfoCommand, "llatch", "lversion");
 
     }
 

@@ -93,6 +93,9 @@ public class HelpCommand implements CommandExecutor {
         contents.add(LatchUtils.formatHelpText("/latch list", "List all of your locks",
                 Text.of("/latch list [player] to list another player's (if you have permission)")));
 
+        contents.add(LatchUtils.formatHelpText("/latch limits", "Shows how close you are to each lock limit",
+                Text.of("/latch limits [players] to list another player's (if you have permission)")));
+
         contents.add(LatchUtils.formatHelpText("/unlock [password]", "Attempt to open a lock with this password",
                 Text.of("Or use /latch open [password]")));
 
