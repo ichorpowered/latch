@@ -34,22 +34,31 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.filter.type.Include;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
+import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.UUID;
 
 public class InteractBlockListener {
+
+    //To work around Sponge issue - if the player is opening a donation chest they don't own... don't let them spawn xp (i.e. furnaces)
+    private HashSet<UUID> stopThem = new HashSet<>();
 
     @Listener
     public void onClickInventory(ClickInventoryEvent event, @First Player player) {
@@ -72,6 +81,24 @@ public class InteractBlockListener {
                 //If there's a donation lock the player CANNOT access
                 if(lock.isPresent() && lock.get().getLockType() == LockType.DONATION && !lock.get().canAccess(player.getUniqueId())) {
                     event.setCancelled(true);
+                }
+            }
+        }
+    }
+
+    @Listener
+    public void onCloseInventory(InteractInventoryEvent.Close event, @Root Player player) {
+        stopThem.remove(player.getUniqueId());
+    }
+
+
+    @Listener
+    public void onSpawnExp(SpawnEntityEvent event, @First Player player) {
+        if(stopThem.contains(player.getUniqueId())) {
+            for(Entity e : event.getEntities()) {
+                if(e.getType() == EntityTypes.EXPERIENCE_ORB) {
+                    event.setCancelled(true);
+                    return;
                 }
             }
         }
@@ -114,6 +141,7 @@ public class InteractBlockListener {
                         player.sendMessage(Text.of(TextColors.RED, "You cannot access this lock."));
                         event.setCancelled(true);
                     } else {
+                        if(lock.getLockType() == LockType.DONATION && !lock.canAccess(player.getUniqueId())) { stopThem.add(player.getUniqueId()); }
                         lock.updateLastAccessed();
                     }
                 });
