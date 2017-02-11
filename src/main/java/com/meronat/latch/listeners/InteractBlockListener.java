@@ -42,6 +42,7 @@ import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.filter.type.Include;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -59,12 +60,14 @@ public class InteractBlockListener {
         //Get the first transaction of this event
         SlotTransaction slotTransaction = event.getTransactions().get(0);
 
+        Slot slot = slotTransaction.getSlot();
+
         //If the player is interacting with a TileEntityCarrier
-        if (slotTransaction.getSlot().parent() instanceof TileEntityCarrier ) {
+        if (slot.parent() instanceof TileEntityCarrier ) {
             //If the final item is NONE (or amount is less) person is trying to withdraw (so we care about it)
             if (slotTransaction.getFinal().getType() == ItemTypes.NONE || slotTransaction.getFinal().getCount() < slotTransaction.getOriginal().getCount()) {
                 //Then check to see if there's a lock
-                Optional<Lock> lock = Latch.getLockManager().getLock(((TileEntityCarrier) slotTransaction.getSlot().parent()).getLocation());
+                Optional<Lock> lock = Latch.getLockManager().getLock(((TileEntityCarrier) slot.parent()).getLocation());
 
                 //If there's a donation lock the player CANNOT access
                 if(lock.isPresent() && lock.get().getLockType() == LockType.DONATION && !lock.get().canAccess(player.getUniqueId())) {
