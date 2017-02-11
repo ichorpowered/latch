@@ -25,6 +25,7 @@
 
 package com.meronat.latch.entities;
 
+import com.google.common.collect.ImmutableMap;
 import com.meronat.latch.Latch;
 import com.meronat.latch.enums.LockType;
 import com.meronat.latch.interactions.LockInteraction;
@@ -164,6 +165,12 @@ public class LockManager {
 
     public boolean isPlayerAtLockLimit(UUID player, LockType type) {
         return Latch.getStorageHandler().isPlayerAtLockLimit(player, type, this.lockLimits);
+    }
+
+    public ImmutableMap<String, Integer> getLimits() {
+
+        return ImmutableMap.copyOf(this.lockLimits);
+
     }
 
     public boolean getProtectFromRedstone() {

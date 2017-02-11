@@ -25,12 +25,14 @@
 
 package com.meronat.latch.commands;
 
+import com.meronat.latch.Latch;
 import com.meronat.latch.enums.LockType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.command.args.CommandFlags;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 
 public final class Commands {
@@ -163,7 +165,7 @@ public final class Commands {
                         flagBuilder
                                 .valueFlag(GenericArguments.enumValue(Text.of("type"), LockType.class), "-type")
                                 .buildWith(GenericArguments.none())),
-                        GenericArguments.optionalWeak(GenericArguments.user(Text.of("owner"))))
+                        GenericArguments.optionalWeak(GenericArguments.user(Text.of("user"))))
                 .build();
 
         final CommandSpec listCommand = CommandSpec.builder()
@@ -221,7 +223,9 @@ public final class Commands {
 
         CommandManager commandManager = Sponge.getCommandManager();
 
-        commandManager.register(this, CommandSpec.builder()
+        PluginContainer plugin = Latch.getPluginContainer();
+
+        commandManager.register(plugin, CommandSpec.builder()
                 .description(Text.of("The base Latch command."))
                 .permission("latch.normal")
                 .child(privateLockCommand, "private")
@@ -245,24 +249,24 @@ public final class Commands {
                 .executor(help)
                 .build(), "latch", "lock");
 
-        commandManager.register(this, unlockCommand, "unlock", "unlatch", "lunlock", "lopen");
-        commandManager.register(this, privateLockCommand, "lprivate");
-        commandManager.register(this, donationLockCommand, "ldonate");
-        commandManager.register(this, passwordLockCommand, "lpassword");
-        commandManager.register(this, publicLockCommand, "lpublic");
-        commandManager.register(this, displayLockCommand, "linfo", "ldisplay");
-        commandManager.register(this, listCommand, "llist");
-        commandManager.register(this, removeLockCommand, "ldelete");
-        commandManager.register(this, persistCommand, "lpersist");
-        commandManager.register(this, changeLockCommand, "lmodify", "lchange");
-        commandManager.register(this, purgeCommand, "lpurge");
-        commandManager.register(this, limitsCommand, "llimits");
-        commandManager.register(this, cleanCommand, "lclean");
-        commandManager.register(this, adminBypassCommand, "lbypass");
-        commandManager.register(this, addAccessorCommand, "ladd");
-        commandManager.register(this, removeAccessorCommand, "lremove");
-        commandManager.register(this, helpCommand, "lhelp");
-        commandManager.register(this, latchInfoCommand, "llatch");
+        commandManager.register(plugin, unlockCommand, "unlock", "unlatch", "lunlock", "lopen");
+        commandManager.register(plugin, privateLockCommand, "lprivate");
+        commandManager.register(plugin, donationLockCommand, "ldonate", "ldonation");
+        commandManager.register(plugin, passwordLockCommand, "lpassword");
+        commandManager.register(plugin, publicLockCommand, "lpublic");
+        commandManager.register(plugin, displayLockCommand, "linfo", "ldisplay");
+        commandManager.register(plugin, listCommand, "llist");
+        commandManager.register(plugin, removeLockCommand, "ldelete");
+        commandManager.register(plugin, persistCommand, "lpersist");
+        commandManager.register(plugin, changeLockCommand, "lmodify", "lchange");
+        commandManager.register(plugin, purgeCommand, "lpurge");
+        commandManager.register(plugin, limitsCommand, "llimits");
+        commandManager.register(plugin, cleanCommand, "lclean");
+        commandManager.register(plugin, adminBypassCommand, "lbypass", "lby");
+        commandManager.register(plugin, addAccessorCommand, "ladd");
+        commandManager.register(plugin, removeAccessorCommand, "lremove");
+        commandManager.register(plugin, helpCommand, "lhelp");
+        commandManager.register(plugin, latchInfoCommand, "llatch");
 
     }
 

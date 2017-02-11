@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -671,6 +672,32 @@ public class SqlHandler {
         }
 
         return amountDeleted;
+
+    }
+
+    public Map<String, Integer> getLimits(UUID uuid) {
+
+        Map<String, Integer> limits = new HashMap<>();
+
+        try (
+                Connection connection = getConnection();
+                PreparedStatement ps = connection.prepareStatement(
+                        "SELECT COUNT(*) as TOTAL, LOCK.LOCK_TYPE as LOCKTYPE FROM LOCK WHERE LOCK.OWNER_UUID = ? GROUP BY LOCK.LOCK_TYPE");
+        ) {
+            ps.setString(1, uuid.toString());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    limits.put(rs.getString("LOCKTYPE").toLowerCase(), rs.getInt("TOTAL"));
+                }
+            }
+
+        } catch (SQLException e) {
+            getLogger().error("Error isPlayerAtLockLimit: " + uuid.toString());
+            e.printStackTrace();
+        }
+
+        return limits;
 
     }
 

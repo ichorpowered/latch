@@ -48,8 +48,6 @@ public class ListCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        List<Text> contents = new ArrayList<>();
-
         Optional<User> optionalUser = args.getOne("owner");
 
         User user;
@@ -67,37 +65,48 @@ public class ListCommand implements CommandExecutor {
             throw new CommandException(Text.of(TextColors.RED, "Only users can use this command without specifying a player."));
         }
 
-        String displayName = src.getName().equalsIgnoreCase(user.getName()) ? "Your" : user.getName()+"'s";
+        Sponge.getScheduler().createAsyncExecutor(Latch.getPluginContainer()).execute(() -> {
 
-        List<Lock> locks = Latch.getLockManager().getPlayersLocks(user.getUniqueId());
+            List<Text> contents = new ArrayList<>();
 
-        for(Lock lock : locks) {
-            String location = lock.getFirstLocation().isPresent() ? LatchUtils.getLocationString(lock.getFirstLocation().get()) : "N/A";
-            contents.add(Text.of("  ",lock.getName(),
-                    TextColors.GRAY,", type: ",
-                    TextColors.WHITE,lock.getLockType(),
-                    TextColors.GRAY,", location: ",
-                    TextColors.WHITE, location));
-        }
+            String displayName = src.getName().equalsIgnoreCase(user.getName()) ? "Your" : user.getName()+"'s";
 
-        Optional<PaginationService> optionalPaginationService = Sponge.getServiceManager().provide(PaginationService.class);
+            List<Lock> locks = Latch.getLockManager().getPlayersLocks(user.getUniqueId());
 
-        if (optionalPaginationService.isPresent()) {
-            optionalPaginationService.get().builder()
-                    .title(Text.of(TextColors.DARK_GREEN, displayName + " Locks"))
-                    .header(Text.of(TextColors.GRAY, "There are ", TextColors.WHITE, locks.size(), TextColors.GRAY, " lock(s):"))
-                    .linesPerPage(10)
-                    .padding(Text.of(TextColors.GRAY, "="))
-                    .contents(contents)
-                    .sendTo(src);
-        } else {
-            src.sendMessage(Text.of(TextColors.RED, "Pagination service not found, printing out list:"));
-            for (Text t : contents) {
-                src.sendMessage(t);
+            for(Lock lock : locks) {
+                String location = lock.getFirstLocation().isPresent() ? LatchUtils.getLocationString(lock.getFirstLocation().get()) : "N/A";
+                contents.add(Text.of("  ",lock.getName(),
+                        TextColors.GRAY,", type: ",
+                        TextColors.WHITE,lock.getLockType(),
+                        TextColors.GRAY,", location: ",
+                        TextColors.WHITE, location));
             }
-        }
+
+            Sponge.getScheduler().createSyncExecutor(Latch.getPluginContainer()).execute(() -> {
+
+                Optional<PaginationService> optionalPaginationService = Sponge.getServiceManager().provide(PaginationService.class);
+
+                if (optionalPaginationService.isPresent()) {
+                    optionalPaginationService.get().builder()
+                            .title(Text.of(TextColors.DARK_GREEN, displayName + " Locks"))
+                            .header(Text.of(TextColors.GRAY, "There are ", TextColors.WHITE, locks.size(), TextColors.GRAY, " lock(s):"))
+                            .linesPerPage(10)
+                            .padding(Text.of(TextColors.GRAY, "="))
+                            .contents(contents)
+                            .sendTo(src);
+                } else {
+                    src.sendMessage(Text.of(TextColors.RED, "Pagination service not found, printing out list:"));
+                    for (Text t : contents) {
+                        src.sendMessage(t);
+                    }
+                }
+
+            });
+
+        });
 
         return CommandResult.success();
+
     }
 
 }
