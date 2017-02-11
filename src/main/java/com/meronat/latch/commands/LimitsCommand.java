@@ -64,7 +64,6 @@ public class LimitsCommand implements CommandExecutor {
         }
 
         Sponge.getScheduler().createAsyncExecutor(Latch.getPluginContainer()).execute(() -> {
-
             List<Text> contents = new ArrayList<>();
 
             String displayName = src.getName().equalsIgnoreCase(user.getName()) ? "Your" : user.getName()+"'s";
@@ -76,21 +75,16 @@ public class LimitsCommand implements CommandExecutor {
             Map<String, Integer> amounts = Latch.getStorageHandler().getLimits(user.getUniqueId());
 
             for (Map.Entry<String, Integer> e : limits.entrySet()) {
-
                 if (!e.getKey().equalsIgnoreCase("total")) {
-
                     contents.add(Text.of(TextColors.GOLD, e.getKey().toLowerCase() + ": ", TextColors.GRAY, amounts.getOrDefault(e.getKey(), 0) + "/" + e.getValue()));
 
                     total += amounts.getOrDefault(e.getKey(), 0);
-
                 }
-
             }
 
             contents.add(Text.of(TextColors.GOLD, "total: ", TextColors.GRAY, total + "/" + limits.get("total")));
 
             Sponge.getScheduler().createSyncExecutor(Latch.getPluginContainer()).execute(() -> {
-
                 Optional<PaginationService> optionalPaginationService = Sponge.getServiceManager().provide(PaginationService.class);
 
                 if (optionalPaginationService.isPresent()) {
@@ -106,9 +100,7 @@ public class LimitsCommand implements CommandExecutor {
                         src.sendMessage(t);
                     }
                 }
-
             });
-
         });
 
         return CommandResult.success();

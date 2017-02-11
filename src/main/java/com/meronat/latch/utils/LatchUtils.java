@@ -59,7 +59,7 @@ public class LatchUtils {
             ImmutableList.of(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
 
     public static String getBlockNameFromType(BlockType type) {
-        if(type.getName().lastIndexOf(':')+1 <= type.getName().length()) {
+        if (type.getName().lastIndexOf(':')+1 <= type.getName().length()) {
             return type.getName().substring(type.getName().lastIndexOf(':') + 1);
         }
         return type.getName();
@@ -70,8 +70,8 @@ public class LatchUtils {
 
         LockManager lockManager = Latch.getLockManager();
 
-        for( Direction d : adjacentDirections) {
-            if(lockManager.isLockableBlock(location.getBlockRelative(d).getBlock().getType())) {
+        for (Direction d : adjacentDirections) {
+            if (lockManager.isLockableBlock(location.getBlockRelative(d).getBlock().getType())) {
                 lockManager.getLock(location.getBlockRelative(d)).ifPresent(lockList::add);
             }
         }
@@ -126,17 +126,17 @@ public class LatchUtils {
         return Latch.getStorageHandler().getRandomLockName(owner, lockedObjectName);
     }
 
-    public static String getLocationString(Location<World> worldLocation) {
-        return "("+worldLocation.getBlockX()+","+worldLocation.getBlockY()+","+worldLocation.getBlockZ()+")";
+    public static String getLocationString(Location<World> location) {
+        return "(" + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ()+ ")";
     }
 
     public static Text formatHelpText(String command, String description, Text extendedDescription) {
-        return Text.of(Text.builder(command)
+        return Text.builder(command)
                 .color(TextColors.GOLD)
                 .onClick(TextActions.suggestCommand(command))
                 .onHover(TextActions.showText(extendedDescription))
-                .build(),Text.of(TextColors.GRAY, " - ", description));
-
+                .append(Text.of(TextColors.GRAY, " - ", description))
+                .build();
     }
 
 }

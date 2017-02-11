@@ -66,7 +66,6 @@ public class ListCommand implements CommandExecutor {
         }
 
         Sponge.getScheduler().createAsyncExecutor(Latch.getPluginContainer()).execute(() -> {
-
             List<Text> contents = new ArrayList<>();
 
             String displayName = src.getName().equalsIgnoreCase(user.getName()) ? "Your" : user.getName()+"'s";
@@ -83,7 +82,6 @@ public class ListCommand implements CommandExecutor {
             }
 
             Sponge.getScheduler().createSyncExecutor(Latch.getPluginContainer()).execute(() -> {
-
                 Optional<PaginationService> optionalPaginationService = Sponge.getServiceManager().provide(PaginationService.class);
 
                 if (optionalPaginationService.isPresent()) {
@@ -100,9 +98,7 @@ public class ListCommand implements CommandExecutor {
                         src.sendMessage(t);
                     }
                 }
-
             });
-
         });
 
         return CommandResult.success();

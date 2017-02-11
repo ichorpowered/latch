@@ -691,7 +691,6 @@ public class SqlHandler {
                     limits.put(rs.getString("LOCKTYPE").toLowerCase(), rs.getInt("TOTAL"));
                 }
             }
-
         } catch (SQLException e) {
             getLogger().error("Error isPlayerAtLockLimit: " + uuid.toString());
             e.printStackTrace();

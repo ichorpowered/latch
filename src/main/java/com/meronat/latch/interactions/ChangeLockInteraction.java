@@ -54,7 +54,6 @@ public class ChangeLockInteraction implements LockInteraction {
     private boolean persisting = false;
     private Boolean protectFromRedstone;
 
-
     public ChangeLockInteraction(UUID player) {
         this.player = player;
     }
@@ -84,8 +83,6 @@ public class ChangeLockInteraction implements LockInteraction {
     }
 
     public void setProtectFromRedstone(Boolean protectFromRedstone) { this.protectFromRedstone = protectFromRedstone; }
-
-
 
     @Override
     public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockState) {

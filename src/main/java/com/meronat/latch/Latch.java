@@ -121,7 +121,6 @@ public class Latch {
     }
 
     private void registerTasks() {
-
         if (getConfig().getNode("clean_old_locks").getBoolean(false)) {
             Task.builder()
                     .name("clean-old-locks")
@@ -133,7 +132,6 @@ public class Latch {
                     })
                     .submit(getPluginContainer());
         }
-
     }
 
     private void registerListeners() {

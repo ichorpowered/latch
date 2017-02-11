@@ -44,16 +44,16 @@ import java.util.UUID;
 
 public class LockManager {
 
+    private HashMap<String, Integer> lockLimits = new HashMap<>();
+    private HashMap<UUID, LockInteraction> interactionData = new HashMap<>();
+
     private Set<UUID> bypassing = new HashSet<>();
 
     private List<String> lockableBlocks = new ArrayList<>();
     private List<String> restrictedBlocks = new ArrayList<>();
     private List<String> protectBelowBlocks = new ArrayList<>();
-    private HashMap<String, Integer> lockLimits = new HashMap<>();
 
     private boolean protectFromRedstone = false;
-
-    private HashMap<UUID, LockInteraction> interactionData = new HashMap<>();
 
     public Optional<Lock> getLock(Location location) {
         return Latch.getStorageHandler().getLockByLocation(location);
@@ -168,9 +168,7 @@ public class LockManager {
     }
 
     public ImmutableMap<String, Integer> getLimits() {
-
         return ImmutableMap.copyOf(this.lockLimits);
-
     }
 
     public boolean getProtectFromRedstone() {
@@ -182,21 +180,15 @@ public class LockManager {
     }
 
     public boolean isBypassing(UUID uuid) {
-
         return this.bypassing.contains(uuid);
-
     }
 
     public void setBypassing(UUID uuid) {
-
         this.bypassing.add(uuid);
-
     }
 
     public void removeBypassing(UUID uuid) {
-
         this.bypassing.remove(uuid);
-
     }
 
 }

@@ -44,19 +44,16 @@ import java.util.UUID;
 
 public class Lock {
 
-    private UUID owner;
-
-    private String name;
-
-    private LockType type;
-
     private HashSet<Location<World>> location = new HashSet<>();
+    private HashSet<UUID> ableToAccess = new HashSet<>();
 
+    private UUID owner;
+    private String name;
+    private LockType type;
     private String lockedObjectName;
 
     private byte[] salt = new byte[8];
     private String password = "";
-    private HashSet<UUID> ableToAccess;
     private boolean protectFromRedstone;
 
     private LocalDateTime lastAccessed;
@@ -66,36 +63,26 @@ public class Lock {
     }
 
     public Lock(UUID owner, String lockName, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password, HashSet<UUID> players, boolean protectFromRedstone, LocalDateTime lastAccessed) {
-
         this.owner = owner;
         this.type = type;
         this.lockedObjectName = lockedObjectName;
-
         this.salt = salt;
         this.password = password;
-
         this.location = location;
-
         this.name = lockName;
-
         this.ableToAccess = players;
-
         this.protectFromRedstone = protectFromRedstone;
-
         this.lastAccessed = lastAccessed;
     }
 
     public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, boolean protectFromRedstone, LocalDateTime lastAccessed) {
-
         this.owner = owner;
         this.name = LatchUtils.getRandomLockName(owner, lockedObjectName);
         this.type = type;
         this.lockedObjectName = lockedObjectName;
         this.location = location;
         this.protectFromRedstone = protectFromRedstone;
-        this.ableToAccess = new HashSet<>();
         this.lastAccessed = lastAccessed;
-
     }
 
     // TODO This is super messy. Let's switch to a builder pattern once we add the flag table.
