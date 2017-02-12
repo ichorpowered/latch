@@ -68,16 +68,14 @@ public class ListCommand implements CommandExecutor {
         Sponge.getScheduler().createAsyncExecutor(Latch.getPluginContainer()).execute(() -> {
             List<Text> contents = new ArrayList<>();
 
-            String displayName = src.getName().equalsIgnoreCase(user.getName()) ? "Your" : user.getName()+"'s";
+            String displayName = src.getName().equalsIgnoreCase(user.getName()) ? "Your" : user.getName() + "'s";
 
             List<Lock> locks = Latch.getLockManager().getPlayersLocks(user.getUniqueId());
 
-            for(Lock lock : locks) {
+            for (Lock lock : locks) {
                 String location = lock.getFirstLocation().isPresent() ? LatchUtils.getLocationString(lock.getFirstLocation().get()) : "N/A";
-                contents.add(Text.of("  ",lock.getName(),
-                        TextColors.GRAY,", type: ",
-                        TextColors.WHITE,lock.getLockType(),
-                        TextColors.GRAY,", location: ",
+                contents.add(
+                    Text.of("  ", lock.getName(), TextColors.GRAY, ", type: ", TextColors.WHITE, lock.getLockType(), TextColors.GRAY, ", location: ",
                         TextColors.WHITE, location));
             }
 
@@ -85,13 +83,9 @@ public class ListCommand implements CommandExecutor {
                 Optional<PaginationService> optionalPaginationService = Sponge.getServiceManager().provide(PaginationService.class);
 
                 if (optionalPaginationService.isPresent()) {
-                    optionalPaginationService.get().builder()
-                            .title(Text.of(TextColors.DARK_GREEN, displayName + " Locks"))
-                            .header(Text.of(TextColors.GRAY, "There are ", TextColors.WHITE, locks.size(), TextColors.GRAY, " lock(s):"))
-                            .linesPerPage(10)
-                            .padding(Text.of(TextColors.GRAY, "="))
-                            .contents(contents)
-                            .sendTo(src);
+                    optionalPaginationService.get().builder().title(Text.of(TextColors.DARK_GREEN, displayName + " Locks"))
+                        .header(Text.of(TextColors.GRAY, "There are ", TextColors.WHITE, locks.size(), TextColors.GRAY, " lock(s):")).linesPerPage(10)
+                        .padding(Text.of(TextColors.GRAY, "=")).contents(contents).sendTo(src);
                 } else {
                     src.sendMessage(Text.of(TextColors.RED, "Pagination service not found, printing out list:"));
                     for (Text t : contents) {

@@ -73,13 +73,15 @@ public class ChangeBlockListener {
         for (Transaction<BlockSnapshot> bs : event.getTransactions()) {
             if (bs.isValid() && bs.getFinal().getLocation().isPresent()) {
                 //If the block is a restricted block, make sure it's not being placed near a lock
-                if( Latch.getLockManager().isRestrictedBlock(bs.getFinal().getState().getType())) {
-                    for(Lock lock : LatchUtils.getAdjacentLocks(bs.getFinal().getLocation().get())) {
+                if (Latch.getLockManager().isRestrictedBlock(bs.getFinal().getState().getType())) {
+                    for (Lock lock : LatchUtils.getAdjacentLocks(bs.getFinal().getLocation().get())) {
                         //If there is a player and they aren't the owner, OR there's no player, invalidate
-                        if( (!optionalPlayer.isPresent() || (optionalPlayer.isPresent() && !lock.isOwnerOrBypassing(optionalPlayer.get().getUniqueId()))) ) {
+                        if ((!optionalPlayer.isPresent() || (optionalPlayer.isPresent() && !lock
+                            .isOwnerOrBypassing(optionalPlayer.get().getUniqueId())))) {
                             bs.setValid(false);
                             event.setCancelled(true);
-                            optionalPlayer.ifPresent(p -> p.sendMessage(Text.of(TextColors.RED, "You can't place that type of block near a lock you don't own.")));
+                            optionalPlayer.ifPresent(
+                                p -> p.sendMessage(Text.of(TextColors.RED, "You can't place that type of block near a lock you don't own.")));
                         }
                     }
                 }
@@ -90,21 +92,22 @@ public class ChangeBlockListener {
                     Optional<Lock> otherBlockLock = Optional.empty();
 
                     //If the block has another block that needs to be unlocked
-                    if(optionalOtherBlock.isPresent()) {
+                    if (optionalOtherBlock.isPresent()) {
                         otherBlockLock = Latch.getLockManager().getLock(optionalOtherBlock.get());
                     }
-                    if(otherBlockLock.isPresent()) {
-                        if(optionalPlayer.isPresent() && otherBlockLock.get().isOwnerOrBypassing(optionalPlayer.get().getUniqueId())) {
+                    if (otherBlockLock.isPresent()) {
+                        if (optionalPlayer.isPresent() && otherBlockLock.get().isOwnerOrBypassing(optionalPlayer.get().getUniqueId())) {
                             Latch.getLockManager().addLockLocation(otherBlockLock.get(), bs.getFinal().getLocation().get());
                             if (!interactionSuccessful) {
-                                optionalPlayer.get().sendMessage(ChatTypes.ACTION_BAR, Text.of(TextColors.DARK_GREEN,
-                                        "You have expanded your " + otherBlockLock.get().getName() + " lock."));
+                                optionalPlayer.get().sendMessage(ChatTypes.ACTION_BAR,
+                                    Text.of(TextColors.DARK_GREEN, "You have expanded your " + otherBlockLock.get().getName() + " lock."));
                             }
                             continue; //break to allow expanding locks while having a command persisted
                         } else {
                             bs.setValid(false);
                             event.setCancelled(true);
-                            optionalPlayer.ifPresent(p -> p.sendMessage(Text.of(TextColors.RED, "You can't place that type of block near a lock you don't own.")));
+                            optionalPlayer.ifPresent(
+                                p -> p.sendMessage(Text.of(TextColors.RED, "You can't place that type of block near a lock you don't own.")));
                             continue;
                         }
                     }
@@ -153,7 +156,7 @@ public class ChangeBlockListener {
                         if (bs.isValid() && bs.getFinal().getLocation().isPresent() && isSolidBlock(bs.getFinal().getState())) {
 
                             boolean result = new CreateLockInteraction(player.getUniqueId(), LockType.PRIVATE, "")
-                                    .handleInteraction(player, bs.getFinal().getLocation().get(), bs.getFinal());
+                                .handleInteraction(player, bs.getFinal().getLocation().get(), bs.getFinal());
 
                             bs.setValid(result);
 
@@ -178,13 +181,15 @@ public class ChangeBlockListener {
     public void onPreBlockChange(ChangeBlockEvent.Pre event, @First LocatableBlock block) {
         BlockType type = block.getBlockState().getType();
 
-        if (type.equals(BlockTypes.PISTON) || type.equals(BlockTypes.STICKY_PISTON) || type.equals(BlockTypes.PISTON_EXTENSION) || type.equals(BlockTypes.PISTON_HEAD)) {
+        if (type.equals(BlockTypes.PISTON) || type.equals(BlockTypes.STICKY_PISTON) || type.equals(BlockTypes.PISTON_EXTENSION) || type
+            .equals(BlockTypes.PISTON_HEAD)) {
             //noinspection OptionalGetWithoutIsPresent
             Location<World> location = block.getLocation().getBlockRelative(block.get(Keys.DIRECTION).get());
 
             LockManager lockManager = Latch.getLockManager();
 
-            if (lockManager.getLock(location).isPresent() || (lockManager.getLock(location.getBlockRelative(Direction.UP)).isPresent() && lockManager.isProtectBelowBlocks(location.getBlockRelative(Direction.UP).getBlockType()))) {
+            if (lockManager.getLock(location).isPresent() || (lockManager.getLock(location.getBlockRelative(Direction.UP)).isPresent() && lockManager
+                .isProtectBelowBlocks(location.getBlockRelative(Direction.UP).getBlockType()))) {
                 event.setCancelled(true);
             }
         }
@@ -207,7 +212,8 @@ public class ChangeBlockListener {
                 //Potentially Sponge issue - should be able to detect these blocks
                 Optional<Lock> aboveLock = lockManager.getLock(location.getBlockRelative(Direction.UP));
 
-                if (aboveLock.isPresent() && lockManager.isProtectBelowBlocks(location.getBlockRelative(Direction.UP).getBlockType()) && !aboveLock.get().isOwnerOrBypassing(player.getUniqueId())) {
+                if (aboveLock.isPresent() && lockManager.isProtectBelowBlocks(location.getBlockRelative(Direction.UP).getBlockType()) && !aboveLock
+                    .get().isOwnerOrBypassing(player.getUniqueId())) {
                     player.sendMessage(Text.of(TextColors.RED, "You cannot destroy a block which is depended on by a lock that's not yours."));
                     bs.setValid(false);
                     continue;
@@ -217,15 +223,16 @@ public class ChangeBlockListener {
                     Lock lock = optionalLock.get();
 
                     //Check to make sure they're the owner
-                    if(!lock.isOwnerOrBypassing(player.getUniqueId())) {
+                    if (!lock.isOwnerOrBypassing(player.getUniqueId())) {
                         bs.setValid(false);
                         player.sendMessage(Text.of(TextColors.RED, "You cannot destroy a lock you are not the owner of."));
                         return;
                     }
 
-                    if(!locksDeleted.contains(lock.getName())) {
-                        player.sendMessage(Text.of(TextColors.DARK_GREEN, "You have destroyed this ", TextColors.GRAY,
-                                lock.getLockedObject(), TextColors.DARK_GREEN, " lock."));
+                    if (!locksDeleted.contains(lock.getName())) {
+                        player.sendMessage(
+                            Text.of(TextColors.DARK_GREEN, "You have destroyed this ", TextColors.GRAY, lock.getLockedObject(), TextColors.DARK_GREEN,
+                                " lock."));
                         locksDeleted.add(lock.getName());
                     }
 
@@ -237,7 +244,7 @@ public class ChangeBlockListener {
 
     @Listener
     public void onBlockBrokenByExplosion(ExplosionEvent.Post event) {
-        if(Latch.getConfig().getNode("protect_from_explosives").getBoolean(true)) {
+        if (Latch.getConfig().getNode("protect_from_explosives").getBoolean(true)) {
             //If we're supposed to protect from explosions, invalidate the transaction
             LockManager lockManager = Latch.getLockManager();
             for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
@@ -254,9 +261,9 @@ public class ChangeBlockListener {
             }
         } else {
             //Otherwise we should delete the locks destroyed by the explosion
-            for( Transaction<BlockSnapshot> bs : event.getTransactions()) {
+            for (Transaction<BlockSnapshot> bs : event.getTransactions()) {
                 if (bs.isValid() && bs.getOriginal().getLocation().isPresent()) {
-                    if(Latch.getLockManager().getLock(bs.getOriginal().getLocation().get()).isPresent()) {
+                    if (Latch.getLockManager().getLock(bs.getOriginal().getLocation().get()).isPresent()) {
                         Latch.getLockManager().deleteLock(bs.getOriginal().getLocation().get(), false);
                     }
                 }

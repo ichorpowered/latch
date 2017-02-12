@@ -79,8 +79,9 @@ public class PurgeCommand implements CommandExecutor {
         if (self) {
             src.sendMessage(Text.of(TextColors.DARK_RED, "Are you sure you want to delete all of your locks? ").concat(yes).concat(no));
         } else {
-            src.sendMessage(Text.of(TextColors.DARK_RED, "Are you sure you want to delete all of ", TextColors.GRAY,
-                    user.getName() +"'s", TextColors.DARK_RED, " locks?").concat(yes).concat(no));
+            src.sendMessage(
+                Text.of(TextColors.DARK_RED, "Are you sure you want to delete all of ", TextColors.GRAY, user.getName() + "'s", TextColors.DARK_RED,
+                    " locks?").concat(yes).concat(no));
         }
 
         return CommandResult.success();
@@ -93,8 +94,8 @@ public class PurgeCommand implements CommandExecutor {
         if (self) {
             src.sendMessage(Text.of(TextColors.DARK_GREEN, "All of your locks have been deleted."));
         } else {
-            src.sendMessage(Text.of(TextColors.DARK_GREEN, "All of ", TextColors.GRAY,
-                    user.getName() + "'s", TextColors.DARK_GREEN, " locks have been purged."));
+            src.sendMessage(
+                Text.of(TextColors.DARK_GREEN, "All of ", TextColors.GRAY, user.getName() + "'s", TextColors.DARK_GREEN, " locks have been purged."));
             user.getPlayer().ifPresent(p -> p.sendMessage(Text.of(TextColors.RED, "All of your locks have been deleted by a staff member.")));
         }
     }
@@ -103,8 +104,9 @@ public class PurgeCommand implements CommandExecutor {
         if (self) {
             src.sendMessage(Text.of(TextColors.DARK_GREEN, "You have cancelled the deletion of all of your locks."));
         } else {
-            src.sendMessage(Text.of(TextColors.DARK_GREEN, "You have cancelled the deletion of ", TextColors.GRAY,
-                    user.getName() + "'s", TextColors.DARK_GREEN, " locks."));
+            src.sendMessage(
+                Text.of(TextColors.DARK_GREEN, "You have cancelled the deletion of ", TextColors.GRAY, user.getName() + "'s", TextColors.DARK_GREEN,
+                    " locks."));
         }
     }
 

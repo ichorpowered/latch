@@ -73,14 +73,15 @@ public class InteractBlockListener {
         Slot slot = slotTransaction.getSlot();
 
         //If the player is interacting with a TileEntityCarrier
-        if (slot.parent() instanceof TileEntityCarrier ) {
+        if (slot.parent() instanceof TileEntityCarrier) {
             //If the final item is NONE (or amount is less) person is trying to withdraw (so we care about it)
-            if (slotTransaction.getFinal().getType() == ItemTypes.NONE || slotTransaction.getFinal().getCount() < slotTransaction.getOriginal().getCount()) {
+            if (slotTransaction.getFinal().getType() == ItemTypes.NONE || slotTransaction.getFinal().getCount() < slotTransaction.getOriginal()
+                .getCount()) {
                 //Then check to see if there's a lock
                 Optional<Lock> lock = Latch.getLockManager().getLock(((TileEntityCarrier) slot.parent()).getLocation());
 
                 //If there's a donation lock the player CANNOT access
-                if(lock.isPresent() && lock.get().getLockType() == LockType.DONATION && !lock.get().canAccess(player.getUniqueId())) {
+                if (lock.isPresent() && lock.get().getLockType() == LockType.DONATION && !lock.get().canAccess(player.getUniqueId())) {
                     event.setCancelled(true);
                 }
             }
@@ -95,9 +96,9 @@ public class InteractBlockListener {
 
     @Listener
     public void onSpawnExp(SpawnEntityEvent event, @First Player player) {
-        if(this.stopThem.contains(player.getUniqueId())) {
-            for(Entity e : event.getEntities()) {
-                if(e.getType() == EntityTypes.EXPERIENCE_ORB) {
+        if (this.stopThem.contains(player.getUniqueId())) {
+            for (Entity e : event.getEntities()) {
+                if (e.getType() == EntityTypes.EXPERIENCE_ORB) {
                     event.setCancelled(true);
                     return;
                 }
@@ -111,12 +112,14 @@ public class InteractBlockListener {
     }
 
     @Listener
-    @Include( {InteractBlockEvent.Primary.class, InteractBlockEvent.Secondary.class})
+    @Include({InteractBlockEvent.Primary.class, InteractBlockEvent.Secondary.class})
     public void onPlayerClick(InteractBlockEvent event, @Root Player player) {
         //Special code to handle shift secondary clicking (placing a block)
-        if(event instanceof InteractBlockEvent.Secondary && player.get(Keys.IS_SNEAKING).orElse(false)) {
-            if(player.getItemInHand(HandTypes.MAIN_HAND).isPresent() && player.getItemInHand(HandTypes.MAIN_HAND).get().getItem().getBlock().isPresent()) {
-                if(event.getTargetBlock().getLocation().isPresent() && event.getTargetBlock().getLocation().get().getBlockRelative(event.getTargetSide()).getBlockType() == BlockTypes.AIR) {
+        if (event instanceof InteractBlockEvent.Secondary && player.get(Keys.IS_SNEAKING).orElse(false)) {
+            if (player.getItemInHand(HandTypes.MAIN_HAND).isPresent() && player.getItemInHand(HandTypes.MAIN_HAND).get().getItem().getBlock()
+                .isPresent()) {
+                if (event.getTargetBlock().getLocation().isPresent()
+                    && event.getTargetBlock().getLocation().get().getBlockRelative(event.getTargetSide()).getBlockType() == BlockTypes.AIR) {
                     //If they're sneaking and have an item(block) in their hand, and are clicking to replace air... let the block place handle it
                     return;
                 }
@@ -124,33 +127,32 @@ public class InteractBlockListener {
         }
 
         //Ignore air and invalid locations, and non-lockable blocks
-        if(event.getTargetBlock().equals(BlockSnapshot.NONE) || !(event.getTargetBlock().getLocation().isPresent()) || !Latch.getLockManager().isLockableBlock(event.getTargetBlock().getState().getType())) {
+        if (event.getTargetBlock().equals(BlockSnapshot.NONE) || !(event.getTargetBlock().getLocation().isPresent()) || !Latch.getLockManager()
+            .isLockableBlock(event.getTargetBlock().getState().getType())) {
             return;
         }
 
         //If they have an interaction, handle the interaction
-        if(Latch.getLockManager().hasInteractionData(player.getUniqueId())) {
+        if (Latch.getLockManager().hasInteractionData(player.getUniqueId())) {
             LockInteraction lockInteraction = Latch.getLockManager().getInteractionData(player.getUniqueId());
 
             lockInteraction.handleInteraction(player, event.getTargetBlock().getLocation().get(), event.getTargetBlock());
 
             event.setCancelled(true);
 
-            if(!lockInteraction.shouldPersist()) {
+            if (!lockInteraction.shouldPersist()) {
                 Latch.getLockManager().removeInteractionData(player.getUniqueId());
             }
         } else {
             //Otherwise we only care if it's a lock
-            if(Latch.getLockManager().isLockableBlock(event.getTargetBlock().getState().getType())) {
+            if (Latch.getLockManager().isLockableBlock(event.getTargetBlock().getState().getType())) {
                 Latch.getLockManager().getLock(event.getTargetBlock().getLocation().get()).ifPresent(lock -> {
                     if (lock.getLockType() != LockType.DONATION && !lock.canAccess(player.getUniqueId())) {
                         player.sendMessage(Text.of(TextColors.RED, "You cannot access this lock."));
                         event.setCancelled(true);
                     } else {
-                        if ((event.getTargetBlock().getState().getType().equals(BlockTypes.FURNACE)
-                                || event.getTargetBlock().getState().getType().equals(BlockTypes.LIT_FURNACE))
-                                && lock.getLockType() == LockType.DONATION
-                                && !lock.canAccess(player.getUniqueId())) {
+                        if ((event.getTargetBlock().getState().getType().equals(BlockTypes.FURNACE) || event.getTargetBlock().getState().getType()
+                            .equals(BlockTypes.LIT_FURNACE)) && lock.getLockType() == LockType.DONATION && !lock.canAccess(player.getUniqueId())) {
                             this.stopThem.add(player.getUniqueId());
                         }
                         lock.updateLastAccessed();

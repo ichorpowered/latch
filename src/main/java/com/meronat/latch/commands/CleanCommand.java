@@ -64,7 +64,8 @@ public class CleanCommand implements CommandExecutor {
 
         Text no = Text.of(TextColors.RED, TextActions.executeCallback(x -> no(src)), " NO");
 
-        src.sendMessage(Text.of(TextColors.DARK_RED, "Are you sure you want to delete all locks not accessed in " + days + " days.").concat(yes).concat(no));
+        src.sendMessage(
+            Text.of(TextColors.DARK_RED, "Are you sure you want to delete all locks not accessed in " + days + " days.").concat(yes).concat(no));
 
         return CommandResult.success();
 
@@ -73,8 +74,7 @@ public class CleanCommand implements CommandExecutor {
     private void yes(CommandSource src, int days) {
         Sponge.getScheduler().createAsyncExecutor(Latch.getPluginContainer()).execute(() -> {
             src.sendMessage(Text.of(TextColors.YELLOW, Latch.getStorageHandler().clearLocksOlderThan(days), TextColors.DARK_GREEN,
-                    " locks have been deleted that were not accessed in the past ", TextColors.YELLOW, days,
-                    TextColors.DARK_GREEN, " days."));
+                " locks have been deleted that were not accessed in the past ", TextColors.YELLOW, days, TextColors.DARK_GREEN, " days."));
         });
     }
 

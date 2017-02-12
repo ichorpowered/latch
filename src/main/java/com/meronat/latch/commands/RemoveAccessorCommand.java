@@ -58,7 +58,7 @@ public class RemoveAccessorCommand implements CommandExecutor {
 
         removePlayers.setPersistence(args.hasAny("p"));
 
-        if(members.size() > 0) {
+        if (members.size() > 0) {
             removePlayers.setMembersToRemove(members);
         } else {
             throw new CommandException(Text.of(TextColors.RED, "You must specify a user to remove."));

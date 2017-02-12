@@ -31,7 +31,7 @@ import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 
-public class LockCreateEvent extends AbstractEvent implements Cancellable  {
+public class LockCreateEvent extends AbstractEvent implements Cancellable {
 
     private final Cause cause;
     private final Player creator;

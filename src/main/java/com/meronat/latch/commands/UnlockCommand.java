@@ -51,7 +51,7 @@ public class UnlockCommand implements CommandExecutor {
 
         Player player = (Player) src;
 
-        if(!password.isPresent())  {
+        if (!password.isPresent()) {
             throw new CommandException(Text.of(TextColors.RED, "You must specify a password to unlock locks."));
         }
 

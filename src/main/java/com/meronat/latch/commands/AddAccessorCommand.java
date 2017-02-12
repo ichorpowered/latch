@@ -58,7 +58,7 @@ public class AddAccessorCommand implements CommandExecutor {
 
         addPlayers.setPersistence(args.hasAny("p"));
 
-        if(members.size() > 0) {
+        if (members.size() > 0) {
             addPlayers.setMembersToAdd(members);
         } else {
             throw new CommandException(Text.of(TextColors.RED, "You must specify a user to add."));

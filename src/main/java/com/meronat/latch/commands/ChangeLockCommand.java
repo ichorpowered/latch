@@ -54,7 +54,8 @@ public class ChangeLockCommand implements CommandExecutor {
 
         Player player = (Player) src;
 
-        if( !(args.hasAny("name") || args.hasAny("type") || args.hasAny("owner") || args.hasAny("password") || args.hasAny("add") || args.hasAny("remove") || args.hasAny("redstone")) ) {
+        if (!(args.hasAny("name") || args.hasAny("type") || args.hasAny("owner") || args.hasAny("password") || args.hasAny("add") || args
+            .hasAny("remove") || args.hasAny("redstone"))) {
             throw new CommandException(Text.of(TextColors.RED, "You must specify at least one attribute to change."));
         }
 
@@ -65,8 +66,8 @@ public class ChangeLockCommand implements CommandExecutor {
         ChangeLockInteraction changeLock = new ChangeLockInteraction(player.getUniqueId());
 
         Optional<String> optionalString = args.getOne("name");
-        if(optionalString.isPresent()) {
-            if(optionalString.get().length() <= 25) {
+        if (optionalString.isPresent()) {
+            if (optionalString.get().length() <= 25) {
                 changeLock.setLockName(optionalString.get());
             } else {
                 throw new CommandException(Text.of(TextColors.RED, "Lock names must be less than 25 characters long."));
@@ -84,13 +85,13 @@ public class ChangeLockCommand implements CommandExecutor {
 
         List<UUID> members = args.<User>getAll("add").stream().map(User::getUniqueId).collect(GuavaCollectors.toImmutableList());
 
-        if(members.size() > 0) {
+        if (members.size() > 0) {
             changeLock.setMembersToAdd(members);
         }
 
         members = args.<User>getAll("remove").stream().map(User::getUniqueId).collect(GuavaCollectors.toImmutableList());
 
-        if(members.size() > 0) {
+        if (members.size() > 0) {
             changeLock.setMembersToRemove(members);
         }
 

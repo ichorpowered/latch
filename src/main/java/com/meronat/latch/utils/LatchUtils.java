@@ -41,8 +41,6 @@ import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -53,13 +51,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+
 public class LatchUtils {
 
-    private static final ImmutableList<Direction> adjacentDirections =
-            ImmutableList.of(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
+    private static final ImmutableList<Direction> adjacentDirections = ImmutableList
+        .of(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
 
     public static String getBlockNameFromType(BlockType type) {
-        if (type.getName().lastIndexOf(':')+1 <= type.getName().length()) {
+        if (type.getName().lastIndexOf(':') + 1 <= type.getName().length()) {
             return type.getName().substring(type.getName().lastIndexOf(':') + 1);
         }
         return type.getName();
@@ -80,6 +81,7 @@ public class LatchUtils {
 
     /**
      * Compare block with surrounding blocks - returning one with the same type if they're associated using CONNECTED_DIRECTIONS or PORTION_TYPE data
+     *
      * @param block The BlockSnapshot of the block we're checking for a double of
      * @return The potential location of a double block
      */
@@ -87,7 +89,8 @@ public class LatchUtils {
         if (block != BlockSnapshot.NONE && block.getLocation().isPresent()) {
             //Get all directions we need to evaluate -- doors don't have CONNECTED_DIRECTIONS just PORTION_TYPEs
             Set<Direction> directionsToInvestigate = block.get(Keys.CONNECTED_DIRECTIONS).orElse(new HashSet<>());
-            block.get(Keys.PORTION_TYPE).map(p -> p == PortionTypes.BOTTOM ? directionsToInvestigate.add(Direction.UP) : directionsToInvestigate.add(Direction.DOWN));
+            block.get(Keys.PORTION_TYPE)
+                .map(p -> p == PortionTypes.BOTTOM ? directionsToInvestigate.add(Direction.UP) : directionsToInvestigate.add(Direction.DOWN));
 
             for (Direction direction : directionsToInvestigate) {
                 if (block.getLocation().get().getBlockRelative(direction).getBlock().getType() == block.getState().getType()) {
@@ -127,16 +130,16 @@ public class LatchUtils {
     }
 
     public static String getLocationString(Location<World> location) {
-        return "(" + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ()+ ")";
+        return "(" + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ() + ")";
     }
 
     public static Text formatHelpText(String command, String description, Text extendedDescription) {
         return Text.builder(command)
-                .color(TextColors.GOLD)
-                .onClick(TextActions.suggestCommand(command))
-                .onHover(TextActions.showText(extendedDescription))
-                .append(Text.of(TextColors.GRAY, " - ", description))
-                .build();
+            .color(TextColors.GOLD)
+            .onClick(TextActions.suggestCommand(command))
+            .onHover(TextActions.showText(extendedDescription))
+            .append(Text.of(TextColors.GRAY, " - ", description))
+            .build();
     }
 
 }

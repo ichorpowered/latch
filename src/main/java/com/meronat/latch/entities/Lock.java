@@ -58,11 +58,14 @@ public class Lock {
 
     private LocalDateTime lastAccessed;
 
-    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password, boolean protectFromRedstone, LocalDateTime lastAccessed) {
-        this(owner, LatchUtils.getRandomLockName(owner, lockedObjectName), type, location, lockedObjectName, salt, password, new HashSet<>(), protectFromRedstone, lastAccessed);
+    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password,
+        boolean protectFromRedstone, LocalDateTime lastAccessed) {
+        this(owner, LatchUtils.getRandomLockName(owner, lockedObjectName), type, location, lockedObjectName, salt, password, new HashSet<>(),
+            protectFromRedstone, lastAccessed);
     }
 
-    public Lock(UUID owner, String lockName, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password, HashSet<UUID> players, boolean protectFromRedstone, LocalDateTime lastAccessed) {
+    public Lock(UUID owner, String lockName, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password,
+        HashSet<UUID> players, boolean protectFromRedstone, LocalDateTime lastAccessed) {
         this.owner = owner;
         this.type = type;
         this.lockedObjectName = lockedObjectName;
@@ -75,7 +78,8 @@ public class Lock {
         this.lastAccessed = lastAccessed;
     }
 
-    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, boolean protectFromRedstone, LocalDateTime lastAccessed) {
+    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, boolean protectFromRedstone,
+        LocalDateTime lastAccessed) {
         this.owner = owner;
         this.name = LatchUtils.getRandomLockName(owner, lockedObjectName);
         this.type = type;
@@ -87,7 +91,8 @@ public class Lock {
 
     // TODO This is super messy. Let's switch to a builder pattern once we add the flag table.
 
-    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, boolean protectFromRedstone, LocalDateTime lastAccessed, String name) {
+    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, boolean protectFromRedstone,
+        LocalDateTime lastAccessed, String name) {
         this.owner = owner;
         this.name = name;
         this.type = type;
@@ -159,8 +164,8 @@ public class Lock {
 
         Optional<UserStorageService> userStorageService = Sponge.getGame().getServiceManager().provide(UserStorageService.class);
 
-        if(userStorageService.isPresent()) {
-            for(UUID uuid : this.ableToAccess) {
+        if (userStorageService.isPresent()) {
+            for (UUID uuid : this.ableToAccess) {
                 userStorageService.get().get(uuid).ifPresent(u -> names.add(u.getName()));
             }
         }
@@ -169,7 +174,8 @@ public class Lock {
     }
 
     public boolean canAccess(UUID uniqueId) {
-        return this.ableToAccess.contains(uniqueId) || this.owner.equals(uniqueId) || this.type == LockType.PUBLIC || Latch.getLockManager().isBypassing(uniqueId);
+        return this.ableToAccess.contains(uniqueId) || this.owner.equals(uniqueId) || this.type == LockType.PUBLIC || Latch.getLockManager()
+            .isBypassing(uniqueId);
     }
 
     public String getPassword() {
@@ -179,7 +185,7 @@ public class Lock {
     public String getOwnerName() {
         Optional<UserStorageService> userStorageService = Sponge.getGame().getServiceManager().provide(UserStorageService.class);
 
-        if(userStorageService.isPresent()) {
+        if (userStorageService.isPresent()) {
             Optional<User> user = userStorageService.get().get(this.owner);
             return user.get().getName();
         }
@@ -190,7 +196,7 @@ public class Lock {
         Optional<Location<World>> location = Optional.empty();
         Iterator<Location<World>> itr = this.location.iterator();
 
-        if(itr.hasNext()) {
+        if (itr.hasNext()) {
             return Optional.of(itr.next());
         }
         return location;
@@ -218,6 +224,7 @@ public class Lock {
 
     public void updateLastAccessed() {
         this.lastAccessed = LocalDateTime.now();
-        Sponge.getScheduler().createAsyncExecutor(Latch.getPluginContainer()).execute(() -> Latch.getLockManager().updateLockAttributes(this.owner, this.name, this));
+        Sponge.getScheduler().createAsyncExecutor(Latch.getPluginContainer())
+            .execute(() -> Latch.getLockManager().updateLockAttributes(this.owner, this.name, this));
     }
 }

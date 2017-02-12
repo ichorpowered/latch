@@ -71,10 +71,8 @@ public class LockManager {
      * Locks that someone should be able to enter a password and access (or gain perm access to)
      */
     public boolean isPasswordCompatibleLock(Lock lock) {
-        //If the lock is one of the two password locks, or a donation lock with a password
-        return lock.getLockType() == LockType.PASSWORD_ALWAYS ||
-                lock.getLockType() == LockType.PASSWORD_ONCE /*||
-                (lock.getLockType() == LockType.DONATION && lock.getPassword().length() > 0)*/;
+        //If the lock is one of the two password locks
+        return lock.getLockType() == LockType.PASSWORD_ALWAYS || lock.getLockType() == LockType.PASSWORD_ONCE;
     }
 
     public boolean hasInteractionData(UUID uniqueId) {
@@ -109,14 +107,16 @@ public class LockManager {
         return this.lockableBlocks.contains(block.getId());
     }
 
-    public boolean isProtectBelowBlocks(BlockType block) { return this.protectBelowBlocks.contains(block.getId()); }
+    public boolean isProtectBelowBlocks(BlockType block) {
+        return this.protectBelowBlocks.contains(block.getId());
+    }
 
     public void removeInteractionData(UUID uniqueId) {
         this.interactionData.remove(uniqueId);
     }
 
     public void addLockAccess(Lock thisLock, UUID uniqueId) {
-        if(!thisLock.canAccess(uniqueId)) {
+        if (!thisLock.canAccess(uniqueId)) {
             thisLock.addAccess(uniqueId);
             Latch.getStorageHandler().addLockAccess(thisLock, uniqueId);
         }
@@ -127,7 +127,7 @@ public class LockManager {
     }
 
     public void addLockLocation(Lock lock, Location<World> location) {
-        if(!lock.getLocations().contains(location)) {
+        if (!lock.getLocations().contains(location)) {
             Latch.getStorageHandler().addLockLocation(lock, location);
         }
     }
@@ -138,7 +138,7 @@ public class LockManager {
     }
 
     public void removeLockAccess(Lock thisLock, UUID uniqueId) {
-        if(thisLock.canAccess(uniqueId)) {
+        if (thisLock.canAccess(uniqueId)) {
             thisLock.removeAccess(uniqueId);
             Latch.getStorageHandler().removeLockAccess(thisLock, uniqueId);
 
@@ -153,11 +153,11 @@ public class LockManager {
         return Latch.getStorageHandler().getLocksByOwner(uniqueId);
     }
 
-    public void setLockLimits(HashMap<String,Integer> lockLimits) {
+    public void setLockLimits(HashMap<String, Integer> lockLimits) {
         this.lockLimits.clear();
-        for(Map.Entry<String, Integer> limit : lockLimits.entrySet()) {
+        for (Map.Entry<String, Integer> limit : lockLimits.entrySet()) {
             //Only add if limit >=0, otherwise no limit
-            if(limit.getValue() >= 0) {
+            if (limit.getValue() >= 0) {
                 this.lockLimits.put(limit.getKey().toLowerCase(), limit.getValue());
             }
         }

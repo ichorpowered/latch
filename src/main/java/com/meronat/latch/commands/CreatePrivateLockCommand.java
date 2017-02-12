@@ -59,7 +59,7 @@ public class CreatePrivateLockCommand implements CommandExecutor {
             if (!Latch.getLockManager().isUniqueName(player.getUniqueId(), optionalName.get())) {
                 throw new CommandException(Text.of(TextColors.RED, "You already have a lock with this name."));
             }
-            if(optionalName.get().length() <= 25) {
+            if (optionalName.get().length() <= 25) {
                 privateLock = new CreateLockInteraction(player.getUniqueId(), LockType.PRIVATE, "", optionalName.get());
             } else {
                 throw new CommandException(Text.of(TextColors.RED, "Lock names must be less than 25 characters long."));
@@ -73,7 +73,8 @@ public class CreatePrivateLockCommand implements CommandExecutor {
         Latch.getLockManager().setInteractionData(player.getUniqueId(), privateLock);
 
         if (args.hasAny("p")) {
-            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will lock all latchable blocks you click or place until you type \"latch persist\"."));
+            player.sendMessage(
+                Text.of(TextColors.DARK_GREEN, "You will lock all latchable blocks you click or place until you type \"latch persist\"."));
         } else {
             player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will lock the next latchable block you click or place."));
         }

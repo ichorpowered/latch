@@ -69,13 +69,13 @@ public class CreateLockInteraction implements LockInteraction {
     @Override
     public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockState) {
         //Check to see if another lock is present
-        if(Latch.getLockManager().getLock(location).isPresent()) {
+        if (Latch.getLockManager().getLock(location).isPresent()) {
             player.sendMessage(Text.of(TextColors.RED, "There is already a lock here."));
             return false;
         }
 
         //Make sure it's a lockable block
-        if(!Latch.getLockManager().isLockableBlock(blockState.getState().getType())) {
+        if (!Latch.getLockManager().isLockableBlock(blockState.getState().getType())) {
             player.sendMessage(Text.of(TextColors.RED, "That is not a lockable block: ", TextColors.GRAY, blockState.getState().getType()));
             return false;
         }
@@ -86,10 +86,10 @@ public class CreateLockInteraction implements LockInteraction {
         lockLocations.add(location);
 
         //If the block has another block that needs to be locked
-        if(optionalOtherBlock.isPresent()) {
+        if (optionalOtherBlock.isPresent()) {
             //Check to see if another lock is present
             Optional<Lock> otherLock = Latch.getLockManager().getLock(optionalOtherBlock.get());
-            if( otherLock.isPresent() && !otherLock.get().isOwnerOrBypassing(player.getUniqueId()) ) {
+            if (otherLock.isPresent() && !otherLock.get().isOwnerOrBypassing(player.getUniqueId())) {
                 //Shouldn't happen if we've configured this correctly - but just in case...
                 player.sendMessage(Text.of(TextColors.RED, "Another lock already present on the double block - delete locks and try again."));
                 return false;
@@ -97,7 +97,7 @@ public class CreateLockInteraction implements LockInteraction {
             lockLocations.add(optionalOtherBlock.get());
         }
 
-        if(Latch.getLockManager().isPlayerAtLockLimit(player.getUniqueId(), this.type)) {
+        if (Latch.getLockManager().isPlayerAtLockLimit(player.getUniqueId(), this.type)) {
             player.sendMessage(Text.of(TextColors.RED, "You have reached the limit for locks."));
             return false;
         }
@@ -105,9 +105,11 @@ public class CreateLockInteraction implements LockInteraction {
         final Lock lock;
 
         if (name != null) {
-            lock = new Lock(player.getUniqueId(), this.type, lockLocations, LatchUtils.getBlockNameFromType(blockState.getState().getType()), Latch.getLockManager().getProtectFromRedstone(), LocalDateTime.now(), name);
+            lock = new Lock(player.getUniqueId(), this.type, lockLocations, LatchUtils.getBlockNameFromType(blockState.getState().getType()),
+                Latch.getLockManager().getProtectFromRedstone(), LocalDateTime.now(), name);
         } else {
-            lock = new Lock(player.getUniqueId(), this.type, lockLocations, LatchUtils.getBlockNameFromType(blockState.getState().getType()), Latch.getLockManager().getProtectFromRedstone(), LocalDateTime.now());
+            lock = new Lock(player.getUniqueId(), this.type, lockLocations, LatchUtils.getBlockNameFromType(blockState.getState().getType()),
+                Latch.getLockManager().getProtectFromRedstone(), LocalDateTime.now());
         }
 
         if (this.type.equals(LockType.PASSWORD_ALWAYS) || this.type.equals(LockType.PASSWORD_ONCE)) {
@@ -126,13 +128,14 @@ public class CreateLockInteraction implements LockInteraction {
         Sponge.getEventManager().post(lockCreateEvent);
 
         //Stop if original locking event or other block locking event is cancelled
-        if (lockCreateEvent.isCancelled() ) {
+        if (lockCreateEvent.isCancelled()) {
             return false;
         }
 
         //Notify the player
-        player.sendMessage(Text.of(TextColors.DARK_GREEN, "You have created a ", TextColors.GRAY, lockCreateEvent.getLock().getLockType().getHumanReadable().toLowerCase(),
-                TextColors.DARK_GREEN, " lock called: ", TextColors.GRAY, lockCreateEvent.getLock().getName()));
+        player.sendMessage(Text.of(TextColors.DARK_GREEN, "You have created a ", TextColors.GRAY,
+            lockCreateEvent.getLock().getLockType().getHumanReadable().toLowerCase(), TextColors.DARK_GREEN, " lock called: ", TextColors.GRAY,
+            lockCreateEvent.getLock().getName()));
         Latch.getLockManager().createLock(lockCreateEvent.getLock());
 
         return true;

@@ -66,7 +66,7 @@ public class LimitsCommand implements CommandExecutor {
         Sponge.getScheduler().createAsyncExecutor(Latch.getPluginContainer()).execute(() -> {
             List<Text> contents = new ArrayList<>();
 
-            String displayName = src.getName().equalsIgnoreCase(user.getName()) ? "Your" : user.getName()+"'s";
+            String displayName = src.getName().equalsIgnoreCase(user.getName()) ? "Your" : user.getName() + "'s";
 
             Map<String, Integer> limits = Latch.getLockManager().getLimits();
 
@@ -76,7 +76,8 @@ public class LimitsCommand implements CommandExecutor {
 
             for (Map.Entry<String, Integer> e : limits.entrySet()) {
                 if (!e.getKey().equalsIgnoreCase("total")) {
-                    contents.add(Text.of(TextColors.GOLD, e.getKey().toLowerCase() + ": ", TextColors.GRAY, amounts.getOrDefault(e.getKey(), 0) + "/" + e.getValue()));
+                    contents.add(Text.of(TextColors.GOLD, e.getKey().toLowerCase() + ": ", TextColors.GRAY,
+                        amounts.getOrDefault(e.getKey(), 0) + "/" + e.getValue()));
 
                     total += amounts.getOrDefault(e.getKey(), 0);
                 }
@@ -88,12 +89,8 @@ public class LimitsCommand implements CommandExecutor {
                 Optional<PaginationService> optionalPaginationService = Sponge.getServiceManager().provide(PaginationService.class);
 
                 if (optionalPaginationService.isPresent()) {
-                    optionalPaginationService.get().builder()
-                            .title(Text.of(TextColors.DARK_GREEN, displayName + " Limits"))
-                            .linesPerPage(10)
-                            .padding(Text.of(TextColors.DARK_GREEN, "="))
-                            .contents(contents)
-                            .sendTo(src);
+                    optionalPaginationService.get().builder().title(Text.of(TextColors.DARK_GREEN, displayName + " Limits")).linesPerPage(10)
+                        .padding(Text.of(TextColors.DARK_GREEN, "=")).contents(contents).sendTo(src);
                 } else {
                     src.sendMessage(Text.of(TextColors.RED, "Pagination service not found, printing out limits list:"));
                     for (Text t : contents) {

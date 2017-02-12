@@ -41,7 +41,7 @@ public class DisplayLockCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
 
-        if(!(src instanceof Player)) {
+        if (!(src instanceof Player)) {
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
 
@@ -53,7 +53,8 @@ public class DisplayLockCommand implements CommandExecutor {
         Latch.getLockManager().setInteractionData(player.getUniqueId(), displayLock);
 
         if (args.hasAny("p")) {
-            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will display information of all locks you click until you type \"/latch persist\"."));
+            player.sendMessage(
+                Text.of(TextColors.DARK_GREEN, "You will display information of all locks you click until you type \"/latch persist\"."));
         } else {
             player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will display information of the next lock you click."));
         }

@@ -53,14 +53,14 @@ public class CreatePasswordLockCommand implements CommandExecutor {
 
         Player player = (Player) src;
 
-        if(!password.isPresent()) {
+        if (!password.isPresent()) {
             throw new CommandException(Text.of(TextColors.RED, "Missing a password: /latch password [password]"));
         }
 
         //Default to the always password if no flag present
         LockType type = LockType.PASSWORD_ALWAYS;
 
-        if(args.hasAny("o")) {
+        if (args.hasAny("o")) {
             type = LockType.PASSWORD_ONCE;
         }
 
@@ -70,7 +70,8 @@ public class CreatePasswordLockCommand implements CommandExecutor {
         Latch.getLockManager().setInteractionData(player.getUniqueId(), passwordLock);
 
         if (args.hasAny("p")) {
-            player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will lock all latchable blocks you click or place until you type \"latch persist\"."));
+            player.sendMessage(
+                Text.of(TextColors.DARK_GREEN, "You will lock all latchable blocks you click or place until you type \"latch persist\"."));
         } else {
             player.sendMessage(Text.of(TextColors.DARK_GREEN, "You will lock the next latchable block you click or place."));
         }
