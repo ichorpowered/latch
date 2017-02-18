@@ -27,7 +27,6 @@ package com.meronat.latch;
 
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
-import com.meronat.latch.bstats.Metrics;
 import com.meronat.latch.commands.Commands;
 import com.meronat.latch.entities.LockManager;
 import com.meronat.latch.listeners.ChangeBlockListener;
@@ -38,6 +37,7 @@ import com.meronat.latch.storage.SqlHandler;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import org.bstats.Metrics;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;

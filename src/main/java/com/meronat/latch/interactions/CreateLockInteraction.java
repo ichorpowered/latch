@@ -139,7 +139,6 @@ public class CreateLockInteraction implements LockInteraction {
         Latch.getLockManager().createLock(lockCreateEvent.getLock());
 
         return true;
-
     }
 
     @Override

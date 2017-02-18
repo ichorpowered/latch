@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'idea'
+    id 'com.github.johnrengelman.shadow' version '1.2.4'
     id 'org.spongepowered.plugin' version '0.8.1'
     id 'ninja.miserable.blossom' version '1.0.1'
     id 'net.minecrell.licenser' version '0.3'
@@ -14,17 +15,29 @@ repositories {
         name = 'sponge'
         url = 'https://repo.spongepowered.org/maven/'
     }
+    maven {
+        name = 'bstats'
+        url = 'https://repo.bstats.org/content/groups/public/'
+    }
 }
 
 dependencies {
     compile 'org.spongepowered:spongeapi:' + project.spongeVersion
+    compile 'org.bstats:bstats-sponge:1.0'
+}
+
+shadowJar {
+    dependencies {
+        include dependency('org.bstats:bstats-sponge')
+    }
+
+    relocate 'org.bstats', 'com.meronat.latch.metrics'
 }
 
 license {
     header = project.file('HEADER.txt')
 
     include '**/*.java'
-    exclude '**/Metrics.java'
 }
 
 blossom {

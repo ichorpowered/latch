@@ -47,7 +47,6 @@ public class ListCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-
         Optional<User> optionalUser = args.getOne("owner");
 
         User user;
@@ -96,7 +95,6 @@ public class ListCommand implements CommandExecutor {
         });
 
         return CommandResult.success();
-
     }
 
 }

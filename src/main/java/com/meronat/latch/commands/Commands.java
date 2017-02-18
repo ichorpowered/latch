@@ -38,7 +38,6 @@ import org.spongepowered.api.text.Text;
 public final class Commands {
 
     public void register() {
-
         final CommandFlags.Builder flagBuilder = GenericArguments.flags();
 
         final CommandSpec addAccessorCommand = CommandSpec.builder()
@@ -267,7 +266,6 @@ public final class Commands {
         commandManager.register(plugin, removeAccessorCommand, "lremove");
         commandManager.register(plugin, helpCommand, "lhelp");
         commandManager.register(plugin, latchInfoCommand, "llatch", "lversion");
-
     }
 
     private static Commands ourInstance = new Commands();

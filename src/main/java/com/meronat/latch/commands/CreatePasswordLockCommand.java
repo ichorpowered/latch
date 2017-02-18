@@ -43,7 +43,6 @@ public class CreatePasswordLockCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-
         if (!(src instanceof Player)) {
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
@@ -77,7 +76,6 @@ public class CreatePasswordLockCommand implements CommandExecutor {
         }
 
         return CommandResult.success();
-
     }
 
 }

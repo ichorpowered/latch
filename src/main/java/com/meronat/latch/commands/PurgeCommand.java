@@ -43,7 +43,6 @@ public class PurgeCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-
         Optional<User> optionalUser = args.getOne("target");
 
         User user;
@@ -85,7 +84,6 @@ public class PurgeCommand implements CommandExecutor {
         }
 
         return CommandResult.success();
-
     }
 
     private void yes(User user, CommandSource src, boolean self) {

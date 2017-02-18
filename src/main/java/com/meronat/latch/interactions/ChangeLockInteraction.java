@@ -166,7 +166,6 @@ public class ChangeLockInteraction implements LockInteraction {
         player.sendMessage(Text.of(TextColors.DARK_GREEN, "Lock data has been successfully updated."));
 
         return true;
-
     }
 
     @Override

@@ -57,7 +57,6 @@ class Configuration {
     }
 
     private void loadDefaults() {
-
         //Should we add latch.normal to default permissions?
         if (this.rootNode.getNode("add_default_permissions").isVirtual()) {
             this.rootNode.getNode("add_default_permissions").setValue(false);

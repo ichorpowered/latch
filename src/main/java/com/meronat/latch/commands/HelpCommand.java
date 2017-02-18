@@ -47,7 +47,6 @@ public class HelpCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(@Nonnull CommandSource src, CommandContext args) throws CommandException {
-
         List<Text> contents = new ArrayList<>();
 
         contents.add(LatchUtils.formatHelpText("/latch version", "Shows information about the Latch plugin",
@@ -132,7 +131,6 @@ public class HelpCommand implements CommandExecutor {
         }
 
         return CommandResult.success();
-
     }
 
 }

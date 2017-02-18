@@ -159,7 +159,6 @@ public class InteractBlockListener {
                     }
                 });
             }
-
         }
     }
 

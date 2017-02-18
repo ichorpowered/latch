@@ -56,7 +56,6 @@ public class DisplayLockInteraction implements LockInteraction {
 
     @Override
     public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockState) {
-
         Optional<Lock> optionalLock = Latch.getLockManager().getLock(location);
         //Check to see if another lock is present
         if (!optionalLock.isPresent()) {
@@ -84,22 +83,17 @@ public class DisplayLockInteraction implements LockInteraction {
         Optional<PaginationService> optionalPaginationService = Sponge.getServiceManager().provide(PaginationService.class);
 
         if (optionalPaginationService.isPresent()) {
-
             optionalPaginationService.get().builder().title(Text.of(TextColors.DARK_GREEN, lock.getName())).linesPerPage(10)
                 .padding(Text.of(TextColors.DARK_GREEN, "=")).contents(contents).sendTo(player);
-
         } else {
-
             player.sendMessage(Text.of(Text.of(TextColors.GOLD, "Latch Name: ", lock.getName())));
             for (Text t : contents) {
                 player.sendMessage(t);
             }
-
         }
 
         //Return false to cancel interactions when using this command
         return false;
-
     }
 
     @Override

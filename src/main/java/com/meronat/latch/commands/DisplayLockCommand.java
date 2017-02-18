@@ -40,7 +40,6 @@ public class DisplayLockCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-
         if (!(src instanceof Player)) {
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
@@ -60,7 +59,6 @@ public class DisplayLockCommand implements CommandExecutor {
         }
 
         return CommandResult.success();
-
     }
 
 }

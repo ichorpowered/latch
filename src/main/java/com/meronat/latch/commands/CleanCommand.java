@@ -43,7 +43,6 @@ public class CleanCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-
         if (!(src instanceof Player)) {
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
@@ -68,7 +67,6 @@ public class CleanCommand implements CommandExecutor {
             Text.of(TextColors.DARK_RED, "Are you sure you want to delete all locks not accessed in " + days + " days.").concat(yes).concat(no));
 
         return CommandResult.success();
-
     }
 
     private void yes(CommandSource src, int days) {

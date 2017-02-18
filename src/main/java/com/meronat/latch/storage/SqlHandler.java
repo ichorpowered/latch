@@ -355,7 +355,6 @@ public class SqlHandler {
                         locationDelete.execute();
                     }
                 }
-                connection.close();
             } catch (SQLException e) {
                 getLogger().error("Error deleteLock for location: " + location.toString());
                 e.printStackTrace();
@@ -391,7 +390,6 @@ public class SqlHandler {
                     }
                 }
             }
-
         } catch (SQLException e) {
             getLogger().error("Error deleting locks for player: " + player.toString());
         }
@@ -411,7 +409,6 @@ public class SqlHandler {
             getLogger().error("Error isUniqueName: " + playerUUID.toString() + ", for lock: " + lockName);
             e.printStackTrace();
         }
-
         return false;
     }
 
@@ -531,7 +528,6 @@ public class SqlHandler {
             getLogger().error("Error getLocksByOwner for owner: " + uniqueId);
             e.printStackTrace();
         }
-
         return locks;
     }
 

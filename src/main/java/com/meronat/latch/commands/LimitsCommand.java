@@ -46,7 +46,6 @@ public class LimitsCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-
         Optional<User> optionalUser = args.getOne("user");
 
         User user;
@@ -101,7 +100,6 @@ public class LimitsCommand implements CommandExecutor {
         });
 
         return CommandResult.success();
-
     }
 
 }

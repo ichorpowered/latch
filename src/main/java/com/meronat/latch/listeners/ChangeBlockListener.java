@@ -119,7 +119,6 @@ public class ChangeBlockListener {
                 }
 
                 if (optionalPlayer.isPresent()) {
-
                     Player player = optionalPlayer.get();
 
                     //If the player has interaction data
@@ -128,7 +127,6 @@ public class ChangeBlockListener {
                         //Could cancel the block placement here if it fails -- but Meronat decided no
 
                         if (bs.isValid() && bs.getFinal().getLocation().isPresent() && isSolidBlock(bs.getFinal().getState())) {
-
                             boolean result = lockInteraction.get().handleInteraction(player, bs.getFinal().getLocation().get(), bs.getFinal());
                             bs.setValid(result);
 
@@ -136,14 +134,12 @@ public class ChangeBlockListener {
                             if (result) {
                                 interactionSuccessful = true;
                             }
-
                         }
 
                         if (!lockInteraction.get().shouldPersist()) {
                             Latch.getLockManager().removeInteractionData(player.getUniqueId());
                         }
                     } else if (Latch.getConfig().getNode("auto_lock_on_placement").getBoolean()) {
-
                         if (!Latch.getLockManager().isLockableBlock(bs.getFinal().getState().getType())) {
                             return;
                         }
@@ -154,7 +150,6 @@ public class ChangeBlockListener {
                         }
 
                         if (bs.isValid() && bs.getFinal().getLocation().isPresent() && isSolidBlock(bs.getFinal().getState())) {
-
                             boolean result = new CreateLockInteraction(player.getUniqueId(), LockType.PRIVATE, "")
                                 .handleInteraction(player, bs.getFinal().getLocation().get(), bs.getFinal());
 
@@ -164,17 +159,11 @@ public class ChangeBlockListener {
                             if (result) {
                                 interactionSuccessful = true;
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
 
     @Listener
@@ -277,6 +266,5 @@ public class ChangeBlockListener {
         Optional<MatterProperty> mp = bs.getProperty(MatterProperty.class);
         return mp.isPresent() && mp.get().getValue() == MatterProperty.Matter.SOLID;
     }
-
 
 }

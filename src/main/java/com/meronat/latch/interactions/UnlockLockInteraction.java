@@ -120,4 +120,5 @@ public class UnlockLockInteraction implements LockInteraction {
     public void setPersistence(boolean persist) {
         this.persisting = persist;
     }
+
 }
