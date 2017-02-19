@@ -220,8 +220,7 @@ public class ChangeBlockListener {
 
                     if (!locksDeleted.contains(lock.getName())) {
                         player.sendMessage(
-                            Text.of(TextColors.DARK_GREEN, "You have destroyed this ", TextColors.GRAY, lock.getLockedObject(), TextColors.DARK_GREEN,
-                                " lock."));
+                            Text.of(TextColors.DARK_GREEN, "You have destroyed this ", TextColors.GRAY, lock.getLockedObject(), TextColors.DARK_GREEN, " lock."));
                         locksDeleted.add(lock.getName());
                     }
 

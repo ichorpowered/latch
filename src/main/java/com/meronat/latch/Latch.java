@@ -165,8 +165,7 @@ public class Latch {
         }
 
         try {
-            lockLimits = (HashMap<String, Integer>) getConfig().getNode("lock_limit").getValue(new TypeToken<Map<String, Integer>>() {
-            });
+            lockLimits = (HashMap<String, Integer>) getConfig().getNode("lock_limit").getValue(new TypeToken<Map<String, Integer>>() {});
         } catch (ObjectMappingException e) {
             getLogger().error("Error loading lock limits");
             e.printStackTrace();

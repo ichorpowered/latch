@@ -53,8 +53,8 @@ public class ChangeLockCommand implements CommandExecutor {
 
         Player player = (Player) src;
 
-        if (!(args.hasAny("name") || args.hasAny("type") || args.hasAny("owner") || args.hasAny("password") || args.hasAny("add") || args
-            .hasAny("remove") || args.hasAny("redstone"))) {
+        if (!(args.hasAny("name") || args.hasAny("type") || args.hasAny("owner") || args.hasAny("password") || args.hasAny("add") ||
+            args.hasAny("remove") || args.hasAny("redstone"))) {
             throw new CommandException(Text.of(TextColors.RED, "You must specify at least one attribute to change."));
         }
 

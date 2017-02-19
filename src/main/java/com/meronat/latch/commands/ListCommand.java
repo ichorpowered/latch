@@ -82,9 +82,13 @@ public class ListCommand implements CommandExecutor {
                 Optional<PaginationService> optionalPaginationService = Sponge.getServiceManager().provide(PaginationService.class);
 
                 if (optionalPaginationService.isPresent()) {
-                    optionalPaginationService.get().builder().title(Text.of(TextColors.DARK_GREEN, displayName + " Locks"))
-                        .header(Text.of(TextColors.GRAY, "There are ", TextColors.WHITE, locks.size(), TextColors.GRAY, " lock(s):")).linesPerPage(10)
-                        .padding(Text.of(TextColors.GRAY, "=")).contents(contents).sendTo(src);
+                    optionalPaginationService.get().builder()
+                        .title(Text.of(TextColors.DARK_GREEN, displayName + " Locks"))
+                        .header(Text.of(TextColors.GRAY, "There are ", TextColors.WHITE, locks.size(), TextColors.GRAY, " lock(s):"))
+                        .linesPerPage(10)
+                        .padding(Text.of(TextColors.GRAY, "="))
+                        .contents(contents)
+                        .sendTo(src);
                 } else {
                     src.sendMessage(Text.of(TextColors.RED, "Pagination service not found, printing out list:"));
                     for (Text t : contents) {
