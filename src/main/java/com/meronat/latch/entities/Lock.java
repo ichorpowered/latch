@@ -218,6 +218,8 @@ public class Lock {
 
         private boolean protectedFromRedstone;
 
+        private Builder() {}
+
         public Lock.Builder owner(UUID owner) {
             this.owner = owner;
 
