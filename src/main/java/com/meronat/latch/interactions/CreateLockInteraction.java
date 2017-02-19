@@ -48,7 +48,7 @@ public class CreateLockInteraction implements LockInteraction {
 
     private final UUID player;
     private final LockType type;
-    private final String password;
+    private String password;
     private String name;
 
     private boolean persisting = false;
@@ -102,28 +102,28 @@ public class CreateLockInteraction implements LockInteraction {
             return false;
         }
 
-        final Lock lock;
-
-        if (name != null) {
-            lock = new Lock(player.getUniqueId(), this.type, lockLocations, LatchUtils.getBlockNameFromType(blockState.getState().getType()),
-                Latch.getLockManager().getProtectFromRedstone(), LocalDateTime.now(), name);
-        } else {
-            lock = new Lock(player.getUniqueId(), this.type, lockLocations, LatchUtils.getBlockNameFromType(blockState.getState().getType()),
-                Latch.getLockManager().getProtectFromRedstone(), LocalDateTime.now());
-        }
+        byte[] salt = null;
 
         if (this.type.equals(LockType.PASSWORD_ALWAYS) || this.type.equals(LockType.PASSWORD_ONCE)) {
+            salt = LatchUtils.generateSalt();
 
-            //Fire the lock create event and create the lock if it's not cancelled (by other plugins)
-            byte[] salt = LatchUtils.generateSalt();
-
-            lock.setSalt(salt);
-
-            lock.changePassword(LatchUtils.hashPassword(this.password, salt));
-
+            this.password = LatchUtils.hashPassword(this.password, salt);
         }
 
-        LockCreateEvent lockCreateEvent = new LockCreateEvent(player, lock, Cause.source(player).build());
+        LockCreateEvent lockCreateEvent = new LockCreateEvent(
+            player,
+            Lock.builder()
+                .owner(player.getUniqueId())
+                .type(this.type)
+                .name(this.name)
+                .objectName(LatchUtils.getBlockNameFromType(blockState.getState().getType()))
+                .password(this.password)
+                .salt(salt)
+                .locations(lockLocations)
+                .lastAccessed(LocalDateTime.now())
+                .protectFromRedstone(Latch.getLockManager().getProtectFromRedstone())
+                .build(),
+            Cause.source(player).build());
 
         Sponge.getEventManager().post(lockCreateEvent);
 

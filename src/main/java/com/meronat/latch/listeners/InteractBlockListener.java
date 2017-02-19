@@ -93,7 +93,6 @@ public class InteractBlockListener {
         this.stopThem.remove(player.getUniqueId());
     }
 
-
     @Listener
     public void onSpawnExp(SpawnEntityEvent event, @First Player player) {
         if (this.stopThem.contains(player.getUniqueId())) {

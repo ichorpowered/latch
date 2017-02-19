@@ -49,6 +49,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public class SqlHandler {
@@ -126,7 +127,7 @@ public class SqlHandler {
     }
 
     public Optional<Lock> getLockByLocation(Location location) {
-        Optional<Lock> lock = Optional.empty();
+        Optional<Lock> optinalLock = Optional.empty();
 
         try (
             Connection connection = getConnection();
@@ -142,11 +143,18 @@ public class SqlHandler {
             try (ResultSet tempLock = ps.executeQuery()) {
                 //Should only be one lock at this location, if any
                 if (tempLock.next()) {
-                    lock = Optional.of(new Lock(UUID.fromString(tempLock.getString("OWNER_UUID")), tempLock.getString("LOCK_NAME"),
-                        LockType.valueOf(tempLock.getString("LOCK_TYPE")), getLockLocationsByID(tempLock.getInt("ID")),
-                        tempLock.getString("LOCKED_OBJECT"), tempLock.getBytes("SALT"), tempLock.getString("PASSWORD"),
-                        getAbleToAccessByID(tempLock.getInt("ID")), tempLock.getBoolean("REDSTONE_PROTECT"),
-                        tempLock.getTimestamp("ACCESSED").toLocalDateTime()));
+                    optinalLock = Optional.of(Lock.builder()
+                        .owner(UUID.fromString(tempLock.getString("OWNER_UUID")))
+                        .name(tempLock.getString("LOCK_NAME"))
+                        .type(LockType.valueOf(tempLock.getString("LOCK_TYPE")))
+                        .locations(getLockLocationsByID(tempLock.getInt("ID")))
+                        .objectName(tempLock.getString("LOCKED_OBJECT"))
+                        .salt(tempLock.getBytes("SALT"))
+                        .password(tempLock.getString("PASSWORD"))
+                        .accessors(getAbleToAccessByID(tempLock.getInt("ID")))
+                        .protectFromRedstone(tempLock.getBoolean("REDSTONE_PROTECT"))
+                        .lastAccessed(tempLock.getTimestamp("ACCESSED").toLocalDateTime())
+                        .build());
                 }
             }
 
@@ -154,11 +162,11 @@ public class SqlHandler {
             getLogger().error("Error running SQL getLockByLocation: ");
             e.printStackTrace();
         }
-        return lock;
+        return optinalLock;
     }
 
-    private HashSet<Location<World>> getLockLocationsByID(int id) {
-        HashSet<Location<World>> locations = new HashSet<>();
+    private Set<Location<World>> getLockLocationsByID(int id) {
+        Set<Location<World>> locations = new HashSet<>();
 
         try (
             Connection connection = getConnection();
@@ -185,8 +193,8 @@ public class SqlHandler {
         return locations;
     }
 
-    private HashSet<UUID> getAbleToAccessByID(int id) {
-        HashSet<UUID> players = new HashSet<>();
+    private Set<UUID> getAbleToAccessByID(int id) {
+        Set<UUID> players = new HashSet<>();
 
         try (PreparedStatement ps = getConnection().prepareStatement("SELECT PLAYER_UUID FROM LOCK_PLAYERS WHERE LOCK_PLAYERS.LOCK_ID = ?")) {
             ps.setObject(1, id);
@@ -262,7 +270,7 @@ public class SqlHandler {
         }
     }
 
-    public void createLock(Lock lock, HashSet<Location<World>> locations, HashSet<UUID> ableToAccess) {
+    public void createLock(Lock lock, Set<Location<World>> locations, Set<UUID> ableToAccess) {
         try (Connection connection = getConnection();
             PreparedStatement psLock = connection.prepareStatement(
             "INSERT INTO LOCK(OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD, REDSTONE_PROTECT, ACCESSED) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
@@ -417,7 +425,7 @@ public class SqlHandler {
             ps.setString(1, lockedObjectName + "%");
 
             try (ResultSet rs = ps.executeQuery()) {
-                HashSet<String> usedNames = new HashSet<>();
+                Set<String> usedNames = new HashSet<>();
 
                 while (rs.next()) {
                     usedNames.add(rs.getString("LOCK_NAME"));
@@ -430,7 +438,6 @@ public class SqlHandler {
                     }
                 }
             }
-
         } catch (SQLException e) {
             getLogger().error("Error getRandomLockName: " + owner + " for " + lockedObjectName);
             e.printStackTrace();
@@ -453,8 +460,7 @@ public class SqlHandler {
                 ps.setInt(5, location.getBlockZ());
                 ps.executeUpdate();
             } catch (SQLException e) {
-                getLogger()
-                    .error("Error addLockLocation for " + lock.getName() + ", owner: " + lock.getOwner() + ", location: " + location.toString());
+                getLogger().error("Error addLockLocation for " + lock.getName() + ", owner: " + lock.getOwner() + ", location: " + location.toString());
                 e.printStackTrace();
             }
         }
@@ -518,16 +524,25 @@ public class SqlHandler {
 
             try (ResultSet rs = ps.executeQuery();) {
                 while (rs.next()) {
-                    locks.add(
-                        new Lock(UUID.fromString(rs.getString("OWNER_UUID")), rs.getString("LOCK_NAME"), LockType.valueOf(rs.getString("LOCK_TYPE")),
-                            getLockLocationsByID(rs.getInt("ID")), rs.getString("LOCKED_OBJECT"), rs.getBytes("SALT"), rs.getString("PASSWORD"),
-                            getAbleToAccessByID(rs.getInt("ID")), rs.getBoolean("REDSTONE_PROTECT"), rs.getTimestamp("ACCESSED").toLocalDateTime()));
+                    locks.add(Lock.builder()
+                        .owner(UUID.fromString(rs.getString("OWNER_UUID")))
+                        .name(rs.getString("LOCK_NAME"))
+                        .type(LockType.valueOf(rs.getString("LOCK_TYPE")))
+                        .locations(getLockLocationsByID(rs.getInt("ID")))
+                        .objectName(rs.getString("LOCKED_OBJECT"))
+                        .salt(rs.getBytes("SALT"))
+                        .password(rs.getString("PASSWORD"))
+                        .accessors(getAbleToAccessByID(rs.getInt("ID")))
+                        .protectFromRedstone(rs.getBoolean("REDSTONE_PROTECT"))
+                        .lastAccessed(rs.getTimestamp("ACCESSED").toLocalDateTime())
+                        .build());
                 }
             }
         } catch (SQLException e) {
             getLogger().error("Error getLocksByOwner for owner: " + uniqueId);
             e.printStackTrace();
         }
+
         return locks;
     }
 

@@ -60,7 +60,7 @@ public class LockManager {
     }
 
     public void createLock(Lock lock) {
-        Latch.getStorageHandler().createLock(lock, lock.getLocations(), lock.getAbleToAccess());
+        Latch.getStorageHandler().createLock(lock, lock.getLocations(), lock.getAccessors());
     }
 
     public void deleteLock(Location<World> location, boolean deleteEntireLock) {
@@ -133,7 +133,7 @@ public class LockManager {
     }
 
     public void removeAllLockAccess(Lock thisLock) {
-        thisLock.getAbleToAccess().clear();
+        thisLock.getAccessors().clear();
         Latch.getStorageHandler().removeAllLockAccess(thisLock);
     }
 
