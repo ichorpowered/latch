@@ -37,7 +37,7 @@ import com.meronat.latch.storage.SqlHandler;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import org.bstats.Metrics;
+import org.bstats.MetricsLite;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
@@ -82,7 +82,7 @@ public class Latch {
     private ConfigurationLoader<CommentedConfigurationNode> configManager;
 
     @Inject
-    private Metrics metrics;
+    private MetricsLite metrics;
 
     private static Configuration config;
 

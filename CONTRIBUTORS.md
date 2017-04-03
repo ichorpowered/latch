@@ -8,8 +8,8 @@ request feel free to add yourself as well.
 
 The two main developers of the plugin. They have done most of the work and
 continue to maintain and create this locking suite. Together they have a lot of
-goals for the plugin and are excited to continue working on it. Nighteyes604 does most of the work
-in all honesty, so thank him.
+goals for the plugin and are excited to continue working on it. Nighteyes604 does
+most of the work in all honesty, so thank him.
 
 ## dualspiral
 
@@ -22,6 +22,6 @@ with its code licensed under the [MIT License](https://github.com/NucleusPowered
 ## Sponge Team
 
 We have gotten stuck while making Latch and many on the Sponge team have
-helped us through these. Many issues with Sponge have shown up while
-testing Latch as well, and they always do their best to fix them as fast
+helped us through our issues. Many issues with Sponge have shown up while
+testing Latch as well, and they continue to do their best to fix them as fast
 as possible. So many thanks to them.

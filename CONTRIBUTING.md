@@ -2,10 +2,10 @@
 We highly appreciate reports of issues you have experienced with Latch as we want the Latch experience to be perfect. Feel free
 to make the issue here on Github or on our [discussion page](https://forums.spongepowered.org/t/latch-a-locking-plugin-to-protect-your-containers/16508?u=meronat),
 just please make sure to include as much information as possible. We appreciate seeing the Sponge version, the Latch version, and
-a detailed description of the problem. If a screenshot is applicable they can be immensely helpful as well.
+a detailed description of the problem. If a screenshot is applicable, they can be immensely helpful as well.
 
 ## Feature Requests
-These are my favorite thing as sometimes there is some great idea we missed. Simply try to make sure we do not already offer your
+These are my favorite thing as often there is some great idea we missed. Simply try to make sure we do not already offer your
 desired feature then make an issue here on Github and include as much information as possible. We will do our best to provide feedback
 on your suggestion and get it into Latch as fast as possible if we deem it a suiting idea.
 
