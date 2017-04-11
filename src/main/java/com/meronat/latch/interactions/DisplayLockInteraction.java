@@ -56,16 +56,16 @@ public class DisplayLockInteraction implements LockInteraction {
 
     @Override
     public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockState) {
-        Optional<Lock> optionalLock = Latch.getLockManager().getLock(location);
+        final Optional<Lock> optionalLock = Latch.getLockManager().getLock(location);
         //Check to see if another lock is present
         if (!optionalLock.isPresent()) {
             player.sendMessage(Text.of(TextColors.RED, "There is no lock there."));
             return false;
         }
 
-        Lock lock = optionalLock.get();
+        final Lock lock = optionalLock.get();
 
-        List<Text> contents = new ArrayList<>();
+        final List<Text> contents = new ArrayList<>();
 
         contents.add(Text.of(TextColors.GOLD, "Owner: ", TextColors.GRAY, lock.getOwnerName()));
         contents.add(Text.of(TextColors.GOLD, "Latch Type: ", TextColors.GRAY, lock.getLockType().getHumanReadable()));
@@ -80,7 +80,7 @@ public class DisplayLockInteraction implements LockInteraction {
                 .getBlockX() + " Y: " + location.getBlockY() + " Z: " + location.getBlockZ()));
         contents.add(Text.of(TextColors.GOLD, "Accessors: ", TextColors.GRAY, String.join(", ", lock.getAbleToAccessNames())));
 
-        Optional<PaginationService> optionalPaginationService = Sponge.getServiceManager().provide(PaginationService.class);
+        final Optional<PaginationService> optionalPaginationService = Sponge.getServiceManager().provide(PaginationService.class);
 
         if (optionalPaginationService.isPresent()) {
             optionalPaginationService.get().builder()

@@ -54,14 +54,14 @@ public class UnlockLockInteraction implements LockInteraction {
 
     @Override
     public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockState) {
-        Optional<Lock> optionalLock = Latch.getLockManager().getLock(location);
+        final Optional<Lock> optionalLock = Latch.getLockManager().getLock(location);
         //Check to see if another lock is present
         if (!optionalLock.isPresent()) {
             player.sendMessage(Text.of("There is no lock there."));
             return false;
         }
 
-        Lock lock = optionalLock.get();
+        final Lock lock = optionalLock.get();
 
         //If they're the owner or on the list of players within the lock, allow
         if (lock.canAccess(player.getUniqueId())) {
@@ -78,10 +78,10 @@ public class UnlockLockInteraction implements LockInteraction {
             //If the password is correct we're returning true - but if it's a PASSWORD_ONCE need to add them to allowed members
             if (lock.getLockType() == LockType.PASSWORD_ONCE) {
                 //Check for other locks
-                ArrayList<Lock> locks = new ArrayList<>();
+                final ArrayList<Lock> locks = new ArrayList<>();
                 locks.add(lock);
 
-                Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(blockState);
+                final Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(blockState);
                 Optional<Lock> otherBlockLock = Optional.empty();
 
                 //If the block has another block that needs to be unlocked

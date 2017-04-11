@@ -44,12 +44,14 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 public class CreateLockInteraction implements LockInteraction {
 
     private final UUID player;
     private final LockType type;
     private String password;
-    private String name;
+    @Nullable private String name;
 
     private boolean persisting = false;
 
@@ -80,15 +82,15 @@ public class CreateLockInteraction implements LockInteraction {
             return false;
         }
 
-        Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(blockState);
+        final Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(blockState);
 
-        HashSet<Location<World>> lockLocations = new HashSet<>();
+        final HashSet<Location<World>> lockLocations = new HashSet<>();
         lockLocations.add(location);
 
         //If the block has another block that needs to be locked
         if (optionalOtherBlock.isPresent()) {
             //Check to see if another lock is present
-            Optional<Lock> otherLock = Latch.getLockManager().getLock(optionalOtherBlock.get());
+            final Optional<Lock> otherLock = Latch.getLockManager().getLock(optionalOtherBlock.get());
             if (otherLock.isPresent() && !otherLock.get().isOwnerOrBypassing(player.getUniqueId())) {
                 //Shouldn't happen if we've configured this correctly - but just in case...
                 player.sendMessage(Text.of(TextColors.RED, "Another lock already present on the double block - delete locks and try again."));
@@ -110,7 +112,7 @@ public class CreateLockInteraction implements LockInteraction {
             this.password = LatchUtils.hashPassword(this.password, salt);
         }
 
-        LockCreateEvent lockCreateEvent = new LockCreateEvent(
+        final LockCreateEvent lockCreateEvent = new LockCreateEvent(
             player,
             Lock.builder()
                 .owner(player.getUniqueId())

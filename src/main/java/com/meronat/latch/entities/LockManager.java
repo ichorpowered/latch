@@ -44,10 +44,10 @@ import java.util.UUID;
 
 public class LockManager {
 
-    private HashMap<String, Integer> lockLimits = new HashMap<>();
-    private HashMap<UUID, LockInteraction> interactionData = new HashMap<>();
+    private final HashMap<String, Integer> lockLimits = new HashMap<>();
+    private final HashMap<UUID, LockInteraction> interactionData = new HashMap<>();
 
-    private Set<UUID> bypassing = new HashSet<>();
+    private final Set<UUID> bypassing = new HashSet<>();
 
     private List<String> lockableBlocks = new ArrayList<>();
     private List<String> restrictedBlocks = new ArrayList<>();
@@ -115,10 +115,10 @@ public class LockManager {
         this.interactionData.remove(uniqueId);
     }
 
-    public void addLockAccess(Lock thisLock, UUID uniqueId) {
-        if (!thisLock.canAccess(uniqueId)) {
-            thisLock.addAccess(uniqueId);
-            Latch.getStorageHandler().addLockAccess(thisLock, uniqueId);
+    public void addLockAccess(Lock lock, UUID uniqueId) {
+        if (!lock.canAccess(uniqueId)) {
+            lock.addAccess(uniqueId);
+            Latch.getStorageHandler().addLockAccess(lock, uniqueId);
         }
     }
 
@@ -132,16 +132,15 @@ public class LockManager {
         }
     }
 
-    public void removeAllLockAccess(Lock thisLock) {
-        thisLock.getAccessors().clear();
-        Latch.getStorageHandler().removeAllLockAccess(thisLock);
+    public void removeAllLockAccess(Lock lock) {
+        lock.getAccessors().clear();
+        Latch.getStorageHandler().removeAllLockAccess(lock);
     }
 
-    public void removeLockAccess(Lock thisLock, UUID uniqueId) {
-        if (thisLock.canAccess(uniqueId)) {
-            thisLock.removeAccess(uniqueId);
-            Latch.getStorageHandler().removeLockAccess(thisLock, uniqueId);
-
+    public void removeLockAccess(Lock lock, UUID uniqueId) {
+        if (lock.canAccess(uniqueId)) {
+            lock.removeAccess(uniqueId);
+            Latch.getStorageHandler().removeLockAccess(lock, uniqueId);
         }
     }
 

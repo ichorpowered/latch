@@ -67,9 +67,9 @@ public class LatchUtils {
     }
 
     public static List<Lock> getAdjacentLocks(Location location) {
-        List<Lock> lockList = new ArrayList<>();
+        final List<Lock> lockList = new ArrayList<>();
 
-        LockManager lockManager = Latch.getLockManager();
+        final LockManager lockManager = Latch.getLockManager();
 
         for (Direction d : adjacentDirections) {
             if (lockManager.isLockableBlock(location.getBlockRelative(d).getBlock().getType())) {
@@ -88,7 +88,7 @@ public class LatchUtils {
     public static Optional<Location<World>> getDoubleBlockLocation(BlockSnapshot block) {
         if (block != BlockSnapshot.NONE && block.getLocation().isPresent()) {
             //Get all directions we need to evaluate -- doors don't have CONNECTED_DIRECTIONS just PORTION_TYPEs
-            Set<Direction> directionsToInvestigate = block.get(Keys.CONNECTED_DIRECTIONS).orElse(new HashSet<>());
+            final Set<Direction> directionsToInvestigate = block.get(Keys.CONNECTED_DIRECTIONS).orElse(new HashSet<>());
             block.get(Keys.PORTION_TYPE)
                 .map(p -> p == PortionTypes.BOTTOM ? directionsToInvestigate.add(Direction.UP) : directionsToInvestigate.add(Direction.DOWN));
 
@@ -102,7 +102,7 @@ public class LatchUtils {
     }
 
     public static byte[] generateSalt() {
-        byte[] salt = new byte[8];
+        final byte[] salt = new byte[8];
 
         new SecureRandom().nextBytes(salt);
 
@@ -110,10 +110,10 @@ public class LatchUtils {
     }
 
     public static String hashPassword(String password, byte[] salt) {
-        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 1000, 256);
+        final PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 1000, 256);
 
         try {
-            SecretKeyFactory key = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+            final SecretKeyFactory key = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
             return BaseEncoding.base16().encode(key.generateSecret(spec).getEncoded());
         } catch (NoSuchAlgorithmException e) {
             Latch.getLogger().error("Password algorithm not detected. Password will be stored as plaintext.");

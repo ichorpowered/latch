@@ -40,19 +40,21 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 public class ChangeLockInteraction implements LockInteraction {
 
     private final UUID player;
 
-    private LockType type;
-    private String password;
-    private String lockName;
-    private UUID newOwner;
-    private Collection<UUID> membersToAdd;
-    private Collection<UUID> membersToRemove;
+    @Nullable private LockType type;
+    @Nullable private String password;
+    @Nullable private String lockName;
+    @Nullable private UUID newOwner;
+    @Nullable private Collection<UUID> membersToAdd;
+    @Nullable private Collection<UUID> membersToRemove;
+    @Nullable private Boolean protectFromRedstone;
 
     private boolean persisting = false;
-    private Boolean protectFromRedstone;
 
     public ChangeLockInteraction(UUID player) {
         this.player = player;
@@ -88,14 +90,14 @@ public class ChangeLockInteraction implements LockInteraction {
 
     @Override
     public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockState) {
-        Optional<Lock> optionalLock = Latch.getLockManager().getLock(location);
+        final Optional<Lock> optionalLock = Latch.getLockManager().getLock(location);
         //Check to see if another lock is present
         if (!optionalLock.isPresent()) {
             player.sendMessage(Text.of(TextColors.RED, "There is no lock there."));
             return false;
         }
 
-        Lock lock = optionalLock.get();
+        final Lock lock = optionalLock.get();
 
         //Check to make sure they're the owner
         if (!lock.isOwnerOrBypassing(player.getUniqueId())) {
@@ -111,15 +113,14 @@ public class ChangeLockInteraction implements LockInteraction {
             }
         }
 
-        UUID originalOwner = lock.getOwner();
-        String originalName = lock.getName();
-
-        if (this.lockName.equalsIgnoreCase(originalName)) {
-            player.sendMessage(Text.of(TextColors.RED, "This lock already has this name."));
-            return false;
-        }
+        final UUID originalOwner = lock.getOwner();
+        final String originalName = lock.getName();
 
         if (this.lockName != null) {
+            if (this.lockName.equalsIgnoreCase(originalName)) {
+                player.sendMessage(Text.of(TextColors.RED, "This lock already has this name."));
+                return false;
+            }
             if (!Latch.getLockManager().isUniqueName(this.player, this.lockName)) {
                 player.sendMessage(Text.of(TextColors.RED, "This lock name is already taken."));
                 return false;

@@ -30,6 +30,7 @@ import com.meronat.latch.entities.Lock;
 import com.meronat.latch.enums.LockType;
 import com.meronat.latch.interactions.LockInteraction;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
@@ -51,6 +52,8 @@ import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -68,16 +71,16 @@ public class InteractBlockListener {
             return;
         }
         //Get the first transaction of this event
-        SlotTransaction slotTransaction = event.getTransactions().get(0);
+        final SlotTransaction slotTransaction = event.getTransactions().get(0);
 
-        Slot slot = slotTransaction.getSlot();
+        final Slot slot = slotTransaction.getSlot();
 
         //If the player is interacting with a TileEntityCarrier
         if (slot.parent() instanceof TileEntityCarrier) {
             //If the final item is NONE (or amount is less) person is trying to withdraw (so we care about it)
             if (slotTransaction.getFinal().getType() == ItemTypes.NONE || slotTransaction.getFinal().getCount() < slotTransaction.getOriginal().getCount()) {
                 //Then check to see if there's a lock
-                Optional<Lock> lock = Latch.getLockManager().getLock(((TileEntityCarrier) slot.parent()).getLocation());
+                final Optional<Lock> lock = Latch.getLockManager().getLock(((TileEntityCarrier) slot.parent()).getLocation());
 
                 //If there's a donation lock the player CANNOT access
                 if (lock.isPresent() && lock.get().getLockType() == LockType.DONATION && !lock.get().canAccess(player.getUniqueId())) {
@@ -112,11 +115,14 @@ public class InteractBlockListener {
     @Listener
     @Include({InteractBlockEvent.Primary.class, InteractBlockEvent.Secondary.class})
     public void onPlayerClick(InteractBlockEvent event, @Root Player player) {
+        if (!event.getTargetBlock().getLocation().isPresent()) {
+            return;
+        }
+        final Location<World> location = event.getTargetBlock().getLocation().get();
         //Special code to handle shift secondary clicking (placing a block)
         if (event instanceof InteractBlockEvent.Secondary && player.get(Keys.IS_SNEAKING).orElse(false)) {
             if (player.getItemInHand(HandTypes.MAIN_HAND).isPresent() && player.getItemInHand(HandTypes.MAIN_HAND).get().getItem().getBlock().isPresent()) {
-                if (event.getTargetBlock().getLocation().isPresent()
-                    && event.getTargetBlock().getLocation().get().getBlockRelative(event.getTargetSide()).getBlockType() == BlockTypes.AIR) {
+                if (location.getBlockRelative(event.getTargetSide()).getBlockType() == BlockTypes.AIR) {
                     //If they're sneaking and have an item(block) in their hand, and are clicking to replace air... let the block place handle it
                     return;
                 }
@@ -124,16 +130,15 @@ public class InteractBlockListener {
         }
 
         //Ignore air and invalid locations, and non-lockable blocks
-        if (event.getTargetBlock().equals(BlockSnapshot.NONE) || !(event.getTargetBlock().getLocation().isPresent()) || !Latch.getLockManager()
-            .isLockableBlock(event.getTargetBlock().getState().getType())) {
+        if (event.getTargetBlock().equals(BlockSnapshot.NONE) || !Latch.getLockManager().isLockableBlock(event.getTargetBlock().getState().getType())) {
             return;
         }
 
         //If they have an interaction, handle the interaction
         if (Latch.getLockManager().hasInteractionData(player.getUniqueId())) {
-            LockInteraction lockInteraction = Latch.getLockManager().getInteractionData(player.getUniqueId());
+            final LockInteraction lockInteraction = Latch.getLockManager().getInteractionData(player.getUniqueId());
 
-            lockInteraction.handleInteraction(player, event.getTargetBlock().getLocation().get(), event.getTargetBlock());
+            lockInteraction.handleInteraction(player, location, event.getTargetBlock());
 
             event.setCancelled(true);
 
@@ -143,13 +148,15 @@ public class InteractBlockListener {
         } else {
             //Otherwise we only care if it's a lock
             if (Latch.getLockManager().isLockableBlock(event.getTargetBlock().getState().getType())) {
-                Latch.getLockManager().getLock(event.getTargetBlock().getLocation().get()).ifPresent(lock -> {
+                Latch.getLockManager().getLock(location).ifPresent(lock -> {
                     if (lock.getLockType() != LockType.DONATION && !lock.canAccess(player.getUniqueId())) {
                         player.sendMessage(Text.of(TextColors.RED, "You cannot access this lock."));
                         event.setCancelled(true);
                     } else {
-                        if ((event.getTargetBlock().getState().getType().equals(BlockTypes.FURNACE) || event.getTargetBlock().getState().getType()
-                            .equals(BlockTypes.LIT_FURNACE)) && lock.getLockType() == LockType.DONATION && !lock.canAccess(player.getUniqueId())) {
+                        final BlockType blockType = event.getTargetBlock().getState().getType();
+                        // Work around code for donation furnaces allowing infinite experience
+                        if ((blockType.equals(BlockTypes.FURNACE) || blockType.equals(BlockTypes.LIT_FURNACE))
+                            && lock.getLockType() == LockType.DONATION && !lock.canAccess(player.getUniqueId())) {
                             this.stopThem.add(player.getUniqueId());
                         }
                         lock.updateLastAccessed();
@@ -158,5 +165,4 @@ public class InteractBlockListener {
             }
         }
     }
-
 }

@@ -125,7 +125,7 @@ public class Latch {
     }
 
     private void registerListeners() {
-        EventManager eventManager = Sponge.getEventManager();
+        final EventManager eventManager = Sponge.getEventManager();
 
         eventManager.registerListeners(this, new ChangeBlockListener());
         eventManager.registerListeners(this, new InteractBlockListener());

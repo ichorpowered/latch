@@ -61,10 +61,10 @@ public class ChangeBlockListener {
     @Listener
     public void validateBlockPlacement(ChangeBlockEvent.Place event) {
         //Did a player cause this... if so use them for owner checks
-        Optional<Player> optionalPlayer = event.getCause().last(Player.class);
+        final Optional<Player> optionalPlayer = event.getCause().last(Player.class);
 
         //Get a player's lock interaction (if present)
-        Optional<LockInteraction> lockInteraction = optionalPlayer.map(p -> Latch.getLockManager().getInteractionData(p.getUniqueId()));
+        final Optional<LockInteraction> lockInteraction = optionalPlayer.map(p -> Latch.getLockManager().getInteractionData(p.getUniqueId()));
 
         //Variable to see if a lock is created -- this way we don't duplicate messages if a lock gets expanded (like placing a door)
         boolean interactionSuccessful = false;
@@ -76,8 +76,7 @@ public class ChangeBlockListener {
                 if (Latch.getLockManager().isRestrictedBlock(bs.getFinal().getState().getType())) {
                     for (Lock lock : LatchUtils.getAdjacentLocks(bs.getFinal().getLocation().get())) {
                         //If there is a player and they aren't the owner, OR there's no player, invalidate
-                        if ((!optionalPlayer.isPresent() || (optionalPlayer.isPresent() && !lock
-                            .isOwnerOrBypassing(optionalPlayer.get().getUniqueId())))) {
+                        if ((!optionalPlayer.isPresent() || !lock.isOwnerOrBypassing(optionalPlayer.get().getUniqueId()))) {
                             bs.setValid(false);
                             event.setCancelled(true);
                             optionalPlayer.ifPresent(
@@ -88,7 +87,7 @@ public class ChangeBlockListener {
 
                 //If the block is a lockable block, make sure it's not connecting with someone else's lock
                 if (Latch.getLockManager().isLockableBlock(bs.getFinal().getState().getType())) {
-                    Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(bs.getFinal());
+                    final Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(bs.getFinal());
                     Optional<Lock> otherBlockLock = Optional.empty();
 
                     //If the block has another block that needs to be unlocked
@@ -119,7 +118,7 @@ public class ChangeBlockListener {
                 }
 
                 if (optionalPlayer.isPresent()) {
-                    Player player = optionalPlayer.get();
+                    final Player player = optionalPlayer.get();
 
                     //If the player has interaction data
                     if (lockInteraction.isPresent()) {
@@ -168,14 +167,14 @@ public class ChangeBlockListener {
 
     @Listener
     public void onPreBlockChange(ChangeBlockEvent.Pre event, @First LocatableBlock block) {
-        BlockType type = block.getBlockState().getType();
+        final BlockType type = block.getBlockState().getType();
 
         if (type.equals(BlockTypes.PISTON) || type.equals(BlockTypes.STICKY_PISTON) || type.equals(BlockTypes.PISTON_EXTENSION) || type
             .equals(BlockTypes.PISTON_HEAD)) {
             //noinspection OptionalGetWithoutIsPresent
-            Location<World> location = block.getLocation().getBlockRelative(block.get(Keys.DIRECTION).get());
+            final Location<World> location = block.getLocation().getBlockRelative(block.get(Keys.DIRECTION).get());
 
-            LockManager lockManager = Latch.getLockManager();
+            final LockManager lockManager = Latch.getLockManager();
 
             if (lockManager.getLock(location).isPresent() || (lockManager.getLock(location.getBlockRelative(Direction.UP)).isPresent() && lockManager
                 .isProtectBelowBlocks(location.getBlockRelative(Direction.UP).getBlockType()))) {
@@ -187,19 +186,19 @@ public class ChangeBlockListener {
     @Listener
     public void onBreakBlockByPlayer(ChangeBlockEvent.Break event, @Root Player player) {
         //Track the names of the locks broken - only display message once per lock
-        HashSet<String> locksDeleted = new HashSet<String>();
+        final HashSet<String> locksDeleted = new HashSet<>();
 
         //Only allow the owner to break a lock
         for (Transaction<BlockSnapshot> bs : event.getTransactions()) {
             if (bs.isValid() && bs.getOriginal().getLocation().isPresent()) {
-                Location location = bs.getOriginal().getLocation().get();
-                LockManager lockManager = Latch.getLockManager();
+                final Location location = bs.getOriginal().getLocation().get();
+                final LockManager lockManager = Latch.getLockManager();
 
-                Optional<Lock> optionalLock = lockManager.getLock(location);
+                final Optional<Lock> optionalLock = lockManager.getLock(location);
 
                 //If the block is below a block we need to protect the below blocks of...
                 //Potentially Sponge issue - should be able to detect these blocks
-                Optional<Lock> aboveLock = lockManager.getLock(location.getBlockRelative(Direction.UP));
+                final Optional<Lock> aboveLock = lockManager.getLock(location.getBlockRelative(Direction.UP));
 
                 if (aboveLock.isPresent() && lockManager.isProtectBelowBlocks(location.getBlockRelative(Direction.UP).getBlockType()) && !aboveLock
                     .get().isOwnerOrBypassing(player.getUniqueId())) {
@@ -209,7 +208,7 @@ public class ChangeBlockListener {
                 }
 
                 if (optionalLock.isPresent()) {
-                    Lock lock = optionalLock.get();
+                    final Lock lock = optionalLock.get();
 
                     //Check to make sure they're the owner
                     if (!lock.isOwnerOrBypassing(player.getUniqueId())) {
@@ -234,14 +233,14 @@ public class ChangeBlockListener {
     public void onBlockBrokenByExplosion(ExplosionEvent.Post event) {
         if (Latch.getConfig().getNode("protect_from_explosives").getBoolean(true)) {
             //If we're supposed to protect from explosions, invalidate the transaction
-            LockManager lockManager = Latch.getLockManager();
+            final LockManager lockManager = Latch.getLockManager();
             for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
                 if (transaction.isValid() && transaction.getOriginal().getLocation().isPresent()) {
-                    Location<World> location = transaction.getOriginal().getLocation().get();
+                    final Location<World> location = transaction.getOriginal().getLocation().get();
                     if (lockManager.getLock(location).isPresent()) {
                         transaction.setValid(false);
                     }
-                    Optional<Lock> aboveLock = lockManager.getLock(location.getBlockRelative(Direction.UP));
+                    final Optional<Lock> aboveLock = lockManager.getLock(location.getBlockRelative(Direction.UP));
                     if (aboveLock.isPresent() && lockManager.isProtectBelowBlocks(location.getBlockRelative(Direction.UP).getBlockType())) {
                         transaction.setValid(false);
                     }
@@ -262,7 +261,7 @@ public class ChangeBlockListener {
     //Sponge issue? - Interacting with chests near water triggers the block place event for the surrounding water
     //So let's limit our block placing to just solid blocks
     private boolean isSolidBlock(BlockState bs) {
-        Optional<MatterProperty> mp = bs.getProperty(MatterProperty.class);
+        final Optional<MatterProperty> mp = bs.getProperty(MatterProperty.class);
         return mp.isPresent() && mp.get().getValue() == MatterProperty.Matter.SOLID;
     }
 

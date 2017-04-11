@@ -45,6 +45,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 public class Lock {
 
     private Set<Location<World>> locations;
@@ -132,7 +134,7 @@ public class Lock {
     }
 
     public List<String> getAbleToAccessNames() {
-        List<String> names = new ArrayList<>();
+        final List<String> names = new ArrayList<>();
 
         Optional<UserStorageService> userStorageService = Sponge.getGame().getServiceManager().provide(UserStorageService.class);
 
@@ -155,7 +157,7 @@ public class Lock {
     }
 
     public String getOwnerName() {
-        Optional<UserStorageService> userStorageService = Sponge.getGame().getServiceManager().provide(UserStorageService.class);
+        final Optional<UserStorageService> userStorageService = Sponge.getGame().getServiceManager().provide(UserStorageService.class);
 
         if (userStorageService.isPresent()) {
             Optional<User> user = userStorageService.get().get(this.owner);
@@ -167,8 +169,8 @@ public class Lock {
     }
 
     public Optional<Location<World>> getFirstLocation() {
-        Optional<Location<World>> location = Optional.empty();
-        Iterator<Location<World>> itr = this.locations.iterator();
+        final Optional<Location<World>> location = Optional.empty();
+        final Iterator<Location<World>> itr = this.locations.iterator();
 
         if (itr.hasNext()) {
             return Optional.of(itr.next());
@@ -204,17 +206,17 @@ public class Lock {
 
     public static class Builder {
 
-        private Set<Location<World>> locations;
-        private Set<UUID> accessors;
+        @Nullable private Set<Location<World>> locations;
+        @Nullable private Set<UUID> accessors;
 
-        private byte[] salt;
+        @Nullable private byte[] salt;
 
-        private UUID owner;
-        private LockType type;
-        private String name;
-        private String objectName;
-        private String password;
-        private LocalDateTime lastAccessed;
+        @Nullable private UUID owner;
+        @Nullable private LockType type;
+        @Nullable private String name;
+        @Nullable private String objectName;
+        @Nullable private String password;
+        @Nullable private LocalDateTime lastAccessed;
 
         private boolean protectedFromRedstone;
 
@@ -232,7 +234,7 @@ public class Lock {
             return this;
         }
 
-        public Lock.Builder name(String name) {
+        public Lock.Builder name(@Nullable String name) {
             this.name = name;
 
             return this;
@@ -262,7 +264,7 @@ public class Lock {
             return this;
         }
 
-        public Lock.Builder salt(byte[] salt) {
+        public Lock.Builder salt(@Nullable byte[] salt) {
             this.salt = salt;
 
             return this;
