@@ -23,48 +23,4 @@
  * THE SOFTWARE.
  */
 
-package com.meronat.latch.events;
-
-import com.meronat.latch.entities.Lock;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Cancellable;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.impl.AbstractEvent;
-
-public class LockCreateEvent extends AbstractEvent implements Cancellable {
-
-    private final Cause cause;
-    private final Player creator;
-    private final Lock lock;
-    private boolean cancelled = false;
-
-    public LockCreateEvent(Player creator, Lock lock, Cause cause) {
-        this.creator = creator;
-        this.lock = lock;
-        this.cause = cause;
-    }
-
-    public Player getPlayer() {
-        return this.creator;
-    }
-
-    public Lock getLock() {
-        return this.lock;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return this.cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean cancel) {
-        this.cancelled = cancel;
-    }
-
-    @Override
-    public Cause getCause() {
-        return this.cause;
-    }
-
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault package com.meronat.latch.events;

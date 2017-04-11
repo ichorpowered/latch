@@ -45,7 +45,6 @@ public class AddAccessorCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-
         if (!(src instanceof Player)) {
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
@@ -58,7 +57,7 @@ public class AddAccessorCommand implements CommandExecutor {
 
         addPlayers.setPersistence(args.hasAny("p"));
 
-        if(members.size() > 0) {
+        if (members.size() > 0) {
             addPlayers.setMembersToAdd(members);
         } else {
             throw new CommandException(Text.of(TextColors.RED, "You must specify a user to add."));
@@ -73,7 +72,6 @@ public class AddAccessorCommand implements CommandExecutor {
         }
 
         return CommandResult.success();
-
     }
 
 }

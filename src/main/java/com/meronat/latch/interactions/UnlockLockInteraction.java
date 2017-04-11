@@ -54,42 +54,42 @@ public class UnlockLockInteraction implements LockInteraction {
 
     @Override
     public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockState) {
-        Optional<Lock> optionalLock = Latch.getLockManager().getLock(location);
+        final Optional<Lock> optionalLock = Latch.getLockManager().getLock(location);
         //Check to see if another lock is present
-        if(!optionalLock.isPresent()) {
+        if (!optionalLock.isPresent()) {
             player.sendMessage(Text.of("There is no lock there."));
             return false;
         }
 
-        Lock lock = optionalLock.get();
+        final Lock lock = optionalLock.get();
 
         //If they're the owner or on the list of players within the lock, allow
-        if(lock.canAccess(player.getUniqueId())) {
+        if (lock.canAccess(player.getUniqueId())) {
             return true;
         }
 
         //Check the password
-        if(Latch.getLockManager().isPasswordCompatibleLock(lock)) {
-            if( !LatchUtils.hashPassword(this.password, lock.getSalt()).equals(lock.getPassword())) {
+        if (Latch.getLockManager().isPasswordCompatibleLock(lock)) {
+            if (!LatchUtils.hashPassword(this.password, lock.getSalt()).equals(lock.getPassword())) {
                 player.sendMessage(Text.of(TextColors.RED, "The password you tried is incorrect."));
                 return false;
             }
 
             //If the password is correct we're returning true - but if it's a PASSWORD_ONCE need to add them to allowed members
-            if(lock.getLockType() == LockType.PASSWORD_ONCE) {
+            if (lock.getLockType() == LockType.PASSWORD_ONCE) {
                 //Check for other locks
-                ArrayList<Lock> locks = new ArrayList<>();
+                final ArrayList<Lock> locks = new ArrayList<>();
                 locks.add(lock);
 
-                Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(blockState);
+                final Optional<Location<World>> optionalOtherBlock = LatchUtils.getDoubleBlockLocation(blockState);
                 Optional<Lock> otherBlockLock = Optional.empty();
 
                 //If the block has another block that needs to be unlocked
-                if(optionalOtherBlock.isPresent()) {
-                    otherBlockLock = Optional.of(Latch.getLockManager().getLock(optionalOtherBlock.get()).get());
+                if (optionalOtherBlock.isPresent()) {
+                    otherBlockLock = Latch.getLockManager().getLock(optionalOtherBlock.get());
                 }
-                if(otherBlockLock.isPresent()) {
-                    if(!otherBlockLock.get().getPassword().equalsIgnoreCase(this.password)) {
+                if (otherBlockLock.isPresent()) {
+                    if (!otherBlockLock.get().getPassword().equalsIgnoreCase(this.password)) {
                         player.sendMessage(Text.of(TextColors.RED, "The adjacent lock does not have the same password."));
                     } else {
                         locks.add(otherBlockLock.get());
@@ -97,7 +97,7 @@ public class UnlockLockInteraction implements LockInteraction {
                 }
 
                 //Modify the attributes of the lock
-                for(Lock thisLock : locks) {
+                for (Lock thisLock : locks) {
                     Latch.getLockManager().addLockAccess(thisLock, player.getUniqueId());
                     lock.updateLastAccessed();
                 }
@@ -120,4 +120,5 @@ public class UnlockLockInteraction implements LockInteraction {
     public void setPersistence(boolean persist) {
         this.persisting = persist;
     }
+
 }

@@ -37,16 +37,16 @@ import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import javax.annotation.Nonnull;
 
 public class HelpCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(@Nonnull CommandSource src, CommandContext args) throws CommandException {
-
         List<Text> contents = new ArrayList<>();
 
         contents.add(LatchUtils.formatHelpText("/latch version", "Shows information about the Latch plugin",
@@ -131,7 +131,6 @@ public class HelpCommand implements CommandExecutor {
         }
 
         return CommandResult.success();
-
     }
 
 }

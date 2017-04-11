@@ -25,6 +25,8 @@
 
 package com.meronat.latch.storage;
 
+import static com.meronat.latch.Latch.getLogger;
+
 import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
 import com.meronat.latch.enums.LockType;
@@ -47,13 +49,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
-import static com.meronat.latch.Latch.getLogger;
+import javax.annotation.Nullable;
 
 public class SqlHandler {
 
-    private SqlService sql;
+    @Nullable private SqlService sql;
 
     public SqlHandler() {
         createTables();
@@ -63,11 +66,13 @@ public class SqlHandler {
         if (this.sql == null) {
             this.sql = Sponge.getServiceManager().provide(SqlService.class).get();
         }
-        return this.sql.getDataSource("jdbc:h2:" + Latch.getConfigPatch().getParent().toAbsolutePath().toString() + File.separator + "latch").getConnection();
+        return this.sql.getDataSource("jdbc:h2:" + Latch.getConfigPatch().getParent().toAbsolutePath().toString() + File.separator + "latch")
+            .getConnection();
     }
 
     private void createTables() {
-        String createLockTable = "CREATE TABLE IF NOT EXISTS LOCK (" +
+        String createLockTable =
+            "CREATE TABLE IF NOT EXISTS LOCK (" +
                 "ID bigint AUTO_INCREMENT, " +
                 "OWNER_UUID char(36) NOT NULL, " +
                 "LOCK_NAME varchar(25) NOT NULL, " +
@@ -79,7 +84,8 @@ public class SqlHandler {
                 "ACCESSED DATETIME NOT NULL," +
                 "PRIMARY KEY(ID), CONSTRAINT UQ_OWNER_NAME UNIQUE (OWNER_UUID, LOCK_NAME) )";
 
-        String createLocationTable = "CREATE TABLE IF NOT EXISTS LOCK_LOCATIONS (" +
+        String createLocationTable =
+            "CREATE TABLE IF NOT EXISTS LOCK_LOCATIONS (" +
                 "LOCK_ID bigint, " +
                 "WORLD_UUID char(36) NOT NULL, " +
                 "X int NOT NULL, " +
@@ -88,16 +94,17 @@ public class SqlHandler {
                 "FOREIGN KEY (LOCK_ID) REFERENCES LOCK(ID), " +
                 "PRIMARY KEY (WORLD_UUID, X, Y, Z) )";
 
-        String createPlayerTable = "CREATE TABLE IF NOT EXISTS LOCK_PLAYERS (" +
+        String createPlayerTable =
+            "CREATE TABLE IF NOT EXISTS LOCK_PLAYERS (" +
                 "LOCK_ID bigint, " +
                 "PLAYER_UUID char(36) NOT NULL, " +
                 "FOREIGN KEY (LOCK_ID) REFERENCES LOCK(ID) )";
 
         try (
-                Connection connection = getConnection();
-                PreparedStatement psLockTable = connection.prepareStatement(createLockTable);
-                PreparedStatement psLocationTable = connection.prepareStatement(createLocationTable);
-                PreparedStatement psPlayerTable = connection.prepareStatement(createPlayerTable)
+            Connection connection = getConnection();
+            PreparedStatement psLockTable = connection.prepareStatement(createLockTable);
+            PreparedStatement psLocationTable = connection.prepareStatement(createLocationTable);
+            PreparedStatement psPlayerTable = connection.prepareStatement(createPlayerTable)
         ) {
             psLockTable.execute();
             psLocationTable.execute();
@@ -108,8 +115,8 @@ public class SqlHandler {
         }
 
         try (
-                Connection connection = getConnection();
-                PreparedStatement add = connection.prepareStatement("ALTER TABLE LOCK ADD COLUMN ACCESSED DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP");
+            Connection connection = getConnection();
+            PreparedStatement add = connection.prepareStatement("ALTER TABLE LOCK ADD COLUMN ACCESSED DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP")
         ) {
             DatabaseMetaData metaData = connection.getMetaData();
             if (!metaData.getColumns(null, null, "LOCK", "ACCESSED").next()) {
@@ -119,39 +126,37 @@ public class SqlHandler {
             getLogger().error("There was a problem adding the ACCESSED column. Please report this to the developers:");
             e.printStackTrace();
         }
-
     }
 
     public Optional<Lock> getLockByLocation(Location location) {
-        Optional<Lock> lock = Optional.empty();
+        Optional<Lock> optionalLock = Optional.empty();
 
         try (
-                Connection connection = getConnection();
-                PreparedStatement ps = connection.prepareStatement(
-                        "SELECT ID, OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD, REDSTONE_PROTECT, ACCESSED FROM LOCK_LOCATIONS JOIN LOCK ON (LOCK_LOCATIONS.LOCK_ID = LOCK.ID) "
-                                + "WHERE LOCK_LOCATIONS.WORLD_UUID = ? AND LOCK_LOCATIONS.X = ? AND LOCK_LOCATIONS.Y = ? AND LOCK_LOCATIONS.Z = ?")
+            Connection connection = getConnection();
+            PreparedStatement ps = connection.prepareStatement(
+                "SELECT ID, OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD, REDSTONE_PROTECT, ACCESSED FROM LOCK_LOCATIONS " +
+                    "JOIN LOCK ON (LOCK_LOCATIONS.LOCK_ID = LOCK.ID) WHERE LOCK_LOCATIONS.WORLD_UUID = ? AND LOCK_LOCATIONS.X = ? AND LOCK_LOCATIONS.Y = ? AND LOCK_LOCATIONS.Z = ?")
         ) {
             ps.setObject(1, location.getExtent().getUniqueId());
             ps.setInt(2, location.getBlockX());
             ps.setInt(3, location.getBlockY());
             ps.setInt(4, location.getBlockZ());
 
-            try (
-                    ResultSet tempLock = ps.executeQuery()
-            ) {
+            try (ResultSet tempLock = ps.executeQuery()) {
                 //Should only be one lock at this location, if any
                 if (tempLock.next()) {
-                    lock = Optional.of(new Lock(
-                            UUID.fromString(tempLock.getString("OWNER_UUID")),
-                            tempLock.getString("LOCK_NAME"),
-                            LockType.valueOf(tempLock.getString("LOCK_TYPE")),
-                            getLockLocationsByID(tempLock.getInt("ID")),
-                            tempLock.getString("LOCKED_OBJECT"),
-                            tempLock.getBytes("SALT"),
-                            tempLock.getString("PASSWORD"),
-                            getAbleToAccessByID(tempLock.getInt("ID")),
-                            tempLock.getBoolean("REDSTONE_PROTECT"),
-                            tempLock.getTimestamp("ACCESSED").toLocalDateTime()));
+                    optionalLock = Optional.of(Lock.builder()
+                        .owner(UUID.fromString(tempLock.getString("OWNER_UUID")))
+                        .name(tempLock.getString("LOCK_NAME"))
+                        .type(LockType.valueOf(tempLock.getString("LOCK_TYPE")))
+                        .locations(getLockLocationsByID(tempLock.getInt("ID")))
+                        .objectName(tempLock.getString("LOCKED_OBJECT"))
+                        .salt(tempLock.getBytes("SALT"))
+                        .password(tempLock.getString("PASSWORD"))
+                        .accessors(getAbleToAccessByID(tempLock.getInt("ID")))
+                        .protectFromRedstone(tempLock.getBoolean("REDSTONE_PROTECT"))
+                        .lastAccessed(tempLock.getTimestamp("ACCESSED").toLocalDateTime())
+                        .build());
                 }
             }
 
@@ -159,28 +164,27 @@ public class SqlHandler {
             getLogger().error("Error running SQL getLockByLocation: ");
             e.printStackTrace();
         }
-        return lock;
+        return optionalLock;
     }
 
-    private HashSet<Location<World>> getLockLocationsByID(int id) {
-        HashSet<Location<World>> locations = new HashSet<>();
+    private Set<Location<World>> getLockLocationsByID(int id) {
+        final Set<Location<World>> locations = new HashSet<>();
 
         try (
-                Connection connection = getConnection();
-                PreparedStatement ps = connection.prepareStatement("SELECT WORLD_UUID, X, Y, Z FROM LOCK_LOCATIONS WHERE LOCK_LOCATIONS.LOCK_ID = ?");
+            Connection connection = getConnection();
+            PreparedStatement ps = connection.prepareStatement("SELECT WORLD_UUID, X, Y, Z FROM LOCK_LOCATIONS WHERE LOCK_LOCATIONS.LOCK_ID = ?")
         ) {
             ps.setObject(1, id);
 
-            try (
-                    ResultSet rs = ps.executeQuery();
-            ) {
+            try (ResultSet rs = ps.executeQuery();) {
                 while (rs.next()) {
-                    Optional<World> world = Sponge.getServer().getWorld(UUID.fromString(rs.getString("WORLD_UUID")));
+                    final Optional<World> world = Sponge.getServer().getWorld(UUID.fromString(rs.getString("WORLD_UUID")));
                     if (world.isPresent()) {
                         locations.add(world.get().getLocation(rs.getInt("X"), rs.getInt("Y"), rs.getInt("Z")));
                     } else {
-                        getLogger().error("Error loading location in getLockLocationsByID: " + rs.getString("WORLD_UUID")
-                                + " does not exist as a world (ID: " + id + ")");
+                        getLogger().error(
+                            "Error loading location in getLockLocationsByID: " + rs.getString("WORLD_UUID") +
+                                " does not exist as a world (ID: " + id + ")");
                     }
                 }
             }
@@ -191,18 +195,16 @@ public class SqlHandler {
         return locations;
     }
 
-    private HashSet<UUID> getAbleToAccessByID(int id) {
-        HashSet<UUID> players = new HashSet<>();
+    private Set<UUID> getAbleToAccessByID(int id) {
+        final Set<UUID> players = new HashSet<>();
 
         try (
-                Connection connection = getConnection();
-                PreparedStatement ps = connection.prepareStatement("SELECT PLAYER_UUID FROM LOCK_PLAYERS WHERE LOCK_PLAYERS.LOCK_ID = ?");
+            Connection connection = getConnection();
+            PreparedStatement ps = connection.prepareStatement("SELECT PLAYER_UUID FROM LOCK_PLAYERS WHERE LOCK_PLAYERS.LOCK_ID = ?")
         ) {
             ps.setObject(1, id);
 
-            try (
-                    ResultSet rs = ps.executeQuery();
-            ) {
+            try (ResultSet rs = ps.executeQuery();) {
                 while (rs.next()) {
                     players.add(UUID.fromString(rs.getString("PLAYER_UUID")));
                 }
@@ -222,8 +224,8 @@ public class SqlHandler {
         Optional<Integer> id = Optional.empty();
 
         try (
-                Connection connection = getConnection();
-                PreparedStatement ps = connection.prepareStatement("SELECT ID FROM LOCK WHERE LOCK.OWNER_UUID = ? AND LOCK.LOCK_NAME = ?");
+            Connection connection = getConnection();
+            PreparedStatement ps = connection.prepareStatement("SELECT ID FROM LOCK WHERE LOCK.OWNER_UUID = ? AND LOCK.LOCK_NAME = ?")
         ) {
             ps.setObject(1, owner);
             ps.setString(2, name);
@@ -243,9 +245,9 @@ public class SqlHandler {
         Optional<Integer> id = Optional.empty();
 
         try (
-                Connection connection = getConnection();
-                PreparedStatement ps = connection.prepareStatement(
-                        "SELECT LOCK_ID FROM LOCK_LOCATIONS WHERE LOCK_LOCATIONS.WORLD_UUID = ? AND LOCK_LOCATIONS.X = ? AND LOCK_LOCATIONS.Y = ? AND LOCK_LOCATIONS.Z = ?");
+            Connection connection = getConnection();
+            PreparedStatement ps = connection.prepareStatement(
+            "SELECT LOCK_ID FROM LOCK_LOCATIONS WHERE LOCK_LOCATIONS.WORLD_UUID = ? AND LOCK_LOCATIONS.X = ? AND LOCK_LOCATIONS.Y = ? AND LOCK_LOCATIONS.Z = ?")
         ) {
             ps.setObject(1, location.getExtent().getUniqueId());
             ps.setInt(2, location.getBlockX());
@@ -269,8 +271,8 @@ public class SqlHandler {
 
         if (id.isPresent()) {
             try (
-                    Connection connection = getConnection();
-                    PreparedStatement ps = connection.prepareStatement("INSERT INTO LOCK_PLAYERS(LOCK_ID, PLAYER_UUID) VALUES (?, ?)");
+                Connection connection = getConnection();
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO LOCK_PLAYERS(LOCK_ID, PLAYER_UUID) VALUES (?, ?)")
             ) {
                 ps.setInt(1, id.get());
                 ps.setObject(2, player);
@@ -279,18 +281,17 @@ public class SqlHandler {
                 getLogger().error("Error addLockAccess for " + thisLock.getName() + ", owner: " + thisLock.getOwner() + ", player: " + player);
                 e.printStackTrace();
             }
-
         }
     }
 
-    public void createLock(Lock lock, HashSet<Location<World>> locations, HashSet<UUID> ableToAccess) {
-        try (
-                Connection connection = getConnection();
-                PreparedStatement psLock = connection.prepareStatement(
-                        "INSERT INTO LOCK(OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD, REDSTONE_PROTECT, ACCESSED) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                        PreparedStatement.RETURN_GENERATED_KEYS);
-                PreparedStatement psLocations = connection.prepareStatement("INSERT INTO LOCK_LOCATIONS(LOCK_ID, WORLD_UUID, X, Y, Z) VALUES (?, ?, ?, ?, ?)");
-                PreparedStatement psPlayers = connection.prepareStatement("INSERT INTO LOCK_PLAYERS(LOCK_ID, PLAYER_UUID) VALUES (?, ?)");
+    public void createLock(Lock lock, Set<Location<World>> locations, Set<UUID> ableToAccess) {
+        try (Connection connection = getConnection();
+            PreparedStatement psLock = connection.prepareStatement(
+            "INSERT INTO LOCK(OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD, REDSTONE_PROTECT, ACCESSED) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            PreparedStatement.RETURN_GENERATED_KEYS);
+            PreparedStatement psLocations = connection.prepareStatement(
+            "INSERT INTO LOCK_LOCATIONS(LOCK_ID, WORLD_UUID, X, Y, Z) VALUES (?, ?, ?, ?, ?)");
+            PreparedStatement psPlayers = connection.prepareStatement("INSERT INTO LOCK_PLAYERS(LOCK_ID, PLAYER_UUID) VALUES (?, ?)")
         ) {
             psLock.setObject(1, lock.getOwner());
             psLock.setString(2, lock.getName());
@@ -331,12 +332,10 @@ public class SqlHandler {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
     }
 
     public void deleteLock(Location<World> location, boolean deleteEntireLock) {
-        Optional<Integer> lockKey = getLockID(location);
+        final Optional<Integer> lockKey = getLockID(location);
         boolean fullyDelete = deleteEntireLock; //do we fully delete the lock (from all tables)
 
         if (lockKey.isPresent()) {
@@ -346,9 +345,7 @@ public class SqlHandler {
                     try (PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) FROM LOCK_LOCATIONS WHERE LOCK_ID = ?")) {
                         ps.setLong(1, lockKey.get());
 
-                        try (
-                                ResultSet rs = ps.executeQuery();
-                        ) {
+                        try (ResultSet rs = ps.executeQuery();) {
                             //if only one row left, fully delete or if no locations left, fully delete
                             fullyDelete = !rs.next() || rs.getLong(1) <= 1;
                         }
@@ -357,9 +354,9 @@ public class SqlHandler {
 
                 if (fullyDelete) {
                     try (
-                            PreparedStatement locationDelete = connection.prepareStatement("DELETE FROM LOCK_LOCATIONS WHERE LOCK_ID = ?");
-                            PreparedStatement playersDelete = connection.prepareStatement("DELETE FROM LOCK_PLAYERS WHERE LOCK_ID = ?");
-                            PreparedStatement lockDelete = connection.prepareStatement("DELETE FROM LOCK WHERE ID = ?");
+                        PreparedStatement locationDelete = connection.prepareStatement("DELETE FROM LOCK_LOCATIONS WHERE LOCK_ID = ?");
+                        PreparedStatement playersDelete = connection.prepareStatement("DELETE FROM LOCK_PLAYERS WHERE LOCK_ID = ?");
+                        PreparedStatement lockDelete = connection.prepareStatement("DELETE FROM LOCK WHERE ID = ?")
                     ) {
                         locationDelete.setLong(1, lockKey.get());
                         locationDelete.execute();
@@ -371,10 +368,8 @@ public class SqlHandler {
                         lockDelete.execute();
                     }
                 } else {
-                    try (
-                            PreparedStatement locationDelete = connection.prepareStatement(
-                                    "DELETE FROM LOCK_LOCATIONS WHERE WORLD_UUID = ? AND X = ? AND Y = ? AND Z = ?");
-                    ) {
+                    try (PreparedStatement locationDelete = connection
+                        .prepareStatement("DELETE FROM LOCK_LOCATIONS WHERE WORLD_UUID = ? AND X = ? AND Y = ? AND Z = ?")) {
                         locationDelete.setObject(1, location.getExtent().getUniqueId());
                         locationDelete.setInt(2, location.getBlockX());
                         locationDelete.setInt(3, location.getBlockY());
@@ -382,11 +377,9 @@ public class SqlHandler {
                         locationDelete.execute();
                     }
                 }
-
-                connection.close();
             } catch (SQLException e) {
-                    getLogger().error("Error deleteLock for location: " + location.toString());
-                    e.printStackTrace();
+                getLogger().error("Error deleteLock for location: " + location.toString());
+                e.printStackTrace();
             }
         } else {
             getLogger().error("Error deleteLock for location (ID not found): " + location.toString());
@@ -396,9 +389,8 @@ public class SqlHandler {
     public void deleteLocksForPlayer(UUID player) {
         try (
             Connection connection = getConnection();
-            PreparedStatement ps = connection.prepareStatement("SELECT ID FROM LOCK WHERE OWNER_UUID = ?");
+            PreparedStatement ps = connection.prepareStatement("SELECT ID FROM LOCK WHERE OWNER_UUID = ?")
         ) {
-
             ps.setString(1, player.toString());
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -406,7 +398,7 @@ public class SqlHandler {
                     try (
                         PreparedStatement psLocations = connection.prepareStatement("DELETE FROM LOCK_LOCATIONS WHERE LOCK_ID = ?");
                         PreparedStatement psAccessors = connection.prepareStatement("DELETE FROM LOCK_PLAYERS WHERE LOCK_ID = ?");
-                        PreparedStatement psLocks = connection.prepareStatement("DELETE FROM LOCK WHERE ID = ?");
+                        PreparedStatement psLocks = connection.prepareStatement("DELETE FROM LOCK WHERE ID = ?")
                     ) {
                         String lockId = rs.getString(1);
 
@@ -420,17 +412,15 @@ public class SqlHandler {
                     }
                 }
             }
-
         } catch (SQLException e) {
             getLogger().error("Error deleting locks for player: " + player.toString());
         }
-
     }
 
     public boolean isUniqueName(UUID playerUUID, String lockName) {
         try (
-                Connection connection = getConnection();
-                PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) FROM LOCK WHERE OWNER_UUID = ? AND LOCK_NAME = ?");
+            Connection connection = getConnection();
+            PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) FROM LOCK WHERE OWNER_UUID = ? AND LOCK_NAME = ?")
         ) {
             ps.setObject(1, playerUUID);
             ps.setString(2, lockName);
@@ -440,24 +430,22 @@ public class SqlHandler {
                     return rs.getLong("COUNT(*)") == 0;
                 }
             }
-
         } catch (SQLException e) {
             getLogger().error("Error isUniqueName: " + playerUUID.toString() + ", for lock: " + lockName);
             e.printStackTrace();
         }
-
         return false;
     }
 
     public String getRandomLockName(UUID owner, String lockedObjectName) {
         try (
-                Connection connection = getConnection();
-                PreparedStatement ps = connection.prepareStatement("SELECT LOCK_NAME FROM LOCK WHERE LOCK_NAME LIKE ?");
+            Connection connection = getConnection();
+            PreparedStatement ps = connection.prepareStatement("SELECT LOCK_NAME FROM LOCK WHERE LOCK_NAME LIKE ?")
         ) {
             ps.setString(1, lockedObjectName + "%");
 
             try (ResultSet rs = ps.executeQuery()) {
-                HashSet<String> usedNames = new HashSet<>();
+                final Set<String> usedNames = new HashSet<>();
 
                 while (rs.next()) {
                     usedNames.add(rs.getString("LOCK_NAME"));
@@ -470,7 +458,6 @@ public class SqlHandler {
                     }
                 }
             }
-
         } catch (SQLException e) {
             getLogger().error("Error getRandomLockName: " + owner + " for " + lockedObjectName);
             e.printStackTrace();
@@ -482,12 +469,12 @@ public class SqlHandler {
     }
 
     public void addLockLocation(Lock lock, Location<World> location) {
-        Optional<Integer> id = getLockID(lock);
+        final Optional<Integer> id = getLockID(lock);
 
         if (id.isPresent()) {
             try (
-                    Connection connection = getConnection();
-                    PreparedStatement ps = connection.prepareStatement("INSERT INTO LOCK_LOCATIONS(LOCK_ID, WORLD_UUID, X, Y, Z) VALUES (?, ?, ?, ?, ?)");
+                Connection connection = getConnection();
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO LOCK_LOCATIONS(LOCK_ID, WORLD_UUID, X, Y, Z) VALUES (?, ?, ?, ?, ?)")
             ) {
                 ps.setInt(1, id.get());
                 ps.setObject(2, location.getExtent().getUniqueId());
@@ -503,12 +490,12 @@ public class SqlHandler {
     }
 
     public void removeLockAccess(Lock thisLock, UUID uniqueId) {
-        Optional<Integer> id = getLockID(thisLock);
+        final Optional<Integer> id = getLockID(thisLock);
 
         if (id.isPresent()) {
             try (
-                    Connection connection = getConnection();
-                    PreparedStatement ps = connection.prepareStatement("DELETE FROM LOCK_PLAYERS WHERE LOCK_ID = ? AND PLAYER_UUID = ?");
+                Connection connection = getConnection();
+                PreparedStatement ps = connection.prepareStatement("DELETE FROM LOCK_PLAYERS WHERE LOCK_ID = ? AND PLAYER_UUID = ?")
             ) {
                 ps.setInt(1, id.get());
                 ps.setObject(2, uniqueId);
@@ -522,9 +509,9 @@ public class SqlHandler {
 
     public void updateLockAttributes(UUID originalOwner, String originalName, Lock thisLock) {
         try (
-                Connection connection = getConnection();
-                PreparedStatement ps = connection.prepareStatement(
-                        "UPDATE LOCK SET OWNER_UUID = ?, LOCK_NAME = ?, LOCK_TYPE = ?, PASSWORD = ?, SALT = ?, REDSTONE_PROTECT = ?, ACCESSED = ? WHERE OWNER_UUID = ? AND LOCK_NAME = ?");
+            Connection connection = getConnection();
+            PreparedStatement ps = connection.prepareStatement(
+            "UPDATE LOCK SET OWNER_UUID = ?, LOCK_NAME = ?, LOCK_TYPE = ?, PASSWORD = ?, SALT = ?, REDSTONE_PROTECT = ?, ACCESSED = ? WHERE OWNER_UUID = ? AND LOCK_NAME = ?")
         ) {
             ps.setString(1, thisLock.getOwner().toString());
             ps.setString(2, thisLock.getName());
@@ -544,12 +531,12 @@ public class SqlHandler {
     }
 
     public void removeAllLockAccess(Lock thisLock) {
-        Optional<Integer> id = getLockID(thisLock);
+        final Optional<Integer> id = getLockID(thisLock);
 
         if (id.isPresent()) {
             try (
-                    Connection connection = getConnection();
-                    PreparedStatement ps = connection.prepareStatement("DELETE FROM LOCK_PLAYERS WHERE LOCK_ID = ?");
+                Connection connection = getConnection();
+                PreparedStatement ps = connection.prepareStatement("DELETE FROM LOCK_PLAYERS WHERE LOCK_ID = ?")
             ) {
                 ps.setInt(1, id.get());
                 ps.executeUpdate();
@@ -561,30 +548,29 @@ public class SqlHandler {
     }
 
     public List<Lock> getLocksByOwner(UUID uniqueId) {
-        List<Lock> locks = new ArrayList<>();
+        final List<Lock> locks = new ArrayList<>();
 
         try (
-                Connection connection = getConnection();
-                PreparedStatement ps = connection.prepareStatement(
-                        "SELECT ID, OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD, REDSTONE_PROTECT, ACCESSED FROM LOCK WHERE OWNER_UUID = ?");
+            Connection connection = getConnection();
+            PreparedStatement ps = connection.prepareStatement(
+            "SELECT ID, OWNER_UUID, LOCK_NAME, LOCK_TYPE, LOCKED_OBJECT, SALT, PASSWORD, REDSTONE_PROTECT, ACCESSED FROM LOCK WHERE OWNER_UUID = ?")
         ) {
             ps.setString(1, uniqueId.toString());
 
-            try (
-                    ResultSet rs = ps.executeQuery();
-            ) {
+            try (ResultSet rs = ps.executeQuery();) {
                 while (rs.next()) {
-                    locks.add(new Lock(
-                            UUID.fromString(rs.getString("OWNER_UUID")),
-                            rs.getString("LOCK_NAME"),
-                            LockType.valueOf(rs.getString("LOCK_TYPE")),
-                            getLockLocationsByID(rs.getInt("ID")),
-                            rs.getString("LOCKED_OBJECT"),
-                            rs.getBytes("SALT"),
-                            rs.getString("PASSWORD"),
-                            getAbleToAccessByID(rs.getInt("ID")),
-                            rs.getBoolean("REDSTONE_PROTECT"),
-                            rs.getTimestamp("ACCESSED").toLocalDateTime()));
+                    locks.add(Lock.builder()
+                        .owner(UUID.fromString(rs.getString("OWNER_UUID")))
+                        .name(rs.getString("LOCK_NAME"))
+                        .type(LockType.valueOf(rs.getString("LOCK_TYPE")))
+                        .locations(getLockLocationsByID(rs.getInt("ID")))
+                        .objectName(rs.getString("LOCKED_OBJECT"))
+                        .salt(rs.getBytes("SALT"))
+                        .password(rs.getString("PASSWORD"))
+                        .accessors(getAbleToAccessByID(rs.getInt("ID")))
+                        .protectFromRedstone(rs.getBoolean("REDSTONE_PROTECT"))
+                        .lastAccessed(rs.getTimestamp("ACCESSED").toLocalDateTime())
+                        .build());
                 }
             }
         } catch (SQLException e) {
@@ -602,9 +588,9 @@ public class SqlHandler {
         }
 
         try (
-                Connection connection = getConnection();
-                PreparedStatement ps = connection.prepareStatement(
-                        "SELECT COUNT(ID) as TOTAL, SUM(CASE WHEN LOCK.LOCK_TYPE = ? THEN 1 ELSE 0 END) AS TYPE_TOTAL FROM LOCK WHERE LOCK.OWNER_UUID = ?");
+            Connection connection = getConnection();
+            PreparedStatement ps = connection.prepareStatement(
+            "SELECT COUNT(ID) as TOTAL, SUM(CASE WHEN LOCK.LOCK_TYPE = ? THEN 1 ELSE 0 END) AS TYPE_TOTAL FROM LOCK WHERE LOCK.OWNER_UUID = ?")
         ) {
             ps.setString(1, type.toString());
             ps.setString(2, player.toString());
@@ -612,11 +598,9 @@ public class SqlHandler {
             try (ResultSet rs = ps.executeQuery()) {
                 //If total limit set and query says we're above that.. or if type limit is set and query says we're above that
                 return rs.next() && ( //if !rs.next(), no locks detected
-                        (limits.containsKey("total") && rs.getInt("TOTAL") >= limits.get("total")) || (
-                                limits.containsKey(type.toString().toLowerCase())
-                                        && rs.getInt("TYPE_TOTAL") >= limits.get(type.toString().toLowerCase())));
+                    (limits.containsKey("total") && rs.getInt("TOTAL") >= limits.get("total")) || (limits.containsKey(type.toString().toLowerCase())
+                        && rs.getInt("TYPE_TOTAL") >= limits.get(type.toString().toLowerCase())));
             }
-
         } catch (SQLException e) {
             getLogger().error("Error isPlayerAtLockLimit: " + player + ", " + type);
             e.printStackTrace();
@@ -626,23 +610,12 @@ public class SqlHandler {
         return true;
     }
 
-    /*public void updateLastAccessed(UUID player, LocalDateTime now) {
-        try (PreparedStatement ps = getConnection().prepareStatement("UPDATE LOCK SET ACCESSED = ? WHERE OWNER_UUID = ?")) {
-            ps.setTimestamp(1, Timestamp.valueOf(now));
-            ps.setString(2, player.toString());
-        } catch (SQLException e) {
-            getLogger().error("Error updateLastAccessed: " + player);
-            e.printStackTrace();
-        }
-    }*/
-
     public int clearLocksOlderThan(int days) {
-
         int amountDeleted = 0;
 
         try (
-                Connection connection = getConnection();
-                PreparedStatement ps = connection.prepareStatement("SELECT ID FROM LOCK WHERE ACCESSED < ?");
+            Connection connection = getConnection();
+            PreparedStatement ps = connection.prepareStatement("SELECT ID FROM LOCK WHERE ACCESSED < ?")
         ) {
             ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now().minusDays(days)));
 
@@ -650,9 +623,9 @@ public class SqlHandler {
                 while (rs.next()) {
                     amountDeleted++;
                     try (
-                            PreparedStatement psLocations = connection.prepareStatement("DELETE FROM LOCK_LOCATIONS WHERE LOCK_ID = ?");
-                            PreparedStatement psAccessors = connection.prepareStatement("DELETE FROM LOCK_PLAYERS WHERE LOCK_ID = ?");
-                            PreparedStatement psLocks = connection.prepareStatement("DELETE FROM LOCK WHERE ID = ?");
+                        PreparedStatement psLocations = connection.prepareStatement("DELETE FROM LOCK_LOCATIONS WHERE LOCK_ID = ?");
+                        PreparedStatement psAccessors = connection.prepareStatement("DELETE FROM LOCK_PLAYERS WHERE LOCK_ID = ?");
+                        PreparedStatement psLocks = connection.prepareStatement("DELETE FROM LOCK WHERE ID = ?")
                     ) {
                         String lockId = rs.getString(1);
 
@@ -672,17 +645,15 @@ public class SqlHandler {
         }
 
         return amountDeleted;
-
     }
 
     public Map<String, Integer> getLimits(UUID uuid) {
-
-        Map<String, Integer> limits = new HashMap<>();
+        final Map<String, Integer> limits = new HashMap<>();
 
         try (
-                Connection connection = getConnection();
-                PreparedStatement ps = connection.prepareStatement(
-                        "SELECT COUNT(*) as TOTAL, LOCK.LOCK_TYPE as LOCKTYPE FROM LOCK WHERE LOCK.OWNER_UUID = ? GROUP BY LOCK.LOCK_TYPE");
+            Connection connection = getConnection();
+            PreparedStatement ps = connection.prepareStatement(
+            "SELECT COUNT(*) as TOTAL, LOCK.LOCK_TYPE as LOCKTYPE FROM LOCK WHERE LOCK.OWNER_UUID = ? GROUP BY LOCK.LOCK_TYPE")
         ) {
             ps.setString(1, uuid.toString());
 
@@ -695,9 +666,7 @@ public class SqlHandler {
             getLogger().error("Error isPlayerAtLockLimit: " + uuid.toString());
             e.printStackTrace();
         }
-
         return limits;
-
     }
 
 }

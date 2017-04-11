@@ -25,6 +25,8 @@
 
 package com.meronat.latch.entities;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.meronat.latch.Latch;
 import com.meronat.latch.enums.LockType;
 import com.meronat.latch.utils.LatchUtils;
@@ -40,66 +42,43 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 public class Lock {
 
-    private HashSet<Location<World>> location = new HashSet<>();
-    private HashSet<UUID> ableToAccess = new HashSet<>();
+    private Set<Location<World>> locations;
+    private Set<UUID> accessors;
+
+    private byte[] salt;
 
     private UUID owner;
-    private String name;
     private LockType type;
-    private String lockedObjectName;
-
-    private byte[] salt = new byte[8];
-    private String password = "";
-    private boolean protectFromRedstone;
-
+    private String name;
+    private String objectName;
+    private String password;
     private LocalDateTime lastAccessed;
 
-    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password, boolean protectFromRedstone, LocalDateTime lastAccessed) {
-        this(owner, LatchUtils.getRandomLockName(owner, lockedObjectName), type, location, lockedObjectName, salt, password, new HashSet<>(), protectFromRedstone, lastAccessed);
-    }
+    private boolean protectFromRedstone;
 
-    public Lock(UUID owner, String lockName, LockType type, HashSet<Location<World>> location, String lockedObjectName, byte[] salt, String password, HashSet<UUID> players, boolean protectFromRedstone, LocalDateTime lastAccessed) {
+    private Lock(UUID owner, LockType type, String name, String objectName, String password, byte[] salt, Set<Location<World>> locations,
+        Set<UUID> accessors, LocalDateTime lastAccessed, boolean protectFromRedstone) {
         this.owner = owner;
         this.type = type;
-        this.lockedObjectName = lockedObjectName;
-        this.salt = salt;
-        this.password = password;
-        this.location = location;
-        this.name = lockName;
-        this.ableToAccess = players;
-        this.protectFromRedstone = protectFromRedstone;
-        this.lastAccessed = lastAccessed;
-    }
-
-    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, boolean protectFromRedstone, LocalDateTime lastAccessed) {
-        this.owner = owner;
-        this.name = LatchUtils.getRandomLockName(owner, lockedObjectName);
-        this.type = type;
-        this.lockedObjectName = lockedObjectName;
-        this.location = location;
-        this.protectFromRedstone = protectFromRedstone;
-        this.lastAccessed = lastAccessed;
-    }
-
-    // TODO This is super messy. Let's switch to a builder pattern once we add the flag table.
-
-    public Lock(UUID owner, LockType type, HashSet<Location<World>> location, String lockedObjectName, boolean protectFromRedstone, LocalDateTime lastAccessed, String name) {
-        this.owner = owner;
         this.name = name;
-        this.type = type;
-        this.lockedObjectName = lockedObjectName;
-        this.location = location;
-        this.protectFromRedstone = protectFromRedstone;
-        this.ableToAccess = new HashSet<>();
+        this.objectName = objectName;
+        this.password = password;
+        this.salt = salt;
+        this.locations = locations;
+        this.accessors = accessors;
         this.lastAccessed = lastAccessed;
+        this.protectFromRedstone = protectFromRedstone;
     }
 
-    protected HashSet<Location<World>> getLocations() {
-        return this.location;
+    public Set<Location<World>> getLocations() {
+        return this.locations;
     }
 
     public void setOwner(UUID uuid) {
@@ -123,7 +102,7 @@ public class Lock {
     }
 
     public String getLockedObject() {
-        return this.lockedObjectName;
+        return this.objectName;
     }
 
     public boolean isOwnerOrBypassing(UUID uniqueId) {
@@ -142,25 +121,25 @@ public class Lock {
         this.password = password;
     }
 
-    protected void addAccess(UUID uuid) {
-        this.ableToAccess.add(uuid);
+    public void addAccess(UUID uuid) {
+        this.accessors.add(uuid);
     }
 
-    protected void removeAccess(UUID uuid) {
-        this.ableToAccess.remove(uuid);
+    public void removeAccess(UUID uuid) {
+        this.accessors.remove(uuid);
     }
 
-    protected HashSet<UUID> getAbleToAccess() {
-        return this.ableToAccess;
+    public Set<UUID> getAccessors() {
+        return this.accessors;
     }
 
     public List<String> getAbleToAccessNames() {
-        List<String> names = new ArrayList<>();
+        final List<String> names = new ArrayList<>();
 
         Optional<UserStorageService> userStorageService = Sponge.getGame().getServiceManager().provide(UserStorageService.class);
 
-        if(userStorageService.isPresent()) {
-            for(UUID uuid : this.ableToAccess) {
+        if (userStorageService.isPresent()) {
+            for (UUID uuid : this.accessors) {
                 userStorageService.get().get(uuid).ifPresent(u -> names.add(u.getName()));
             }
         }
@@ -169,7 +148,8 @@ public class Lock {
     }
 
     public boolean canAccess(UUID uniqueId) {
-        return this.ableToAccess.contains(uniqueId) || this.owner.equals(uniqueId) || this.type == LockType.PUBLIC || Latch.getLockManager().isBypassing(uniqueId);
+        return this.accessors.contains(uniqueId) || this.owner.equals(uniqueId) || this.type == LockType.PUBLIC || Latch.getLockManager()
+            .isBypassing(uniqueId);
     }
 
     public String getPassword() {
@@ -177,20 +157,22 @@ public class Lock {
     }
 
     public String getOwnerName() {
-        Optional<UserStorageService> userStorageService = Sponge.getGame().getServiceManager().provide(UserStorageService.class);
+        final Optional<UserStorageService> userStorageService = Sponge.getGame().getServiceManager().provide(UserStorageService.class);
 
-        if(userStorageService.isPresent()) {
+        if (userStorageService.isPresent()) {
             Optional<User> user = userStorageService.get().get(this.owner);
-            return user.get().getName();
+            if (user.isPresent()) {
+                return user.get().getName();
+            }
         }
         return "(owner name not found)";
     }
 
     public Optional<Location<World>> getFirstLocation() {
-        Optional<Location<World>> location = Optional.empty();
-        Iterator<Location<World>> itr = this.location.iterator();
+        final Optional<Location<World>> location = Optional.empty();
+        final Iterator<Location<World>> itr = this.locations.iterator();
 
-        if(itr.hasNext()) {
+        if (itr.hasNext()) {
             return Optional.of(itr.next());
         }
         return location;
@@ -218,6 +200,130 @@ public class Lock {
 
     public void updateLastAccessed() {
         this.lastAccessed = LocalDateTime.now();
-        Sponge.getScheduler().createAsyncExecutor(Latch.getPluginContainer()).execute(() -> Latch.getLockManager().updateLockAttributes(this.owner, this.name, this));
+        Sponge.getScheduler().createAsyncExecutor(Latch.getPluginContainer())
+            .execute(() -> Latch.getLockManager().updateLockAttributes(this.owner, this.name, this));
     }
+
+    public static class Builder {
+
+        @Nullable private Set<Location<World>> locations;
+        @Nullable private Set<UUID> accessors;
+
+        @Nullable private byte[] salt;
+
+        @Nullable private UUID owner;
+        @Nullable private LockType type;
+        @Nullable private String name;
+        @Nullable private String objectName;
+        @Nullable private String password;
+        @Nullable private LocalDateTime lastAccessed;
+
+        private boolean protectedFromRedstone;
+
+        private Builder() {}
+
+        public Lock.Builder owner(UUID owner) {
+            this.owner = owner;
+
+            return this;
+        }
+
+        public Lock.Builder type(LockType type) {
+            this.type = type;
+
+            return this;
+        }
+
+        public Lock.Builder name(@Nullable String name) {
+            this.name = name;
+
+            return this;
+        }
+
+        public Lock.Builder objectName(String name) {
+            this.objectName = name;
+
+            return this;
+        }
+
+        public Lock.Builder password(String password) {
+            this.password = password;
+
+            return this;
+        }
+
+        public Lock.Builder lastAccessed(LocalDateTime lastAccessed) {
+            this.lastAccessed = lastAccessed;
+
+            return this;
+        }
+
+        public Lock.Builder protectFromRedstone(boolean protect) {
+            this.protectedFromRedstone = protect;
+
+            return this;
+        }
+
+        public Lock.Builder salt(@Nullable byte[] salt) {
+            this.salt = salt;
+
+            return this;
+        }
+
+        public Lock.Builder accessors(Set<UUID> accessors) {
+            this.accessors = accessors;
+
+            return this;
+        }
+
+        public Lock.Builder locations(Set<Location<World>> locations) {
+            this.locations = locations;
+
+            return this;
+        }
+
+        public Lock build() {
+            checkNotNull(this.owner, "You must specify an owner for the lock.");
+            checkNotNull(this.type, "You must specify the type of lock.");
+            if (this.locations == null) {
+                this.locations = new HashSet<>();
+            }
+            if (this.accessors == null) {
+                this.accessors = new HashSet<>();
+            }
+            if (this.salt == null) {
+                this.salt = new byte[8];
+            }
+            if (this.objectName == null) {
+                this.objectName = "unknown";
+            }
+            if (this.name == null) {
+                this.name = LatchUtils.getRandomLockName(this.owner, this.objectName);
+            }
+            if (this.password == null) {
+                this.password = "";
+            }
+            if (this.lastAccessed == null) {
+                this.lastAccessed = LocalDateTime.now();
+            }
+
+            return new Lock(
+                this.owner,
+                this.type,
+                this.name,
+                this.objectName,
+                this.password,
+                this.salt,
+                this.locations,
+                this.accessors,
+                this.lastAccessed,
+                this.protectedFromRedstone);
+        }
+
+    }
+
+    public static Lock.Builder builder() {
+        return new Lock.Builder();
+    }
+
 }

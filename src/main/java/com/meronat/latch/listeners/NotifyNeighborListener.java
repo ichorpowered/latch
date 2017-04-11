@@ -53,18 +53,18 @@ public class NotifyNeighborListener {
     //TODO Could this be improved? Is this querying too often? +Reevaluate once Sponge modifies redstone data
     @Listener
     public void notifyNeighbors(NotifyNeighborBlockEvent event, @First LocatableBlock cause) {
-        LockManager lockManager = Latch.getLockManager();
+        final LockManager lockManager = Latch.getLockManager();
         event.getNeighbors().entrySet().removeIf(neighbor -> {
-            Optional<Lock> optionalLock = lockManager.getLock(cause.getLocation().getBlockRelative(neighbor.getKey()));
+            final Optional<Lock> optionalLock = lockManager.getLock(cause.getLocation().getBlockRelative(neighbor.getKey()));
 
             if (optionalLock.isPresent()) {
-                Lock lock = optionalLock.get();
+                final Lock lock = optionalLock.get();
 
                 if (!lock.getProtectFromRedstone()) {
                     return false;
                 }
 
-                Optional<Player> optionalPlayer = event.getCause().first(Player.class);
+                final Optional<Player> optionalPlayer = event.getCause().first(Player.class);
 
                 //noinspection OptionalIsPresent
                 return !optionalPlayer.isPresent() || !lock.canAccess(optionalPlayer.get().getUniqueId());

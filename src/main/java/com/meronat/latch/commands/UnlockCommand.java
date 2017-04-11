@@ -42,7 +42,6 @@ public class UnlockCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-
         if (!(src instanceof Player)) {
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
@@ -51,7 +50,7 @@ public class UnlockCommand implements CommandExecutor {
 
         Player player = (Player) src;
 
-        if(!password.isPresent())  {
+        if (!password.isPresent()) {
             throw new CommandException(Text.of(TextColors.RED, "You must specify a password to unlock locks."));
         }
 
@@ -68,7 +67,6 @@ public class UnlockCommand implements CommandExecutor {
         }
 
         return CommandResult.success();
-
     }
 
 }

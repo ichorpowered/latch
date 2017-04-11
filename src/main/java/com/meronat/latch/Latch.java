@@ -27,7 +27,6 @@ package com.meronat.latch;
 
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
-import com.meronat.latch.bstats.Metrics;
 import com.meronat.latch.commands.Commands;
 import com.meronat.latch.entities.LockManager;
 import com.meronat.latch.listeners.ChangeBlockListener;
@@ -38,6 +37,7 @@ import com.meronat.latch.storage.SqlHandler;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import org.bstats.MetricsLite;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
@@ -58,17 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-@Plugin(
-        id = Info.ID,
-        name = Info.NAME,
-        version = Info.VERSION,
-        description = Info.DESCRIPTION,
-        url = Info.URL,
-        authors = {
-                "Nighteyes604",
-                "Meronat"
-        }
-)
+@Plugin(id = Info.ID, name = Info.NAME, version = Info.VERSION, description = Info.DESCRIPTION, url = Info.URL, authors = {"Nighteyes604", "Meronat"})
 public class Latch {
 
     private static Logger logger;
@@ -92,7 +82,7 @@ public class Latch {
     private ConfigurationLoader<CommentedConfigurationNode> configManager;
 
     @Inject
-    private Metrics metrics;
+    private MetricsLite metrics;
 
     private static Configuration config;
 
@@ -108,10 +98,9 @@ public class Latch {
         Commands.getCommands().register();
 
         // Register base permission node.
-        if(getConfig().getNode("add_default_permissions").getBoolean()) {
-            Sponge.getServiceManager().provide(PermissionService.class).ifPresent(
-                    p -> p.getUserSubjects().getDefaults().getSubjectData()
-                            .setPermission(p.getDefaults().getActiveContexts(), "latch.normal", Tristate.TRUE));
+        if (getConfig().getNode("add_default_permissions").getBoolean()) {
+            Sponge.getServiceManager().provide(PermissionService.class).ifPresent(p -> p.getUserSubjects().getDefaults().getSubjectData()
+                .setPermission(p.getDefaults().getActiveContexts(), "latch.normal", Tristate.TRUE));
         }
     }
 
@@ -123,23 +112,24 @@ public class Latch {
     private void registerTasks() {
         if (getConfig().getNode("clean_old_locks").getBoolean(false)) {
             Task.builder()
-                    .name("clean-old-locks")
-                    .async()
-                    .interval(getConfig().getNode("clean_old_locks_interval").getInt(4), TimeUnit.HOURS)
-                    .execute(() -> {
-                        int daysOld = getConfig().getNode("clean_locks_older_than").getInt(40);
-                        getLogger().info("Successfully deleted " + storageHandler.clearLocksOlderThan(daysOld) + " locks older than " + daysOld + " days old.");
-                    })
-                    .submit(getPluginContainer());
+                .name("clean-old-locks")
+                .async()
+                .interval(getConfig().getNode("clean_old_locks_interval").getInt(4), TimeUnit.HOURS)
+                .execute(() -> {
+                    int daysOld = getConfig().getNode("clean_locks_older_than").getInt(40);
+                    getLogger()
+                        .info("Successfully deleted " + storageHandler.clearLocksOlderThan(daysOld) + " locks older than " + daysOld + " days old.");
+                })
+                .submit(getPluginContainer());
         }
     }
 
     private void registerListeners() {
-        EventManager eventManager = Sponge.getEventManager();
+        final EventManager eventManager = Sponge.getEventManager();
 
         eventManager.registerListeners(this, new ChangeBlockListener());
         eventManager.registerListeners(this, new InteractBlockListener());
-        if (getConfig().getNode("protect_from_redstone").getBoolean(false)); {
+        if (getConfig().getNode("protect_from_redstone").getBoolean(false)) {
             eventManager.registerListeners(this, new NotifyNeighborListener());
         }
         if (getConfig().getNode("remove_bypass_on_logout").getBoolean()) {

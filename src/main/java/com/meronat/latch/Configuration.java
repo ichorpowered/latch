@@ -57,14 +57,13 @@ class Configuration {
     }
 
     private void loadDefaults() {
-
         //Should we add latch.normal to default permissions?
-        if(this.rootNode.getNode("add_default_permissions").isVirtual()) {
+        if (this.rootNode.getNode("add_default_permissions").isVirtual()) {
             this.rootNode.getNode("add_default_permissions").setValue(false);
         }
 
         //Blocks we're able to lock
-        if(this.rootNode.getNode("lockable_blocks").isVirtual()) {
+        if (this.rootNode.getNode("lockable_blocks").isVirtual()) {
             List<String> lockableBlocks = new ArrayList<>();
 
             lockableBlocks.add(BlockTypes.CHEST.getId());
@@ -117,19 +116,19 @@ class Configuration {
         }
 
         //Should we protect locks from explosions?
-        if(this.rootNode.getNode("protect_from_explosives").isVirtual()) {
+        if (this.rootNode.getNode("protect_from_explosives").isVirtual()) {
             this.rootNode.getNode("protect_from_explosives").setValue(true);
         }
 
         //Blocks we should prevent being placed next to locks the player doesn't own
-        if(this.rootNode.getNode("prevent_adjacent_to_locks").isVirtual()) {
+        if (this.rootNode.getNode("prevent_adjacent_to_locks").isVirtual()) {
             List<String> preventAdjacent = new ArrayList<>();
             preventAdjacent.add(BlockTypes.HOPPER.getId());
             this.rootNode.getNode("prevent_adjacent_to_locks").setValue(preventAdjacent);
         }
 
         //Blocks that rely on a block under them to stay intact
-        if(this.rootNode.getNode("protect_below_block").isVirtual()) {
+        if (this.rootNode.getNode("protect_below_block").isVirtual()) {
             List<String> protectBelowBlock = new ArrayList<>();
             protectBelowBlock.add(BlockTypes.ACACIA_DOOR.getId());
             protectBelowBlock.add(BlockTypes.BIRCH_DOOR.getId());
@@ -142,16 +141,17 @@ class Configuration {
         }
 
         //Lock limit per enum
-        if(this.rootNode.getNode("lock_limit").isVirtual()) {
+        if (this.rootNode.getNode("lock_limit").isVirtual()) {
             HashMap<String, Integer> limits = new HashMap<>();
             limits.put("total", 30);
 
-            for(LockType type : LockType.values()) {
+            for (LockType type : LockType.values()) {
                 limits.put(type.toString().toLowerCase(), 8);
             }
 
             try {
-                this.rootNode.getNode("lock_limit").setValue(new TypeToken<Map<String, Integer>>() {}, limits);
+                this.rootNode.getNode("lock_limit").setValue(new TypeToken<Map<String, Integer>>() {
+                }, limits);
             } catch (ObjectMappingException e) {
                 this.rootNode.getNode("lock_limit").setValue(limits);
                 e.printStackTrace();
@@ -159,7 +159,7 @@ class Configuration {
         }
 
         //Do we allow redstone protection?
-        if(this.rootNode.getNode("protect_from_redstone").isVirtual()) {
+        if (this.rootNode.getNode("protect_from_redstone").isVirtual()) {
             this.rootNode.getNode("protect_from_redstone").setValue(false);
         }
 

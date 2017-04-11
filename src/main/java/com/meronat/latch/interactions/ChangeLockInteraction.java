@@ -40,19 +40,21 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 public class ChangeLockInteraction implements LockInteraction {
 
     private final UUID player;
 
-    private LockType type;
-    private String password;
-    private String lockName;
-    private UUID newOwner;
-    private Collection<UUID> membersToAdd;
-    private Collection<UUID> membersToRemove;
+    @Nullable private LockType type;
+    @Nullable private String password;
+    @Nullable private String lockName;
+    @Nullable private UUID newOwner;
+    @Nullable private Collection<UUID> membersToAdd;
+    @Nullable private Collection<UUID> membersToRemove;
+    @Nullable private Boolean protectFromRedstone;
 
     private boolean persisting = false;
-    private Boolean protectFromRedstone;
 
     public ChangeLockInteraction(UUID player) {
         this.player = player;
@@ -82,42 +84,43 @@ public class ChangeLockInteraction implements LockInteraction {
         this.membersToRemove = members;
     }
 
-    public void setProtectFromRedstone(Boolean protectFromRedstone) { this.protectFromRedstone = protectFromRedstone; }
+    public void setProtectFromRedstone(Boolean protectFromRedstone) {
+        this.protectFromRedstone = protectFromRedstone;
+    }
 
     @Override
     public boolean handleInteraction(Player player, Location<World> location, BlockSnapshot blockState) {
-        Optional<Lock> optionalLock = Latch.getLockManager().getLock(location);
+        final Optional<Lock> optionalLock = Latch.getLockManager().getLock(location);
         //Check to see if another lock is present
-        if(!optionalLock.isPresent()) {
+        if (!optionalLock.isPresent()) {
             player.sendMessage(Text.of(TextColors.RED, "There is no lock there."));
             return false;
         }
 
-        Lock lock = optionalLock.get();
+        final Lock lock = optionalLock.get();
 
         //Check to make sure they're the owner
-        if(!lock.isOwnerOrBypassing(player.getUniqueId())) {
+        if (!lock.isOwnerOrBypassing(player.getUniqueId())) {
             player.sendMessage(Text.of(TextColors.RED, "You are not the owner of this lock."));
             return false;
         }
 
         //Check to make sure, if they're assigning a new owner, the new owner is not at their limit
-        if(newOwner != null || type != null) {
+        if (newOwner != null || type != null) {
             if (Latch.getLockManager().isPlayerAtLockLimit(newOwner == null ? lock.getOwner() : newOwner, type == null ? lock.getLockType() : type)) {
                 player.sendMessage(Text.of(TextColors.RED, "You cannot change this lock due to lock limits."));
                 return false;
             }
         }
 
-        UUID originalOwner = lock.getOwner();
-        String originalName = lock.getName();
-
-        if (this.lockName.equalsIgnoreCase(originalName)) {
-            player.sendMessage(Text.of(TextColors.RED, "This lock already has this name."));
-            return false;
-        }
+        final UUID originalOwner = lock.getOwner();
+        final String originalName = lock.getName();
 
         if (this.lockName != null) {
+            if (this.lockName.equalsIgnoreCase(originalName)) {
+                player.sendMessage(Text.of(TextColors.RED, "This lock already has this name."));
+                return false;
+            }
             if (!Latch.getLockManager().isUniqueName(this.player, this.lockName)) {
                 player.sendMessage(Text.of(TextColors.RED, "This lock name is already taken."));
                 return false;
@@ -125,46 +128,45 @@ public class ChangeLockInteraction implements LockInteraction {
             lock.setName(this.lockName);
         }
 
-        if(this.type != null) {
+        if (this.type != null) {
             lock.setType(type);
         }
-        if(this.password != null) {
+        if (this.password != null) {
             lock.setSalt(LatchUtils.generateSalt());
             lock.changePassword(LatchUtils.hashPassword(this.password, lock.getSalt()));
 
             //If changing password, need to clear out ability to access
             Latch.getLockManager().removeAllLockAccess(lock);
         }
-        if(this.newOwner != null) {
+        if (this.newOwner != null) {
             //If assigning to a new owner - need to validate the name
-            if(!Latch.getLockManager().isUniqueName(this.newOwner, lock.getName())) {
+            if (!Latch.getLockManager().isUniqueName(this.newOwner, lock.getName())) {
                 lock.setName(LatchUtils.getRandomLockName(this.newOwner, lock.getLockedObject()));
             }
             lock.setOwner(this.newOwner);
         }
-        if(this.membersToAdd != null) {
-            for(UUID u : this.membersToAdd) {
+        if (this.membersToAdd != null) {
+            for (UUID u : this.membersToAdd) {
                 Latch.getLockManager().addLockAccess(lock, u);
             }
         }
-        if(this.membersToRemove != null) {
-            for(UUID u : this.membersToRemove) {
+        if (this.membersToRemove != null) {
+            for (UUID u : this.membersToRemove) {
                 Latch.getLockManager().removeLockAccess(lock, u);
             }
         }
-        if(this.protectFromRedstone != null) {
+        if (this.protectFromRedstone != null) {
             lock.setProtectFromRedstone(this.protectFromRedstone);
         }
 
         //Update the base lock elements
-        if(this.lockName != null || this.type != null || this.password != null || this.newOwner != null || this.protectFromRedstone != null) {
+        if (this.lockName != null || this.type != null || this.password != null || this.newOwner != null || this.protectFromRedstone != null) {
             Latch.getLockManager().updateLockAttributes(originalOwner, originalName, lock);
         }
 
         player.sendMessage(Text.of(TextColors.DARK_GREEN, "Lock data has been successfully updated."));
 
         return true;
-
     }
 
     @Override
