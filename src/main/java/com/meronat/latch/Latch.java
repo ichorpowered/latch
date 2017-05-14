@@ -121,6 +121,8 @@ public class Latch {
         loadConfigurationData();
         registerListeners();
         registerTasks();
+
+        logger.info("Latch has been successfully reloaded.");
     }
 
     @Listener
@@ -147,6 +149,7 @@ public class Latch {
         final EventManager eventManager = Sponge.getEventManager();
 
         eventManager.unregisterPluginListeners(this);
+        eventManager.registerListeners(this, this);
     }
 
     private void registerListeners() {
