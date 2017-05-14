@@ -193,6 +193,12 @@ class Configuration {
         }
     }
 
+    public void reloadConfig() {
+        this.saveConfig();
+        this.loadDefaults();
+    }
+
+
     public CommentedConfigurationNode getRootNode() {
         return this.rootNode;
     }

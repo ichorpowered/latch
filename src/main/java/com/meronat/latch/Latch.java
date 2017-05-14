@@ -43,6 +43,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
@@ -68,14 +69,10 @@ public class Latch {
 
     private static PluginContainer plugin;
 
+    private static Configuration config;
     private static SqlHandler storageHandler;
 
-    @Inject
-    public Latch(Logger logger, @DefaultConfig(sharedRoot = false) Path configPath, PluginContainer pluginContainer) {
-        Latch.logger = logger;
-        Latch.configPath = configPath;
-        Latch.plugin = pluginContainer;
-    }
+    private Task cleanLocksTask;
 
     @Inject
     @DefaultConfig(sharedRoot = false)
@@ -84,16 +81,22 @@ public class Latch {
     @Inject
     private MetricsLite metrics;
 
-    private static Configuration config;
+
+    @Inject
+    public Latch(Logger logger, @DefaultConfig(sharedRoot = false) Path configPath, PluginContainer pluginContainer) {
+        Latch.logger = logger;
+        Latch.configPath = configPath;
+        Latch.plugin = pluginContainer;
+    }
 
     @Listener
     public void onGameInit(GameInitializationEvent event) {
         config = new Configuration(configManager);
         storageHandler = new SqlHandler();
 
-        loadConfigurationData();
+        this.loadConfigurationData();
 
-        registerListeners();
+        this.registerListeners();
 
         Commands.getCommands().register();
 
@@ -105,13 +108,26 @@ public class Latch {
     }
 
     @Listener
+    public void onGameReload(GameReloadEvent event) {
+        if (this.cleanLocksTask != null) this.cleanLocksTask.cancel();
+        this.unregisterListeners();
+
+        config.reloadConfig();
+        storageHandler.reloadTables();
+
+        this.loadConfigurationData();
+        this.registerListeners();
+        this.registerTasks();
+    }
+
+    @Listener
     public void onGamePostInitialization(GamePostInitializationEvent event) {
         registerTasks();
     }
 
     private void registerTasks() {
         if (getConfig().getNode("clean_old_locks").getBoolean(false)) {
-            Task.builder()
+            this.cleanLocksTask = Task.builder()
                 .name("clean-old-locks")
                 .async()
                 .interval(getConfig().getNode("clean_old_locks_interval").getInt(4), TimeUnit.HOURS)
@@ -122,6 +138,12 @@ public class Latch {
                 })
                 .submit(getPluginContainer());
         }
+    }
+
+    private void unregisterListeners() {
+        final EventManager eventManager = Sponge.getEventManager();
+
+        eventManager.unregisterPluginListeners(this);
     }
 
     private void registerListeners() {

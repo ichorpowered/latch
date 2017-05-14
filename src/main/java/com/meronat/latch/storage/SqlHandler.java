@@ -62,6 +62,10 @@ public class SqlHandler {
         createTables();
     }
 
+    public void reloadTables() {
+        createTables();
+    }
+
     private Connection getConnection() throws SQLException {
         if (this.sql == null) {
             this.sql = Sponge.getServiceManager().provide(SqlService.class).get();
