@@ -205,7 +205,6 @@ class Configuration {
         this.saveConfig();
     }
 
-
     public CommentedConfigurationNode getRootNode() {
         return this.rootNode;
     }

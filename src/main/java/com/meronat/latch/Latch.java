@@ -94,9 +94,9 @@ public class Latch {
         config = new Configuration(configManager);
         storageHandler = new SqlHandler();
 
-        this.loadConfigurationData();
+        loadConfigurationData();
 
-        this.registerListeners();
+        registerListeners();
 
         Commands.getCommands().register();
 
@@ -109,15 +109,18 @@ public class Latch {
 
     @Listener
     public void onGameReload(GameReloadEvent event) {
-        if (this.cleanLocksTask != null) this.cleanLocksTask.cancel();
-        this.unregisterListeners();
+        if (this.cleanLocksTask != null) {
+            this.cleanLocksTask.cancel();
+        }
+
+        unregisterListeners();
 
         config.reloadConfig();
         storageHandler.reloadTables();
 
-        this.loadConfigurationData();
-        this.registerListeners();
-        this.registerTasks();
+        loadConfigurationData();
+        registerListeners();
+        registerTasks();
     }
 
     @Listener
