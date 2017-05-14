@@ -1,4 +1,4 @@
-# Latch - An extensive locking plugin [![Build Status](https://travis-ci.org/IchorPowered/Latch.svg?branch=master)](https://travis-ci.org/IchorPowered/Latch)  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# Latch - An extensive locking plugin [![Build Status](https://travis-ci.org/ichorpowered/latch.svg?branch=master)](https://travis-ci.org/ichorpowered/latch)  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 - [Issues](https://github.com/IchorPowered/Latch/issues)
 - [Ore](https://ore.spongepowered.org/IchorPowered/Latch)
