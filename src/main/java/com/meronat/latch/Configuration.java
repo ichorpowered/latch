@@ -194,8 +194,15 @@ class Configuration {
     }
 
     public void reloadConfig() {
-        this.saveConfig();
+        try {
+            this.rootNode = configManager.load();
+        } catch (IOException e) {
+            Latch.getLogger().error("Unable to load configuration, starting with a default one.");
+            this.rootNode = configManager.createEmptyNode();
+        }
+
         this.loadDefaults();
+        this.saveConfig();
     }
 
 
