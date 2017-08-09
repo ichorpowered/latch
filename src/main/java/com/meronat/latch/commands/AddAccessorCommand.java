@@ -49,11 +49,9 @@ public class AddAccessorCommand implements CommandExecutor {
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
 
-        Player player = (Player) src;
-
-        List<UUID> members = args.<User>getAll("add").stream().map(User::getUniqueId).collect(GuavaCollectors.toImmutableList());
-
-        ChangeLockInteraction addPlayers = new ChangeLockInteraction(player.getUniqueId());
+        final Player player = (Player) src;
+        final List<UUID> members = args.<User>getAll("add").stream().map(User::getUniqueId).collect(GuavaCollectors.toImmutableList());
+        final ChangeLockInteraction addPlayers = new ChangeLockInteraction(player.getUniqueId());
 
         addPlayers.setPersistence(args.hasAny("p"));
 

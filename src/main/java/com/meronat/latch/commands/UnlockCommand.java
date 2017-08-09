@@ -46,15 +46,14 @@ public class UnlockCommand implements CommandExecutor {
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
 
-        Optional<String> password = args.getOne("password");
-
-        Player player = (Player) src;
+        final Optional<String> password = args.getOne("password");
+        final Player player = (Player) src;
 
         if (!password.isPresent()) {
             throw new CommandException(Text.of(TextColors.RED, "You must specify a password to unlock locks."));
         }
 
-        UnlockLockInteraction unlockLock = new UnlockLockInteraction(player.getUniqueId(), password.get());
+        final UnlockLockInteraction unlockLock = new UnlockLockInteraction(player.getUniqueId(), password.get());
 
         unlockLock.setPersistence(args.hasAny("p"));
 

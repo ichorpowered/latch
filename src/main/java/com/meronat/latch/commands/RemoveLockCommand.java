@@ -44,9 +44,8 @@ public class RemoveLockCommand implements CommandExecutor {
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
 
-        Player player = (Player) src;
-
-        DeleteLockInteraction deleteLock = new DeleteLockInteraction(player.getUniqueId());
+        final Player player = (Player) src;
+        final DeleteLockInteraction deleteLock = new DeleteLockInteraction(player.getUniqueId());
 
         deleteLock.setPersistence(args.hasAny("p"));
 

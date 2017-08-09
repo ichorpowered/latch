@@ -37,7 +37,7 @@ import com.meronat.latch.storage.SqlHandler;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import org.bstats.MetricsLite;
+import org.bstats.sponge.MetricsLite;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
@@ -53,9 +53,7 @@ import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.util.Tristate;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -79,8 +77,7 @@ public class Latch {
     private ConfigurationLoader<CommentedConfigurationNode> configManager;
 
     @Inject
-    private MetricsLite metrics;
-
+    private MetricsLite metricsLite;
 
     @Inject
     public Latch(Logger logger, @DefaultConfig(sharedRoot = false) Path configPath, PluginContainer pluginContainer) {
@@ -95,9 +92,7 @@ public class Latch {
         storageHandler = new SqlHandler();
 
         loadConfigurationData();
-
-        registerListeners();
-
+        registerListeners(false);
         Commands.getCommands().register();
 
         // Register base permission node.
@@ -119,7 +114,7 @@ public class Latch {
         storageHandler.reloadTables();
 
         loadConfigurationData();
-        registerListeners();
+        registerListeners(true);
         registerTasks();
 
         logger.info("Latch has been successfully reloaded.");
@@ -149,10 +144,9 @@ public class Latch {
         final EventManager eventManager = Sponge.getEventManager();
 
         eventManager.unregisterPluginListeners(this);
-        eventManager.registerListeners(this, this);
     }
 
-    private void registerListeners() {
+    private void registerListeners(boolean reload) {
         final EventManager eventManager = Sponge.getEventManager();
 
         eventManager.registerListeners(this, new ChangeBlockListener());
@@ -163,46 +157,40 @@ public class Latch {
         if (getConfig().getNode("remove_bypass_on_logout").getBoolean()) {
             eventManager.registerListeners(this, new PlayerDisconnectListener());
         }
+        if(reload) {
+            eventManager.registerListeners(this, this);
+        }
     }
 
     private void loadConfigurationData() {
-        List<String> configBlockNames = new ArrayList<>();
-        List<String> restrictedBlockNames = new ArrayList<>();
-        List<String> protectBelowBlocks = new ArrayList<>();
-        HashMap<String, Integer> lockLimits = new HashMap<>();
-
         try {
-            configBlockNames = getConfig().getNode("lockable_blocks").getList(TypeToken.of(String.class));
+            lockManager.setLockableBlocks(getConfig().getNode("lockable_blocks").getList(TypeToken.of(String.class)));
         } catch (ObjectMappingException e) {
             getLogger().error("Error loading list of lockable_blocks.");
             e.printStackTrace();
         }
 
         try {
-            restrictedBlockNames = getConfig().getNode("prevent_adjacent_to_locks").getList(TypeToken.of(String.class));
+            lockManager.setRestrictedBlocks(getConfig().getNode("prevent_adjacent_to_locks").getList(TypeToken.of(String.class)));
         } catch (ObjectMappingException e) {
             getLogger().error("Error loading list of prevent_adjacent_to_locks.");
             e.printStackTrace();
         }
 
         try {
-            protectBelowBlocks = getConfig().getNode("protect_below_block").getList(TypeToken.of(String.class));
+            lockManager.setProtectBelowBlocks(getConfig().getNode("protect_below_block").getList(TypeToken.of(String.class)));
         } catch (ObjectMappingException e) {
             getLogger().error("Error loading list of protect_below_block.");
             e.printStackTrace();
         }
 
         try {
-            lockLimits = (HashMap<String, Integer>) getConfig().getNode("lock_limit").getValue(new TypeToken<Map<String, Integer>>() {});
+            lockManager.setLockLimits((HashMap<String, Integer>) getConfig().getNode("lock_limit").getValue(new TypeToken<Map<String, Integer>>() {}));
         } catch (ObjectMappingException e) {
             getLogger().error("Error loading lock limits");
             e.printStackTrace();
         }
 
-        lockManager.setLockableBlocks(configBlockNames);
-        lockManager.setRestrictedBlocks(restrictedBlockNames);
-        lockManager.setProtectBelowBlocks(protectBelowBlocks);
-        lockManager.setLockLimits(lockLimits);
         lockManager.setProtectFromRedstone(getConfig().getNode("protect_from_redstone").getBoolean(false));
     }
 

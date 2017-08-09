@@ -46,9 +46,9 @@ public class LimitsCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        Optional<User> optionalUser = args.getOne("user");
+        final Optional<User> optionalUser = args.getOne("user");
 
-        User user;
+        final User user;
 
         if (optionalUser.isPresent()) {
             if (src.hasPermission("latch.admin.limits")) {
@@ -63,15 +63,13 @@ public class LimitsCommand implements CommandExecutor {
         }
 
         Sponge.getScheduler().createAsyncExecutor(Latch.getPluginContainer()).execute(() -> {
-            List<Text> contents = new ArrayList<>();
-
-            String displayName = src.getName().equalsIgnoreCase(user.getName()) ? "Your" : user.getName() + "'s";
-
-            Map<String, Integer> limits = Latch.getLockManager().getLimits();
+            final List<Text> contents = new ArrayList<>();
+            final String displayName = src.getName().equalsIgnoreCase(user.getName()) ? "Your" : user.getName() + "'s";
+            final Map<String, Integer> limits = Latch.getLockManager().getLimits();
 
             int total = 0;
 
-            Map<String, Integer> amounts = Latch.getStorageHandler().getLimits(user.getUniqueId());
+            final Map<String, Integer> amounts = Latch.getStorageHandler().getLimits(user.getUniqueId());
 
             for (Map.Entry<String, Integer> e : limits.entrySet()) {
                 if (!e.getKey().equalsIgnoreCase("total")) {

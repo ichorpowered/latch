@@ -64,12 +64,11 @@ class Configuration {
 
         //Blocks we're able to lock
         if (this.rootNode.getNode("lockable_blocks").isVirtual()) {
-            List<String> lockableBlocks = new ArrayList<>();
+            final List<String> lockableBlocks = new ArrayList<>();
 
             lockableBlocks.add(BlockTypes.CHEST.getId());
             lockableBlocks.add(BlockTypes.TRAPPED_CHEST.getId());
 
-            /* Uncomment for 6.0.0 builds.
             lockableBlocks.add(BlockTypes.BLACK_SHULKER_BOX.getId());
             lockableBlocks.add(BlockTypes.BLUE_SHULKER_BOX.getId());
             lockableBlocks.add(BlockTypes.BROWN_SHULKER_BOX.getId());
@@ -86,7 +85,6 @@ class Configuration {
             lockableBlocks.add(BlockTypes.SILVER_SHULKER_BOX.getId());
             lockableBlocks.add(BlockTypes.WHITE_SHULKER_BOX.getId());
             lockableBlocks.add(BlockTypes.YELLOW_SHULKER_BOX.getId());
-            */
 
             lockableBlocks.add(BlockTypes.BREWING_STAND.getId());
             lockableBlocks.add(BlockTypes.JUKEBOX.getId());
@@ -122,14 +120,14 @@ class Configuration {
 
         //Blocks we should prevent being placed next to locks the player doesn't own
         if (this.rootNode.getNode("prevent_adjacent_to_locks").isVirtual()) {
-            List<String> preventAdjacent = new ArrayList<>();
+            final List<String> preventAdjacent = new ArrayList<>();
             preventAdjacent.add(BlockTypes.HOPPER.getId());
             this.rootNode.getNode("prevent_adjacent_to_locks").setValue(preventAdjacent);
         }
 
         //Blocks that rely on a block under them to stay intact
         if (this.rootNode.getNode("protect_below_block").isVirtual()) {
-            List<String> protectBelowBlock = new ArrayList<>();
+            final List<String> protectBelowBlock = new ArrayList<>();
             protectBelowBlock.add(BlockTypes.ACACIA_DOOR.getId());
             protectBelowBlock.add(BlockTypes.BIRCH_DOOR.getId());
             protectBelowBlock.add(BlockTypes.DARK_OAK_DOOR.getId());
@@ -142,16 +140,16 @@ class Configuration {
 
         //Lock limit per enum
         if (this.rootNode.getNode("lock_limit").isVirtual()) {
-            HashMap<String, Integer> limits = new HashMap<>();
-            limits.put("total", 30);
+            final HashMap<String, Integer> limits = new HashMap<>();
+            limits.put("total", 64);
 
             for (LockType type : LockType.values()) {
-                limits.put(type.toString().toLowerCase(), 8);
+                limits.put(type.toString().toLowerCase(), 12);
             }
+            limits.put(LockType.PRIVATE.toString().toLowerCase(), 24);
 
             try {
-                this.rootNode.getNode("lock_limit").setValue(new TypeToken<Map<String, Integer>>() {
-                }, limits);
+                this.rootNode.getNode("lock_limit").setValue(new TypeToken<Map<String, Integer>>() {}, limits);
             } catch (ObjectMappingException e) {
                 this.rootNode.getNode("lock_limit").setValue(limits);
                 e.printStackTrace();

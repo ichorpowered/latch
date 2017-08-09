@@ -127,10 +127,8 @@ public class CreateLockInteraction implements LockInteraction {
                 .build(),
             Cause.source(player).build());
 
-        Sponge.getEventManager().post(lockCreateEvent);
-
         //Stop if original locking event or other block locking event is cancelled
-        if (lockCreateEvent.isCancelled()) {
+        if (Sponge.getEventManager().post(lockCreateEvent)) {
             return false;
         }
 

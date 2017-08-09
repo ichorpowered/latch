@@ -48,9 +48,8 @@ public class CreatePasswordLockCommand implements CommandExecutor {
         }
 
         //Check for password
-        Optional<String> password = args.getOne("password");
-
-        Player player = (Player) src;
+        final Optional<String> password = args.getOne("password");
+        final Player player = (Player) src;
 
         if (!password.isPresent()) {
             throw new CommandException(Text.of(TextColors.RED, "Missing a password: /latch password [password]"));
@@ -63,7 +62,7 @@ public class CreatePasswordLockCommand implements CommandExecutor {
             type = LockType.PASSWORD_ONCE;
         }
 
-        CreateLockInteraction passwordLock = new CreateLockInteraction(player.getUniqueId(), type, password.get());
+        final CreateLockInteraction passwordLock = new CreateLockInteraction(player.getUniqueId(), type, password.get());
         passwordLock.setPersistence(args.hasAny("p"));
 
         Latch.getLockManager().setInteractionData(player.getUniqueId(), passwordLock);

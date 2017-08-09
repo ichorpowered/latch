@@ -44,9 +44,8 @@ public class AdminBypassCommand implements CommandExecutor {
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
 
-        Player player = (Player) src;
-
-        LockManager lockManager = Latch.getLockManager();
+        final Player player = (Player) src;
+        final LockManager lockManager = Latch.getLockManager();
 
         if (lockManager.isBypassing(player.getUniqueId())) {
             lockManager.removeBypassing(player.getUniqueId());

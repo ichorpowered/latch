@@ -26,8 +26,6 @@
 package com.meronat.latch.commands;
 
 import com.meronat.latch.Info;
-import org.apache.commons.lang3.StringUtils;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -37,27 +35,47 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
-import javax.annotation.Nonnull;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class LatchInfoCommand implements CommandExecutor {
 
+    private static final URL ICHOR_URL;
+
+    static {
+        try {
+            ICHOR_URL = new URL("http://ichorpowered.com");
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final Text INFO_TEXT =
+            Text.of(TextColors.DARK_GREEN, "Latch", " v", Info.VERSION, Text.NEW_LINE)
+                    .concat(Text.of(TextColors.GRAY, "Created by "))
+                    .concat(Text.builder("IchorPowered")
+                            .color(TextColors.GOLD)
+                            .onHover(TextActions.showText(Text.of(TextColors.GRAY, "Visit the IchorPowered website.")))
+                            .onClick(ICHOR_URL != null ? TextActions.openUrl(ICHOR_URL) : TextActions.suggestCommand("Error getting url."))
+                            .append(Text.NEW_LINE)
+                            .build())
+                    .concat(Text.builder("Click here for ")
+                            .color(TextColors.GRAY)
+                            .onClick(TextActions.runCommand("/latch help"))
+                            .onHover(TextActions.showText(Text.of("/latch help")))
+                            .append(Text.builder("Latch")
+                                    .color(TextColors.DARK_GREEN)
+                                    .onClick(TextActions.runCommand("/latch help"))
+                                    .onHover(TextActions.showText(Text.of("/latch help")))
+                                    .append(Text.builder(" help.")
+                                            .color(TextColors.GRAY)
+                                            .onClick(TextActions.runCommand("/latch help"))
+                                            .onHover(TextActions.showText(Text.of("/latch help")))
+                                            .build()).build()).build());
+
     @Override
-    public CommandResult execute(@Nonnull CommandSource src, CommandContext args) throws CommandException {
-        src.sendMessage(Text.of(TextColors.DARK_GREEN, Info.NAME, " v", Info.VERSION));
-        src.sendMessage(Text.of(TextColors.GRAY, "Created by ", StringUtils.join(Sponge.getPluginManager().getPlugin(Info.ID).get().getAuthors(), ", ")));
-        src.sendMessage(Text.builder("Click here for ")
-                .color(TextColors.GRAY)
-                .onClick(TextActions.runCommand("/latch help"))
-                .onHover(TextActions.showText(Text.of("/latch help")))
-                .append(Text.builder("Latch")
-                        .color(TextColors.DARK_GREEN)
-                        .onClick(TextActions.runCommand("/latch help"))
-                        .onHover(TextActions.showText(Text.of("/latch help")))
-                        .append(Text.builder(" help.")
-                                .color(TextColors.GRAY)
-                                .onClick(TextActions.runCommand("/latch help"))
-                                .onHover(TextActions.showText(Text.of("/latch help")))
-                                .build()).build()).build());
+    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+        src.sendMessage(INFO_TEXT);
 
         return CommandResult.success();
     }

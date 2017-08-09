@@ -51,7 +51,7 @@ public class ChangeLockCommand implements CommandExecutor {
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
 
-        Player player = (Player) src;
+        final Player player = (Player) src;
 
         if (!(args.hasAny("name") || args.hasAny("type") || args.hasAny("owner") || args.hasAny("password") || args.hasAny("add") ||
             args.hasAny("remove") || args.hasAny("redstone"))) {
@@ -62,9 +62,8 @@ public class ChangeLockCommand implements CommandExecutor {
             throw new CommandException(Text.of(TextColors.RED, "Protection from redstone is disabled for all locks."));
         }
 
-        ChangeLockInteraction changeLock = new ChangeLockInteraction(player.getUniqueId());
-
-        Optional<String> optionalString = args.getOne("name");
+        final ChangeLockInteraction changeLock = new ChangeLockInteraction(player.getUniqueId());
+        final Optional<String> optionalString = args.getOne("name");
         if (optionalString.isPresent()) {
             if (optionalString.get().length() <= 25) {
                 changeLock.setLockName(optionalString.get());

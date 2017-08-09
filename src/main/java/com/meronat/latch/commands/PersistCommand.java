@@ -44,13 +44,13 @@ public class PersistCommand implements CommandExecutor {
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
 
-        Player player = (Player) src;
+        final Player player = (Player) src;
 
         if (!Latch.getLockManager().hasInteractionData(player.getUniqueId())) {
             throw new CommandException(Text.of(TextColors.RED, "You must have run a latch command to persist/clear it."));
         }
 
-        LockInteraction interaction = Latch.getLockManager().getInteractionData(player.getUniqueId());
+        final LockInteraction interaction = Latch.getLockManager().getInteractionData(player.getUniqueId());
         interaction.setPersistence(!interaction.shouldPersist());
 
         if (interaction.shouldPersist()) {

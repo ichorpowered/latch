@@ -47,9 +47,8 @@ public class ListCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        Optional<User> optionalUser = args.getOne("owner");
-
-        User user;
+        final Optional<User> optionalUser = args.getOne("owner");
+        final User user;
 
         //If the user doesn't have the permission to check someone else's lock, default to them
         if (optionalUser.isPresent()) {
@@ -65,11 +64,9 @@ public class ListCommand implements CommandExecutor {
         }
 
         Sponge.getScheduler().createAsyncExecutor(Latch.getPluginContainer()).execute(() -> {
-            List<Text> contents = new ArrayList<>();
-
-            String displayName = src.getName().equalsIgnoreCase(user.getName()) ? "Your" : user.getName() + "'s";
-
-            List<Lock> locks = Latch.getLockManager().getPlayersLocks(user.getUniqueId());
+            final List<Text> contents = new ArrayList<>();
+            final String displayName = src.getName().equalsIgnoreCase(user.getName()) ? "Your" : user.getName() + "'s";
+            final List<Lock> locks = Latch.getLockManager().getPlayersLocks(user.getUniqueId());
 
             for (Lock lock : locks) {
                 String location = lock.getFirstLocation().isPresent() ? LatchUtils.getLocationString(lock.getFirstLocation().get()) : "N/A";

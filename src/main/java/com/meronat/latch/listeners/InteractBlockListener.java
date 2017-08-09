@@ -65,7 +65,7 @@ public class InteractBlockListener {
     private HashSet<UUID> stopThem = new HashSet<>();
 
     @Listener
-    public void onClickInventory(ClickInventoryEvent event, @First Player player) {
+    public void onClickInventory(final ClickInventoryEvent event, @First Player player) {
         //Make sure we have a transaction to validate
         if (event.getTransactions().size() <= 0) {
             return;
@@ -91,12 +91,12 @@ public class InteractBlockListener {
     }
 
     @Listener
-    public void onCloseInventory(InteractInventoryEvent.Close event, @Root Player player) {
+    public void onCloseInventory(final InteractInventoryEvent.Close event, @Root Player player) {
         this.stopThem.remove(player.getUniqueId());
     }
 
     @Listener
-    public void onSpawnExp(SpawnEntityEvent event, @First Player player) {
+    public void onSpawnExp(final SpawnEntityEvent event, @First Player player) {
         if (this.stopThem.contains(player.getUniqueId())) {
             for (Entity e : event.getEntities()) {
                 if (e.getType() == EntityTypes.EXPERIENCE_ORB) {
@@ -108,13 +108,13 @@ public class InteractBlockListener {
     }
 
     @Listener
-    public void onLeave(ClientConnectionEvent.Disconnect event, @Root Player player) {
+    public void onLeave(final ClientConnectionEvent.Disconnect event, @Root Player player) {
         this.stopThem.remove(player.getUniqueId());
     }
 
     @Listener
     @Include({InteractBlockEvent.Primary.class, InteractBlockEvent.Secondary.class})
-    public void onPlayerClick(InteractBlockEvent event, @Root Player player) {
+    public void onPlayerClick(final InteractBlockEvent event, @Root Player player) {
         if (!event.getTargetBlock().getLocation().isPresent()) {
             return;
         }
@@ -165,4 +165,5 @@ public class InteractBlockListener {
             }
         }
     }
+
 }

@@ -43,9 +43,8 @@ public class PurgeCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        Optional<User> optionalUser = args.getOne("target");
-
-        User user;
+        final Optional<User> optionalUser = args.getOne("target");
+        final User user;
         final boolean self;
 
         if (src instanceof User) {
@@ -71,9 +70,8 @@ public class PurgeCommand implements CommandExecutor {
             throw new CommandException(Text.of(TextColors.RED, "You source type is not able to execute this command."));
         }
 
-        Text yes = Text.of(TextColors.GREEN, TextActions.executeCallback(x -> yes(user, src, self)), "YES   ");
-
-        Text no = Text.of(TextColors.RED, TextActions.executeCallback(x -> no(user, src, self)), " NO");
+        final Text yes = Text.of(TextColors.GREEN, TextActions.executeCallback(x -> yes(user, src, self)), "YES   ");
+        final Text no = Text.of(TextColors.RED, TextActions.executeCallback(x -> no(user, src, self)), " NO");
 
         if (self) {
             src.sendMessage(Text.of(TextColors.DARK_RED, "Are you sure you want to delete all of your locks? ").concat(yes).concat(no));

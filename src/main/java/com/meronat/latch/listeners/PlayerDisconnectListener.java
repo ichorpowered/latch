@@ -34,7 +34,7 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 public class PlayerDisconnectListener {
 
     @Listener
-    public void onPlayerDisconnect(ClientConnectionEvent.Disconnect event, @Root Player player) {
+    public void onPlayerDisconnect(final ClientConnectionEvent.Disconnect event, @Root Player player) {
         Latch.getLockManager().removeBypassing(player.getUniqueId());
     }
 

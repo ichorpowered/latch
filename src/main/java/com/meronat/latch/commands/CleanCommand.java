@@ -47,21 +47,21 @@ public class CleanCommand implements CommandExecutor {
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
 
-        Optional<Integer> optionalDays = args.getOne("days");
+        final Optional<Integer> optionalDays = args.getOne("days");
 
         if (!optionalDays.isPresent()) {
             throw new CommandException(Text.of(TextColors.RED, "You must specify a certain amount of days."));
         }
 
-        int days = optionalDays.get();
+        final int days = optionalDays.get();
 
         if (days <= 0) {
             throw new CommandException(Text.of(TextColors.RED, "Please specify an amount of days larger than 0."));
         }
 
-        Text yes = Text.of(TextColors.GREEN, TextActions.executeCallback(x -> yes(src, days)), "    YES   ");
+        final Text yes = Text.of(TextColors.GREEN, TextActions.executeCallback(x -> yes(src, days)), "    YES   ");
 
-        Text no = Text.of(TextColors.RED, TextActions.executeCallback(x -> no(src)), " NO");
+        final Text no = Text.of(TextColors.RED, TextActions.executeCallback(x -> no(src)), " NO");
 
         src.sendMessage(
             Text.of(TextColors.DARK_RED, "Are you sure you want to delete all locks not accessed in " + days + " days.").concat(yes).concat(no));

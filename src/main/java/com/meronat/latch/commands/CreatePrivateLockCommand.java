@@ -47,9 +47,8 @@ public class CreatePrivateLockCommand implements CommandExecutor {
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
 
-        Player player = (Player) src;
-
-        Optional<String> optionalName = args.getOne("name");
+        final Player player = (Player) src;
+        final Optional<String> optionalName = args.getOne("name");
 
         final CreateLockInteraction privateLock;
 

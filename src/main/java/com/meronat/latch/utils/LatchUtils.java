@@ -26,6 +26,7 @@
 package com.meronat.latch.utils;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.BaseEncoding;
 import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
@@ -89,6 +90,8 @@ public class LatchUtils {
         if (block != BlockSnapshot.NONE && block.getLocation().isPresent()) {
             //Get all directions we need to evaluate -- doors don't have CONNECTED_DIRECTIONS just PORTION_TYPEs
             final Set<Direction> directionsToInvestigate = block.get(Keys.CONNECTED_DIRECTIONS).orElse(new HashSet<>());
+            block.getLocation().get().getExtent().getTileEntity(block.getLocation().get().getBlockPosition())
+                    .ifPresent(tileEntity1 -> directionsToInvestigate.addAll(tileEntity1.get(Keys.CONNECTED_DIRECTIONS).orElse(ImmutableSet.of())));
             block.get(Keys.PORTION_TYPE)
                 .map(p -> p == PortionTypes.BOTTOM ? directionsToInvestigate.add(Direction.UP) : directionsToInvestigate.add(Direction.DOWN));
 

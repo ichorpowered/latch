@@ -45,9 +45,9 @@ public class CreateDonationLockCommand implements CommandExecutor {
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
 
-        Player player = (Player) src;
+        final Player player = (Player) src;
+        final CreateLockInteraction privateLock = new CreateLockInteraction(player.getUniqueId(), LockType.DONATION, "");
 
-        CreateLockInteraction privateLock = new CreateLockInteraction(player.getUniqueId(), LockType.DONATION, "");
         privateLock.setPersistence(args.hasAny("p"));
 
         Latch.getLockManager().setInteractionData(player.getUniqueId(), privateLock);

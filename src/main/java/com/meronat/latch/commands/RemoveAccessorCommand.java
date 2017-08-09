@@ -49,11 +49,10 @@ public class RemoveAccessorCommand implements CommandExecutor {
             throw new CommandException(Text.of(TextColors.RED, "You must be a player to use this command."));
         }
 
-        Player player = (Player) src;
+        final Player player = (Player) src;
+        final List<UUID> members = args.<User>getAll("remove").stream().map(User::getUniqueId).collect(GuavaCollectors.toImmutableList());
 
-        List<UUID> members = args.<User>getAll("remove").stream().map(User::getUniqueId).collect(GuavaCollectors.toImmutableList());
-
-        ChangeLockInteraction removePlayers = new ChangeLockInteraction(player.getUniqueId());
+        final ChangeLockInteraction removePlayers = new ChangeLockInteraction(player.getUniqueId());
 
         removePlayers.setPersistence(args.hasAny("p"));
 

@@ -59,7 +59,7 @@ import java.util.Optional;
 public class ChangeBlockListener {
 
     @Listener
-    public void validateBlockPlacement(ChangeBlockEvent.Place event) {
+    public void validateBlockPlacement(final ChangeBlockEvent.Place event) {
         //Did a player cause this... if so use them for owner checks
         final Optional<Player> optionalPlayer = event.getCause().last(Player.class);
 
@@ -166,7 +166,7 @@ public class ChangeBlockListener {
     }
 
     @Listener
-    public void onPreBlockChange(ChangeBlockEvent.Pre event, @First LocatableBlock block) {
+    public void onPreBlockChange(final ChangeBlockEvent.Pre event, @First LocatableBlock block) {
         final BlockType type = block.getBlockState().getType();
 
         if (type.equals(BlockTypes.PISTON) || type.equals(BlockTypes.STICKY_PISTON) || type.equals(BlockTypes.PISTON_EXTENSION) || type
@@ -184,7 +184,7 @@ public class ChangeBlockListener {
     }
 
     @Listener
-    public void onBreakBlockByPlayer(ChangeBlockEvent.Break event, @Root Player player) {
+    public void onBreakBlockByPlayer(final ChangeBlockEvent.Break event, @Root Player player) {
         //Track the names of the locks broken - only display message once per lock
         final HashSet<String> locksDeleted = new HashSet<>();
 
@@ -230,7 +230,7 @@ public class ChangeBlockListener {
     }
 
     @Listener
-    public void onBlockBrokenByExplosion(ExplosionEvent.Post event) {
+    public void onBlockBrokenByExplosion(final ExplosionEvent.Post event) {
         if (Latch.getConfig().getNode("protect_from_explosives").getBoolean(true)) {
             //If we're supposed to protect from explosions, invalidate the transaction
             final LockManager lockManager = Latch.getLockManager();
