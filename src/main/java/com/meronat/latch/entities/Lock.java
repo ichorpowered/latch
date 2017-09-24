@@ -25,8 +25,6 @@
 
 package com.meronat.latch.entities;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.meronat.latch.Latch;
 import com.meronat.latch.enums.LockType;
 import com.meronat.latch.utils.LatchUtils;
@@ -46,6 +44,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class Lock {
 

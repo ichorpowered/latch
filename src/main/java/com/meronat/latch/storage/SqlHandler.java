@@ -25,8 +25,6 @@
 
 package com.meronat.latch.storage;
 
-import static com.meronat.latch.Latch.getLogger;
-
 import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
 import com.meronat.latch.enums.LockType;
@@ -53,6 +51,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
+import static com.meronat.latch.Latch.getLogger;
 
 public class SqlHandler {
 
