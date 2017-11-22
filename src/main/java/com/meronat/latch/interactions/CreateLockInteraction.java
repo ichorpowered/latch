@@ -28,12 +28,9 @@ package com.meronat.latch.interactions;
 import com.meronat.latch.Latch;
 import com.meronat.latch.entities.Lock;
 import com.meronat.latch.enums.LockType;
-import com.meronat.latch.events.LockCreateEvent;
 import com.meronat.latch.utils.LatchUtils;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
@@ -112,6 +109,7 @@ public class CreateLockInteraction implements LockInteraction {
             this.password = LatchUtils.hashPassword(this.password, salt);
         }
 
+        /* Investigate adding back with full API
         final LockCreateEvent lockCreateEvent = new LockCreateEvent(
             player,
             Lock.builder()
@@ -125,18 +123,29 @@ public class CreateLockInteraction implements LockInteraction {
                 .lastAccessed(LocalDateTime.now())
                 .protectFromRedstone(Latch.getLockManager().getProtectFromRedstone())
                 .build(),
-            Cause.source(player).build());
+            Cause.of(EventContext.builder().add(EventContextKeys.CREATOR, player).build(), player));
 
         //Stop if original locking event or other block locking event is cancelled
         if (Sponge.getEventManager().post(lockCreateEvent)) {
             return false;
-        }
+        }*/
+
+        final Lock newLock = Lock.builder()
+                .owner(player.getUniqueId())
+                .type(this.type)
+                .name(this.name)
+                .objectName(LatchUtils.getBlockNameFromType(blockState.getState().getType()))
+                .password(this.password)
+                .salt(salt)
+                .locations(lockLocations)
+                .lastAccessed(LocalDateTime.now())
+                .protectFromRedstone(Latch.getLockManager().getProtectFromRedstone())
+                .build();
 
         //Notify the player
-        player.sendMessage(Text.of(TextColors.DARK_GREEN, "You have created a ", TextColors.GRAY,
-            lockCreateEvent.getLock().getLockType().getHumanReadable().toLowerCase(), TextColors.DARK_GREEN, " lock called: ", TextColors.GRAY,
-            lockCreateEvent.getLock().getName()));
-        Latch.getLockManager().createLock(lockCreateEvent.getLock());
+        player.sendMessage(Text.of(TextColors.DARK_GREEN, "You have created a ", TextColors.GRAY, this.type.getHumanReadable().toLowerCase(),
+                TextColors.DARK_GREEN, " lock called: ", TextColors.GRAY, newLock.getName()));
+        Latch.getLockManager().createLock(newLock);
 
         return true;
     }
