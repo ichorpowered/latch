@@ -89,7 +89,7 @@ public class LatchUtils {
     public static Optional<Location<World>> getDoubleBlockLocation(BlockSnapshot block) {
         if (block != BlockSnapshot.NONE && block.getLocation().isPresent()) {
             //Get all directions we need to evaluate -- doors don't have CONNECTED_DIRECTIONS just PORTION_TYPEs
-            final Set<Direction> directionsToInvestigate = block.get(Keys.CONNECTED_DIRECTIONS).orElse(new HashSet<>());
+            Set<Direction> directionsToInvestigate = block.get(Keys.CONNECTED_DIRECTIONS).isPresent() ? new HashSet<>(block.get(Keys.CONNECTED_DIRECTIONS).get()) : new HashSet<>();
             block.getLocation().get().getExtent().getTileEntity(block.getLocation().get().getBlockPosition())
                     .ifPresent(tileEntity1 -> directionsToInvestigate.addAll(tileEntity1.get(Keys.CONNECTED_DIRECTIONS).orElse(ImmutableSet.of())));
             block.get(Keys.PORTION_TYPE)
