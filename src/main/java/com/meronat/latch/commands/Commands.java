@@ -248,23 +248,23 @@ public final class Commands {
                 .executor(help)
                 .build(), "latch", "lock");
 
-        commandManager.register(plugin, unlockCommand, "unlock", "unlatch", "lunlock", "lopen");
-        commandManager.register(plugin, privateLockCommand, "lprivate", "lpriv");
-        commandManager.register(plugin, donationLockCommand, "ldonate", "ldonation");
-        commandManager.register(plugin, passwordLockCommand, "lpassword", "lpass");
-        commandManager.register(plugin, publicLockCommand, "lpublic", "lpub");
-        commandManager.register(plugin, displayLockCommand, "linfo", "ldisplay");
-        commandManager.register(plugin, listCommand, "llist");
-        commandManager.register(plugin, removeLockCommand, "ldelete");
-        commandManager.register(plugin, persistCommand, "lpersist", "lclear");
-        commandManager.register(plugin, changeLockCommand, "lmodify", "lchange");
-        commandManager.register(plugin, purgeCommand, "lpurge");
-        commandManager.register(plugin, limitsCommand, "llimits");
-        commandManager.register(plugin, cleanCommand, "lclean");
-        commandManager.register(plugin, adminBypassCommand, "lbypass", "lby");
-        commandManager.register(plugin, addAccessorCommand, "ladd");
-        commandManager.register(plugin, removeAccessorCommand, "lremove");
-        commandManager.register(plugin, helpCommand, "lhelp");
+        commandManager.register(plugin, unlockCommand, "unlock", "unlatch", "lunlock", "lopen", "copen");
+        commandManager.register(plugin, privateLockCommand, "lprivate", "lpriv", "cprivate");
+        commandManager.register(plugin, donationLockCommand, "ldonate", "ldonation", "cdonate");
+        commandManager.register(plugin, passwordLockCommand, "lpassword", "lpass", "cpassword");
+        commandManager.register(plugin, publicLockCommand, "lpublic", "lpub", "cpublic");
+        commandManager.register(plugin, displayLockCommand, "linfo", "ldisplay", "cinfo");
+        commandManager.register(plugin, listCommand, "llist", "clist");
+        commandManager.register(plugin, removeLockCommand, "ldelete", "cdelete");
+        commandManager.register(plugin, persistCommand, "lpersist", "lclear", "cpersist");
+        commandManager.register(plugin, changeLockCommand, "lmodify", "lchange", "cmodify");
+        commandManager.register(plugin, purgeCommand, "lpurge", "cpurge");
+        commandManager.register(plugin, limitsCommand, "llimits", "climits");
+        commandManager.register(plugin, cleanCommand, "lclean", "cclean");
+        commandManager.register(plugin, adminBypassCommand, "lbypass", "lby", "cbypass");
+        commandManager.register(plugin, addAccessorCommand, "ladd", "cadd");
+        commandManager.register(plugin, removeAccessorCommand, "lremove", "cremove");
+        commandManager.register(plugin, helpCommand, "lhelp", "chelp");
         commandManager.register(plugin, latchInfoCommand, "llatch", "lversion");
     }
 

@@ -32,7 +32,6 @@ import com.meronat.latch.interactions.LockInteraction;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Entity;
@@ -48,8 +47,9 @@ import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.BlockCarrier;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
+import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
@@ -70,17 +70,36 @@ public class InteractBlockListener {
         if (event.getTransactions().size() <= 0) {
             return;
         }
+
         //Get the first transaction of this event
         final SlotTransaction slotTransaction = event.getTransactions().get(0);
 
-        final Slot slot = slotTransaction.getSlot();
+        if (event.getTargetInventory() instanceof CarriedInventory<?>) {
+            final CarriedInventory<?> carriedInventory = (CarriedInventory<?>) event.getTargetInventory();
+            final Optional<?> carrier = carriedInventory.getCarrier();
 
+            if (carrier.isPresent() && carrier.get() instanceof BlockCarrier) {
+                final BlockCarrier blockCarrier = (BlockCarrier) carrier.get();
+                //If the final item is NONE (or amount is less) person is trying to withdraw (so we care about it)
+                if (slotTransaction.getFinal().getType() == ItemTypes.NONE || slotTransaction.getFinal().getQuantity() < slotTransaction.getOriginal().getQuantity()) {
+                    //Then check to see if there's a lock
+                    final Optional<Lock> lock = Latch.getLockManager().getLock(blockCarrier.getLocation());
+
+                    //If there's a donation lock the player CANNOT access
+                    if (lock.isPresent() && lock.get().getLockType() == LockType.DONATION && !lock.get().canAccess(player.getUniqueId())) {
+                        event.setCancelled(true);
+                    }
+                }
+            }
+        }
+
+        /*
         //If the player is interacting with a TileEntityCarrier
-        if (slot.parent() instanceof TileEntityCarrier) {
+        if (event.getTargetInventory() instanceof TileEntityCarrier) {
             //If the final item is NONE (or amount is less) person is trying to withdraw (so we care about it)
-            if (slotTransaction.getFinal().getType() == ItemTypes.NONE || slotTransaction.getFinal().getCount() < slotTransaction.getOriginal().getCount()) {
+            if (slotTransaction.getFinal().getType() == ItemTypes.NONE || slotTransaction.getFinal().getQuantity() < slotTransaction.getOriginal().getQuantity()) {
                 //Then check to see if there's a lock
-                final Optional<Lock> lock = Latch.getLockManager().getLock(((TileEntityCarrier) slot.parent()).getLocation());
+                final Optional<Lock> lock = Latch.getLockManager().getLock(((TileEntityCarrier) event.getTargetInventory()).getLocation());
 
                 //If there's a donation lock the player CANNOT access
                 if (lock.isPresent() && lock.get().getLockType() == LockType.DONATION && !lock.get().canAccess(player.getUniqueId())) {
@@ -88,6 +107,7 @@ public class InteractBlockListener {
                 }
             }
         }
+        */
     }
 
     @Listener

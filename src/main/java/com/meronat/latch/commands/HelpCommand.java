@@ -100,7 +100,7 @@ public class HelpCommand implements CommandExecutor {
                 Text.of("Add -p to persist")));
 
         Text changeHelp = Text.of("--name=[name] to rename the lock", Text.NEW_LINE,
-                "--type=[PRIVATE, PASSWORD_ALWAYS, PASSWORD_ONCE] to change the lock type", Text.NEW_LINE,
+                "--type=[PRIVATE, PASSWORD_ALWAYS, PASSWORD_ONCE, DONATION] to change the lock type", Text.NEW_LINE,
                 "--password=[password] change the password of the lock (resets access list)", Text.NEW_LINE,
                 "--add=[player] add the player to the lock access list", Text.NEW_LINE,
                 "--remove=[player] remove the player from the lock access list", Text.NEW_LINE,
@@ -108,7 +108,7 @@ public class HelpCommand implements CommandExecutor {
 
         if (Latch.getConfig().getNode("protect_from_redstone").getBoolean(false)) {
             changeHelp = Text.of("--name=[name] to rename the lock", Text.NEW_LINE,
-                    "--type=[PRIVATE, PASSWORD_ALWAYS, PASSWORD_ONCE] to change the lock type", Text.NEW_LINE,
+                    "--type=[PRIVATE, PASSWORD_ALWAYS, PASSWORD_ONCE, DONATION] to change the lock type", Text.NEW_LINE,
                     "--password=[password] change the password of the lock (resets access list)", Text.NEW_LINE,
                     "--add=[player] add the player to the lock access list", Text.NEW_LINE,
                     "--remove=[player] remove the player from the lock access list", Text.NEW_LINE,
