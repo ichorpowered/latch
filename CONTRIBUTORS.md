@@ -8,7 +8,7 @@ request feel free to add yourself as well.
 
 The three main developers of the plugin. They have done most of the work and
 continue to maintain and create this locking suite. Together they have a lot of
-goals for the plugin and are excited to continue working on it. Nighteyes604 does
+goals for the plugin and are excited to continue working on it. Nighteyes604 did
 most of the work in all honesty, so thank him.
 
 ## dualspiral
@@ -17,7 +17,12 @@ Has contributed a small pull request fixing issues with our events and has
 helped with a few questions throughout the process of building the plugin.
 His great project [Nucleus](https://github.com/NucleusPowered/Nucleus),
 with its code licensed under the [MIT License](https://github.com/NucleusPowered/Nucleus/blob/sponge-api/5/LICENSE.txt)
- and organization has inspired pieces of our plugin. Thanks dual.
+ and organization has inspired pieces of our plugin as well. Thanks dual.
+ 
+## Eufranio
+
+Was nice enough to contribute a fix which caused double chest locks to not
+function properly. Thanks!
 
 ## Sponge Team
 
