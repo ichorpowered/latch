@@ -83,7 +83,7 @@ public class Latch {
     }
 
     @Listener
-    public void onGameInit(GameInitializationEvent event) {
+    public void onGamePostInit(GamePostInitializationEvent event) {
         config = new Configuration(configManager);
         storageHandler = new SqlHandler();
 
@@ -96,6 +96,8 @@ public class Latch {
             Sponge.getServiceManager().provide(PermissionService.class).ifPresent(p -> p.getUserSubjects().getDefaults().getSubjectData()
                 .setPermission(p.getDefaults().getActiveContexts(), "latch.normal", Tristate.TRUE));
         }
+
+        registerTasks();
     }
 
     @Listener
@@ -114,11 +116,6 @@ public class Latch {
         registerTasks();
 
         logger.info("Latch has been successfully reloaded.");
-    }
-
-    @Listener
-    public void onGamePostInitialization(GamePostInitializationEvent event) {
-        registerTasks();
     }
 
     private void registerTasks() {

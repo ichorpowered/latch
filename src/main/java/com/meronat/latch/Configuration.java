@@ -31,6 +31,7 @@ import com.meronat.latch.enums.LockType;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 
@@ -90,7 +91,7 @@ public class Configuration {
 
             lockableBlocks.add(BlockTypes.BREWING_STAND.getId());
             lockableBlocks.add(BlockTypes.JUKEBOX.getId());
-            lockableBlocks.add(BlockTypes.TRAPDOOR.getId());
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:trapdoor").ifPresent(t -> lockableBlocks.add(t.getId()));
             lockableBlocks.add(BlockTypes.FURNACE.getId());
             lockableBlocks.add(BlockTypes.LIT_FURNACE.getId());
 
