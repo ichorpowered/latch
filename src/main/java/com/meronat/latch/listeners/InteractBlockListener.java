@@ -30,10 +30,12 @@ import com.meronat.latch.entities.Lock;
 import com.meronat.latch.enums.LockType;
 import com.meronat.latch.interactions.LockInteraction;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
+import org.spongepowered.api.data.type.PortionTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -52,17 +54,20 @@ import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public class InteractBlockListener {
 
     //To work around Sponge issue - if the player is opening a donation chest they don't own... don't let them spawn xp (i.e. furnaces)
     private HashSet<UUID> stopThem = new HashSet<>();
+    private Set<Location<World>> noChange = new HashSet<>();
 
     @Listener
     public void onClickInventory(final ClickInventoryEvent event, @First Player player) {
@@ -135,13 +140,15 @@ public class InteractBlockListener {
     @Listener
     @Include({InteractBlockEvent.Primary.class, InteractBlockEvent.Secondary.class})
     public void onPlayerClick(final InteractBlockEvent event, @Root Player player) {
-        if (!event.getTargetBlock().getLocation().isPresent()) {
+        final BlockSnapshot block = event.getTargetBlock();
+        if (!block.getLocation().isPresent()) {
             return;
         }
-        final Location<World> location = event.getTargetBlock().getLocation().get();
+
+        final Location<World> location = block.getLocation().get();
         //Special code to handle shift secondary clicking (placing a block)
         if (event instanceof InteractBlockEvent.Secondary && player.get(Keys.IS_SNEAKING).orElse(false)) {
-            if (player.getItemInHand(HandTypes.MAIN_HAND).isPresent() && player.getItemInHand(HandTypes.MAIN_HAND).get().getItem().getBlock().isPresent()) {
+            if (player.getItemInHand(HandTypes.MAIN_HAND).isPresent() && player.getItemInHand(HandTypes.MAIN_HAND).get().getType().getBlock().isPresent()) {
                 if (location.getBlockRelative(event.getTargetSide()).getBlockType() == BlockTypes.AIR) {
                     //If they're sneaking and have an item(block) in their hand, and are clicking to replace air... let the block place handle it
                     return;
@@ -149,8 +156,10 @@ public class InteractBlockListener {
             }
         }
 
+        final BlockType blockType = block.getState().getType();
+
         //Ignore air and invalid locations, and non-lockable blocks
-        if (event.getTargetBlock().equals(BlockSnapshot.NONE) || !Latch.getLockManager().isLockableBlock(event.getTargetBlock().getState().getType())) {
+        if (block.equals(BlockSnapshot.NONE) || !Latch.getLockManager().isLockableBlock(blockType)) {
             return;
         }
 
@@ -158,7 +167,7 @@ public class InteractBlockListener {
         if (Latch.getLockManager().hasInteractionData(player.getUniqueId())) {
             final LockInteraction lockInteraction = Latch.getLockManager().getInteractionData(player.getUniqueId());
 
-            lockInteraction.handleInteraction(player, location, event.getTargetBlock());
+            lockInteraction.handleInteraction(player, location, block);
 
             event.setCancelled(true);
 
@@ -167,22 +176,37 @@ public class InteractBlockListener {
             }
         } else {
             //Otherwise we only care if it's a lock
-            if (Latch.getLockManager().isLockableBlock(event.getTargetBlock().getState().getType())) {
-                Latch.getLockManager().getLock(location).ifPresent(lock -> {
-                    if (lock.getLockType() != LockType.DONATION && !lock.canAccess(player.getUniqueId())) {
-                        player.sendMessage(Text.of(TextColors.RED, "You cannot access this lock."));
-                        event.setCancelled(true);
-                    } else {
-                        final BlockType blockType = event.getTargetBlock().getState().getType();
-                        // Work around code for donation furnaces allowing infinite experience
-                        if ((blockType.equals(BlockTypes.FURNACE) || blockType.equals(BlockTypes.LIT_FURNACE))
+            Latch.getLockManager().getLock(location).ifPresent(lock -> {
+                if (lock.getLockType() != LockType.DONATION && !lock.canAccess(player.getUniqueId())) {
+                    player.sendMessage(Text.of(TextColors.RED, "You cannot access this lock."));
+                    event.setCancelled(true);
+                } else {
+                    // Work around code for donation furnaces allowing infinite experience
+                    if ((blockType.equals(BlockTypes.FURNACE) || blockType.equals(BlockTypes.LIT_FURNACE))
                             && lock.getLockType() == LockType.DONATION && !lock.canAccess(player.getUniqueId())) {
-                            this.stopThem.add(player.getUniqueId());
+                        this.stopThem.add(player.getUniqueId());
+                    } else if (blockType.equals(BlockTypes.IRON_DOOR) || blockType.equals(BlockTypes.IRON_TRAPDOOR)) {
+                        if (!this.noChange.remove(location)) { // Hack to get iron door opening working for now
+                            this.noChange.add(location);
+                            final Location<World> newLocation;
+                            if (blockType.equals(BlockTypes.IRON_DOOR) &&
+                                    location.get(Keys.PORTION_TYPE).orElse(PortionTypes.BOTTOM).equals(PortionTypes.TOP)) {
+                                newLocation = location.getBlockRelative(Direction.DOWN);
+                            } else {
+                                newLocation = location;
+                            }
+                            if (newLocation.get(Keys.OPEN).orElse(false)) {
+                                newLocation.offer(Keys.OPEN, false);
+                                newLocation.offer(Keys.POWERED, false);
+                            } else {
+                                newLocation.offer(Keys.OPEN, true);
+                                newLocation.offer(Keys.POWERED, true);
+                            }
                         }
-                        lock.updateLastAccessed();
                     }
-                });
-            }
+                    lock.updateLastAccessed();
+                }
+            });
         }
     }
 

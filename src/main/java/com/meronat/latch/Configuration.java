@@ -112,6 +112,8 @@ public class Configuration {
             lockableBlocks.add(BlockTypes.WOODEN_DOOR.getId());
             lockableBlocks.add(BlockTypes.JUNGLE_DOOR.getId());
             lockableBlocks.add(BlockTypes.SPRUCE_DOOR.getId());
+            lockableBlocks.add(BlockTypes.IRON_DOOR.getId());
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:iron_trapdoor").ifPresent(t -> lockableBlocks.add(t.getId()));
 
             this.rootNode.getNode("lockable_blocks").setValue(lockableBlocks);
         }
