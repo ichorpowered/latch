@@ -239,7 +239,7 @@ public final class Commands {
                 .build();
 
         final CommandSpec lockableCommand = CommandSpec.builder()
-                .description(Text.of("Base command for modifying lockable block list"))
+                .description(Text.of("Base command for modifying the lockable block list"))
                 .permission("latch.admin.lockable")
                 .child(addLockableCommand, "add", "put")
                 .child(removeLockableCommand, "remove")
