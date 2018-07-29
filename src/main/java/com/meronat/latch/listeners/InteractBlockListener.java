@@ -185,7 +185,7 @@ public class InteractBlockListener {
                     if ((blockType.equals(BlockTypes.FURNACE) || blockType.equals(BlockTypes.LIT_FURNACE))
                             && lock.getLockType() == LockType.DONATION && !lock.canAccess(player.getUniqueId())) {
                         this.stopThem.add(player.getUniqueId());
-                    } else if (blockType.equals(BlockTypes.IRON_DOOR) || blockType.equals(BlockTypes.IRON_TRAPDOOR)) {
+                    } else if (Latch.getConfiguration().allowOpeningLockedIron() && (blockType.equals(BlockTypes.IRON_DOOR) || blockType.equals(BlockTypes.IRON_TRAPDOOR))) {
                         if (!this.noChange.remove(location)) { // Hack to get iron door opening working for now
                             this.noChange.add(location);
                             final Location<World> newLocation;

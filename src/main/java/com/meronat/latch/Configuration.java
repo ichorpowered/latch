@@ -186,6 +186,15 @@ public class Configuration {
             this.rootNode.getNode("clean_locks_older_than").setValue(40);
         }
 
+        if (this.rootNode.getNode("allow_opening_locked_iron").isVirtual()) {
+            this.rootNode.getNode("allow_opening_locked_iron").setComment("Allows opening locked iron doors and trapdoors by right clicking.");
+            this.rootNode.getNode("allow_opening_locked_iron").setValue(true);
+        }
+
+    }
+
+    public boolean allowOpeningLockedIron() {
+        return this.rootNode.getNode("allow_opening_locked_iron").getBoolean(false);
     }
 
     /*
