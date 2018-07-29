@@ -26,8 +26,12 @@
 package com.meronat.latch.commands;
 
 import com.meronat.latch.Latch;
+import com.meronat.latch.commands.lockable.AddLockableCommand;
+import com.meronat.latch.commands.lockable.ListLockableCommand;
+import com.meronat.latch.commands.lockable.RemoveLockableCommand;
 import com.meronat.latch.enums.LockType;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.command.args.CommandFlags;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -212,6 +216,36 @@ public final class Commands {
                         GenericArguments.optionalWeak(GenericArguments.string(Text.of("password"))))
                 .build();
 
+        final CommandSpec addLockableCommand = CommandSpec.builder()
+                .description(Text.of("Add a block type to the lockable block list"))
+                .permission("latch.admin.lockable.add")
+                .executor(new AddLockableCommand())
+                .arguments(GenericArguments.optionalWeak(
+                        GenericArguments.onlyOne(GenericArguments.catalogedElement(Text.of("entered"), BlockType.class))))
+                .build();
+
+        final CommandSpec removeLockableCommand = CommandSpec.builder()
+                .description(Text.of("Remove a block type from the lockable block list"))
+                .permission("latch.admin.lockable.remove")
+                .executor(new RemoveLockableCommand())
+                .arguments(GenericArguments.optionalWeak(
+                        GenericArguments.onlyOne(GenericArguments.catalogedElement(Text.of("entered"), BlockType.class))))
+                .build();
+
+        final CommandSpec listLockableCommand = CommandSpec.builder()
+                .description(Text.of("List the block types on the lockable block list"))
+                .permission("latch.admin.lockable.list")
+                .executor(new ListLockableCommand())
+                .build();
+
+        final CommandSpec lockableCommand = CommandSpec.builder()
+                .description(Text.of("Base command for modifying the lockable block list"))
+                .permission("latch.admin.lockable")
+                .child(addLockableCommand, "add", "put")
+                .child(removeLockableCommand, "remove")
+                .child(listLockableCommand, "list")
+                .build();
+
         final HelpCommand help = new HelpCommand();
 
         final CommandSpec helpCommand = CommandSpec.builder()
@@ -245,6 +279,7 @@ public final class Commands {
                 .child(latchInfoCommand, "version", "authors")
                 .child(limitsCommand, "limits", "max")
                 .child(cleanCommand, "clean", "misterclean")
+                .child(lockableCommand, "lockable", "latchable")
                 .executor(help)
                 .build(), "latch", "lock");
 
@@ -266,6 +301,7 @@ public final class Commands {
         commandManager.register(plugin, removeAccessorCommand, "lremove", "cremove");
         commandManager.register(plugin, helpCommand, "lhelp", "chelp");
         commandManager.register(plugin, latchInfoCommand, "llatch", "lversion");
+        commandManager.register(plugin, lockableCommand, "lockable", "latchable");
     }
 
     private static Commands ourInstance = new Commands();

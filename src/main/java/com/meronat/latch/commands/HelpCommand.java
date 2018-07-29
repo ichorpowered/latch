@@ -152,6 +152,15 @@ public class HelpCommand implements CommandExecutor {
         contents.add(LatchUtils.formatHelpText("/latch clean [days]", "Deletes all locks older than the specified amount of days",
                 Text.of("Be careful as it is not possible to undo this command")));
 
+        contents.add(LatchUtils.formatHelpText("/latch lockable add", "Adds a block type to the lockable block list",
+                Text.of("This will be either the item in hand or the block type you specify")));
+
+        contents.add(LatchUtils.formatHelpText("/latch lockable remove", "Removes a block type from the lockable block list",
+                Text.of("This will be either the item in hand or the block type you specify")));
+
+        contents.add(LatchUtils.formatHelpText("/latch lockable list", "Lists all lockable block types",
+                Text.of("This list can be modified by the other lockable commands")));
+
         return contents;
     }
 

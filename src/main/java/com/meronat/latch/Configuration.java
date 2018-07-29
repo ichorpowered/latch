@@ -25,11 +25,13 @@
 
 package com.meronat.latch;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
 import com.meronat.latch.enums.LockType;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 
 import java.io.IOException;
@@ -38,7 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class Configuration {
+public class Configuration {
 
     private CommentedConfigurationNode rootNode;
     private final ConfigurationLoader<CommentedConfigurationNode> configManager;
@@ -183,6 +185,32 @@ class Configuration {
 
     }
 
+    /*
+    public boolean addLockableBlock(BlockType blockType) {
+        final CommentedConfigurationNode node = this.rootNode.getNode("lockable_blocks");
+        try {
+            node.setValue(node.getList(TypeToken.of(String.class)).add(blockType.getId()));
+            saveConfig();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    public boolean removeLockableBlock(BlockType blockType) {
+        final CommentedConfigurationNode node = this.rootNode.getNode("lockable_blocks");
+        try {
+            node.setValue(node.getList(TypeToken.of(String.class)).remove(blockType.getId()));
+            saveConfig();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+    */
+
     private void saveConfig() {
         try {
             this.configManager.save(this.rootNode);
@@ -205,5 +233,17 @@ class Configuration {
 
     public CommentedConfigurationNode getRootNode() {
         return this.rootNode;
+    }
+
+    public boolean setLockableBlocks(ImmutableSet<String> blockTypes) {
+        final CommentedConfigurationNode node = this.rootNode.getNode("lockable_blocks");
+        try {
+            node.setValue(blockTypes);
+            saveConfig();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 }

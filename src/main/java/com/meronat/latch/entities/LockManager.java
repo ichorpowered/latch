@@ -26,6 +26,7 @@
 package com.meronat.latch.entities;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.meronat.latch.Latch;
 import com.meronat.latch.enums.LockType;
 import com.meronat.latch.interactions.LockInteraction;
@@ -33,7 +34,6 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -49,9 +49,9 @@ public class LockManager {
 
     private final Set<UUID> bypassing = new HashSet<>();
 
-    private List<String> lockableBlocks = new ArrayList<>();
-    private List<String> restrictedBlocks = new ArrayList<>();
-    private List<String> protectBelowBlocks = new ArrayList<>();
+    private Set<String> lockableBlocks = new HashSet<>();
+    private Set<String> restrictedBlocks = new HashSet<>();
+    private Set<String> protectBelowBlocks = new HashSet<>();
 
     private boolean protectFromRedstone = false;
 
@@ -88,15 +88,29 @@ public class LockManager {
     }
 
     public void setLockableBlocks(List<String> lockableBlocks) {
-        this.lockableBlocks = lockableBlocks;
+        this.lockableBlocks = new HashSet<>(lockableBlocks);
+    }
+
+    public boolean addLockableBlock(BlockType blockType) {
+        this.lockableBlocks.add(blockType.getId());
+        return Latch.getConfiguration().setLockableBlocks(ImmutableSet.copyOf(this.lockableBlocks));
+    }
+
+    public boolean removeLockableBlock(BlockType blockType) {
+        this.lockableBlocks.remove(blockType.getId());
+        return Latch.getConfiguration().setLockableBlocks(ImmutableSet.copyOf(this.lockableBlocks));
+    }
+
+    public Set<String> getLockableBlocks() {
+        return ImmutableSet.copyOf(this.lockableBlocks);
     }
 
     public void setRestrictedBlocks(List<String> preventAdjacentToLocks) {
-        this.restrictedBlocks = preventAdjacentToLocks;
+        this.restrictedBlocks = new HashSet<>(preventAdjacentToLocks);
     }
 
     public void setProtectBelowBlocks(List<String> protectBelowBlocks) {
-        this.protectBelowBlocks = protectBelowBlocks;
+        this.protectBelowBlocks = new HashSet<>(protectBelowBlocks);
     }
 
     public boolean isRestrictedBlock(BlockType type) {

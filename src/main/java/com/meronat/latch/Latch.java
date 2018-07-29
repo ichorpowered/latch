@@ -206,6 +206,10 @@ public class Latch {
         return config.getRootNode();
     }
 
+    public static Configuration getConfiguration() {
+        return config;
+    }
+
     public static Path getConfigPatch() {
         return configPath;
     }
