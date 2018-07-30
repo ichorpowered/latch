@@ -33,7 +33,6 @@ import com.meronat.latch.enums.LockType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.command.CommandManager;
-import org.spongepowered.api.command.args.CommandFlags;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.plugin.PluginContainer;

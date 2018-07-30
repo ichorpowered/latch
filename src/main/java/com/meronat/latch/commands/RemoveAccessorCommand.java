@@ -37,9 +37,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.GuavaCollectors;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 

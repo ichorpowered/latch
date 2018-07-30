@@ -133,12 +133,13 @@ public class Configuration {
         //Blocks that rely on a block under them to stay intact
         if (this.rootNode.getNode("protect_below_block").isVirtual()) {
             final List<String> protectBelowBlock = new ArrayList<>();
-            protectBelowBlock.add(BlockTypes.ACACIA_DOOR.getId());
-            protectBelowBlock.add(BlockTypes.BIRCH_DOOR.getId());
-            protectBelowBlock.add(BlockTypes.DARK_OAK_DOOR.getId());
-            protectBelowBlock.add(BlockTypes.WOODEN_DOOR.getId());
-            protectBelowBlock.add(BlockTypes.JUNGLE_DOOR.getId());
-            protectBelowBlock.add(BlockTypes.SPRUCE_DOOR.getId());
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:wooden_door").ifPresent(t -> protectBelowBlock.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:spruce_door").ifPresent(t -> protectBelowBlock.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:birch_door").ifPresent(t -> protectBelowBlock.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:jungle_door").ifPresent(t -> protectBelowBlock.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:acacia_door").ifPresent(t -> protectBelowBlock.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:dark_oak_door").ifPresent(t -> protectBelowBlock.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:iron_door").ifPresent(t -> protectBelowBlock.add(t.getId()));
 
             this.rootNode.getNode("protect_below_block").setValue(protectBelowBlock);
         }
