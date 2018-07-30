@@ -106,8 +106,9 @@ public class ChangeLockInteraction implements LockInteraction {
         }
 
         //Check to make sure, if they're assigning a new owner, the new owner is not at their limit
-        if (newOwner != null || type != null) {
-            if (Latch.getLockManager().isPlayerAtLockLimit(newOwner == null ? lock.getOwner() : newOwner, type == null ? lock.getLockType() : type)) {
+        if (this.newOwner != null || this.type != null) {
+            if (Latch.getLockManager().isPlayerAtLockLimit(this.newOwner == null ? lock.getOwner() : this.newOwner,
+                    this.type == null ? lock.getLockType() : this.type)) {
                 player.sendMessage(Text.of(TextColors.RED, "You cannot change this lock due to lock limits."));
                 return false;
             }
