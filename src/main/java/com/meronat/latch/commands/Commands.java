@@ -42,15 +42,14 @@ import org.spongepowered.api.text.Text;
 public final class Commands {
 
     public void register() {
-        final CommandFlags.Builder flagBuilder = GenericArguments.flags();
 
         final CommandSpec addAccessorCommand = CommandSpec.builder()
                 .description(Text.of("Add a player to a locked block of yours."))
                 .permission("latch.normal.change")
                 .executor(new AddAccessorCommand())
-                .arguments(GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.user(Text.of("add")))),
+                .arguments(GenericArguments.optionalWeak(GenericArguments.allOf(GenericArguments.user(Text.of("add")))),
                         GenericArguments.optionalWeak(
-                                flagBuilder
+                                GenericArguments.flags()
                                         .permissionFlag("latch.normal.persist", "persist", "p")
                                         .buildWith(GenericArguments.none())))
                 .build();
@@ -61,7 +60,7 @@ public final class Commands {
                 .executor(new RemoveAccessorCommand())
                 .arguments(GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.user(Text.of("remove")))),
                         GenericArguments.optionalWeak(
-                                flagBuilder
+                                GenericArguments.flags()
                                         .permissionFlag("latch.normal.persist", "persist", "p")
                                         .buildWith(GenericArguments.none())))
                 .build();
@@ -77,7 +76,7 @@ public final class Commands {
                 .permission("latch.normal.info")
                 .executor(new DisplayLockCommand())
                 .arguments(GenericArguments.optionalWeak(
-                        flagBuilder
+                        GenericArguments.flags()
                                 .permissionFlag("latch.normal.persist", "persist", "p")
                                 .buildWith(GenericArguments.none())))
                 .build();
@@ -93,7 +92,7 @@ public final class Commands {
                 .permission("latch.normal.change")
                 .executor(new ChangeLockCommand())
                 .arguments(GenericArguments.optionalWeak(
-                        flagBuilder
+                        GenericArguments.flags()
                                 .valueFlag(GenericArguments.string(Text.of("name")), "-name")
                                 .valueFlag(GenericArguments.enumValue(Text.of("type"), LockType.class), "-type")
                                 .valueFlag(GenericArguments.user(Text.of("owner")), "-owner")
@@ -118,7 +117,7 @@ public final class Commands {
                 .permission("latch.normal.create.donation")
                 .executor(new CreateDonationLockCommand())
                 .arguments(GenericArguments.optionalWeak(
-                        flagBuilder
+                        GenericArguments.flags()
                                 .permissionFlag("latch.normal.persist", "persist", "p")
                                 .buildWith(GenericArguments.none())))
                 .build();
@@ -129,7 +128,7 @@ public final class Commands {
                 .executor(new CreatePasswordLockCommand())
                 .arguments(
                         GenericArguments.optionalWeak(
-                                flagBuilder
+                                GenericArguments.flags()
                                         .permissionFlag("latch.normal.create.password.always", "always", "a")
                                         .permissionFlag("latch.normal.create.password.once", "once", "o")
                                         .permissionFlag("latch.normal.persist", "persist", "p")
@@ -144,7 +143,7 @@ public final class Commands {
                 .permission("latch.normal.create.private")
                 .executor(new CreatePrivateLockCommand())
                 .arguments(GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.string(Text.of("name")))),
-                        GenericArguments.optionalWeak(flagBuilder
+                        GenericArguments.optionalWeak(GenericArguments.flags()
                                 .permissionFlag("latch.normal.persist", "persist", "p")
                                 .buildWith(GenericArguments.none())))
                 .build();
@@ -155,7 +154,7 @@ public final class Commands {
                 .permission("latch.normal.create.public")
                 .executor(new CreatePublicLockCommand())
                 .arguments(GenericArguments.optionalWeak(
-                        flagBuilder
+                        GenericArguments.flags()
                                 .permissionFlag("latch.normal.persist", "persist", "p")
                                 .buildWith(GenericArguments.none())))
                 .build();
@@ -165,7 +164,7 @@ public final class Commands {
                 .permission("latch.normal.limits")
                 .executor(new LimitsCommand())
                 .arguments(GenericArguments.optionalWeak(
-                        flagBuilder
+                        GenericArguments.flags()
                                 .valueFlag(GenericArguments.enumValue(Text.of("type"), LockType.class), "-type")
                                 .buildWith(GenericArguments.none())),
                         GenericArguments.optionalWeak(GenericArguments.user(Text.of("user"))))
@@ -176,7 +175,7 @@ public final class Commands {
                 .permission("latch.normal.list")
                 .executor(new ListCommand())
                 .arguments(GenericArguments.optionalWeak(
-                        flagBuilder
+                        GenericArguments.flags()
                                 .valueFlag(GenericArguments.enumValue(Text.of("type"), LockType.class), "-type")
                                 .buildWith(GenericArguments.none())),
                         GenericArguments.optionalWeak(GenericArguments.user(Text.of("owner"))))
@@ -200,7 +199,7 @@ public final class Commands {
                 .permission("latch.normal.remove")
                 .executor(new RemoveLockCommand())
                 .arguments(GenericArguments.optionalWeak(
-                        flagBuilder
+                        GenericArguments.flags()
                                 .permissionFlag("latch.normal.persist", "persist", "p")
                                 .buildWith(GenericArguments.none())))
                 .build();
@@ -210,7 +209,7 @@ public final class Commands {
                 .permission("latch.normal.unlock")
                 .executor(new UnlockCommand())
                 .arguments(GenericArguments.optionalWeak(
-                        flagBuilder
+                        GenericArguments.flags()
                                 .permissionFlag("latch.normal.persist", "persist", "p")
                                 .buildWith(GenericArguments.none())),
                         GenericArguments.optionalWeak(GenericArguments.string(Text.of("password"))))

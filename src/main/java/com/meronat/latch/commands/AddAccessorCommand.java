@@ -25,6 +25,8 @@
 
 package com.meronat.latch.commands;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.meronat.latch.Latch;
 import com.meronat.latch.interactions.ChangeLockInteraction;
 import org.spongepowered.api.command.CommandException;
@@ -39,6 +41,7 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class AddAccessorCommand implements CommandExecutor {
@@ -50,12 +53,15 @@ public class AddAccessorCommand implements CommandExecutor {
         }
 
         final Player player = (Player) src;
-        final List<UUID> members = args.<User>getAll("add").stream().map(User::getUniqueId).collect(GuavaCollectors.toImmutableList());
+        final Set<UUID> members = args.<User>getAll("add").stream().map(User::getUniqueId).collect(ImmutableSet.toImmutableSet());
         final ChangeLockInteraction addPlayers = new ChangeLockInteraction(player.getUniqueId());
 
         addPlayers.setPersistence(args.hasAny("p"));
 
         if (members.size() > 0) {
+            if (members.contains(player.getUniqueId())) {
+                throw new CommandException(Text.of(TextColors.RED, "You cannot add yourself as an accessor!"));
+            }
             addPlayers.setMembersToAdd(members);
         } else {
             throw new CommandException(Text.of(TextColors.RED, "You must specify a user to add."));

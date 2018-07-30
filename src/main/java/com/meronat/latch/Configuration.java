@@ -91,7 +91,6 @@ public class Configuration {
 
             lockableBlocks.add(BlockTypes.BREWING_STAND.getId());
             lockableBlocks.add(BlockTypes.JUKEBOX.getId());
-            Sponge.getRegistry().getType(BlockType.class, "minecraft:trapdoor").ifPresent(t -> lockableBlocks.add(t.getId()));
             lockableBlocks.add(BlockTypes.FURNACE.getId());
             lockableBlocks.add(BlockTypes.LIT_FURNACE.getId());
 
@@ -99,20 +98,21 @@ public class Configuration {
             lockableBlocks.add(BlockTypes.DISPENSER.getId());
             lockableBlocks.add(BlockTypes.DROPPER.getId());
 
-            lockableBlocks.add(BlockTypes.ACACIA_FENCE_GATE.getId());
-            lockableBlocks.add(BlockTypes.BIRCH_FENCE_GATE.getId());
-            lockableBlocks.add(BlockTypes.DARK_OAK_FENCE_GATE.getId());
-            lockableBlocks.add(BlockTypes.FENCE_GATE.getId());
-            lockableBlocks.add(BlockTypes.JUNGLE_FENCE_GATE.getId());
-            lockableBlocks.add(BlockTypes.SPRUCE_FENCE_GATE.getId());
-
-            lockableBlocks.add(BlockTypes.ACACIA_DOOR.getId());
-            lockableBlocks.add(BlockTypes.BIRCH_DOOR.getId());
-            lockableBlocks.add(BlockTypes.DARK_OAK_DOOR.getId());
-            lockableBlocks.add(BlockTypes.WOODEN_DOOR.getId());
-            lockableBlocks.add(BlockTypes.JUNGLE_DOOR.getId());
-            lockableBlocks.add(BlockTypes.SPRUCE_DOOR.getId());
-            lockableBlocks.add(BlockTypes.IRON_DOOR.getId());
+            // Fix issue with doors, possibly from MalisisDoors, look into it more later and revisit in 1.13
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:fence_gate").ifPresent(t -> lockableBlocks.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:spruce_fence_gate").ifPresent(t -> lockableBlocks.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:birch_fence_gate").ifPresent(t -> lockableBlocks.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:jungle_fence_gate").ifPresent(t -> lockableBlocks.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:dark_oak_fence_gate").ifPresent(t -> lockableBlocks.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:acacia_fence_gate").ifPresent(t -> lockableBlocks.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:wooden_door").ifPresent(t -> lockableBlocks.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:spruce_door").ifPresent(t -> lockableBlocks.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:birch_door").ifPresent(t -> lockableBlocks.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:jungle_door").ifPresent(t -> lockableBlocks.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:acacia_door").ifPresent(t -> lockableBlocks.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:dark_oak_door").ifPresent(t -> lockableBlocks.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:iron_door").ifPresent(t -> lockableBlocks.add(t.getId()));
+            Sponge.getRegistry().getType(BlockType.class, "minecraft:trapdoor").ifPresent(t -> lockableBlocks.add(t.getId()));
             Sponge.getRegistry().getType(BlockType.class, "minecraft:iron_trapdoor").ifPresent(t -> lockableBlocks.add(t.getId()));
 
             this.rootNode.getNode("lockable_blocks").setValue(lockableBlocks);

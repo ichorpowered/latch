@@ -45,6 +45,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
@@ -83,18 +84,22 @@ public class Latch {
     }
 
     @Listener
-    public void onGamePostInit(GamePostInitializationEvent event) {
+    public void onGamePostInit(final GamePostInitializationEvent event) {
         config = new Configuration(configManager);
         storageHandler = new SqlHandler();
 
+        Commands.getCommands().register();
+    }
+
+    @Listener
+    public void onGameStarted(final GameStartedServerEvent event) {
         loadConfigurationData();
         registerListeners(false);
-        Commands.getCommands().register();
 
         // Register base permission node.
         if (getConfig().getNode("add_default_permissions").getBoolean()) {
             Sponge.getServiceManager().provide(PermissionService.class).ifPresent(p -> p.getUserSubjects().getDefaults().getSubjectData()
-                .setPermission(p.getDefaults().getActiveContexts(), "latch.normal", Tristate.TRUE));
+                    .setPermission(p.getDefaults().getActiveContexts(), "latch.normal", Tristate.TRUE));
         }
 
         registerTasks();
