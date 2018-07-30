@@ -47,22 +47,20 @@ public final class Commands {
                 .description(Text.of("Add a player to a locked block of yours."))
                 .permission("latch.normal.change")
                 .executor(new AddAccessorCommand())
-                .arguments(GenericArguments.optionalWeak(GenericArguments.allOf(GenericArguments.user(Text.of("add")))),
-                        GenericArguments.optionalWeak(
-                                GenericArguments.flags()
-                                        .permissionFlag("latch.normal.persist", "persist", "p")
-                                        .buildWith(GenericArguments.none())))
+                .arguments(GenericArguments.optionalWeak(GenericArguments.flags()
+                                .permissionFlag("latch.normal.persist", "persist", "p")
+                                .buildWith(GenericArguments.none())),
+                        GenericArguments.optionalWeak(GenericArguments.allOf(GenericArguments.user(Text.of("add")))))
                 .build();
 
         final CommandSpec removeAccessorCommand = CommandSpec.builder()
                 .description(Text.of("Remove a player from a locked block of yours."))
                 .permission("latch.normal.change")
                 .executor(new RemoveAccessorCommand())
-                .arguments(GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.user(Text.of("remove")))),
-                        GenericArguments.optionalWeak(
-                                GenericArguments.flags()
-                                        .permissionFlag("latch.normal.persist", "persist", "p")
-                                        .buildWith(GenericArguments.none())))
+                .arguments(GenericArguments.optionalWeak(GenericArguments.flags()
+                                .permissionFlag("latch.normal.persist", "persist", "p")
+                                .buildWith(GenericArguments.none())),
+                        GenericArguments.optionalWeak(GenericArguments.allOf(GenericArguments.user(Text.of("remove")))))
                 .build();
 
         final CommandSpec latchInfoCommand = CommandSpec.builder()
