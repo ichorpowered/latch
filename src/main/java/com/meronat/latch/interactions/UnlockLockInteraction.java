@@ -76,7 +76,7 @@ public class UnlockLockInteraction implements LockInteraction {
             }
 
             //If the password is correct we're returning true - but if it's a PASSWORD_ONCE need to add them to allowed members
-            if (lock.getLockType() == LockType.PASSWORD_ONCE) {
+            if (lock.getLockType() == LockType.PASSWORD_ONCE || lock.getLockType() == LockType.PASSWORD_ALWAYS) {
                 //Check for other locks
                 final ArrayList<Lock> locks = new ArrayList<>();
                 locks.add(lock);
@@ -88,6 +88,7 @@ public class UnlockLockInteraction implements LockInteraction {
                 if (optionalOtherBlock.isPresent()) {
                     otherBlockLock = Latch.getLockManager().getLock(optionalOtherBlock.get());
                 }
+
                 if (otherBlockLock.isPresent()) {
                     if (!otherBlockLock.get().getPassword().equalsIgnoreCase(this.password)) {
                         player.sendMessage(Text.of(TextColors.RED, "The adjacent lock does not have the same password."));
@@ -101,12 +102,15 @@ public class UnlockLockInteraction implements LockInteraction {
                     Latch.getLockManager().addLockAccess(thisLock, player.getUniqueId());
                     lock.updateLastAccessed();
                 }
+
                 player.sendMessage(Text.of(TextColors.DARK_GREEN, "Unlocking the password lock for future access."));
             }
+
             return true;
         } else {
             player.sendMessage(Text.of(TextColors.RED, "That is not a password lock."));
         }
+
         //Default state
         return false;
     }

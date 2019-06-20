@@ -204,6 +204,12 @@ public class InteractBlockListener {
                             }
                         }
                     }
+
+                    // Remove temporary access for password always locks.
+                    if (lock.getLockType() == LockType.PASSWORD_ALWAYS) {
+                        Latch.getLockManager().removeLockAccess(lock, player.getUniqueId());
+                    }
+
                     lock.updateLastAccessed();
                 }
             });
